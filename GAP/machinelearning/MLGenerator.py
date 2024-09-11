@@ -1,5 +1,12 @@
-# HANDWRITTEN DIGIT RECOGNITION
-# -------by ZlomenyMesic-------
+#
+#
+#
+#
+#          THIS IS JUST A TESTING PROGRAM
+#
+#
+#
+#
 
 # disable annoying warnings
 import os
@@ -10,6 +17,9 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.datasets import mnist
 import matplotlib.pyplot as plt
+
+EPOCHS = 1
+BATCH_SIZE = 128
 
 # test digit index
 TEST_INDEX = 1
@@ -42,12 +52,12 @@ test_images = test_images.reshape((10_000, 28 * 28))
 test_images = test_images.astype("float32") / 255
 
 # train the model
-model.fit(train_images, train_labels, epochs = 5, batch_size = 128)
+model.fit(train_images, train_labels, epochs = EPOCHS, batch_size = BATCH_SIZE, verbose = 0)
 
 
 # test the model with a selected testing digit
 test_digit = test_images[TEST_INDEX:(TEST_INDEX + 1)]
-predictions = model.predict(test_digit)
+predictions = model.predict(test_digit, verbose = 0)
 
 guess = predictions[0].argmax()
 confidence = predictions[0][guess]

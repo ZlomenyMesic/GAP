@@ -9,7 +9,10 @@ namespace GAP;
 
 class Program {
     static int Main() {
-        Console.WriteLine("Hello, World!");
+        //Console.WriteLine("Hello, World");
+
+        MLGenControl.RunGenerator();
+
         return 0;
     }
 }
