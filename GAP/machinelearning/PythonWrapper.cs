@@ -10,26 +10,30 @@ using System.Diagnostics;
 namespace GAP;
 
 internal static class PythonWrapper {
-    private static readonly string PY_EXE_PATH = $@"C:\Users\{Environment.UserName}\AppData\Local\Programs\Python\Python312\python.exe";
-    private static readonly string SCRIPT_PATH = $@"..\..\..\machinelearning\";
+    private static readonly string SCRIPT_DIR = $@"..\..\..\machinelearning\";
 
-    // uses the standard path for Python 3.12
     // script must be located in directory machinelearning
-    internal static string RunScript(string name, string args = "") {
+    internal static string RunPythonScript(string name, string args = "")
+         => RunProcess(GetPythonExecutablePath(), $"{SCRIPT_DIR}{name} {args}", false);
+
+    private static string GetPythonExecutablePath()
+        => RunProcess("cmd.exe", "python -c \"import sys; print(sys.executable)\"", true);
+
+    // cmd.exe arguments have to start with /c
+    private static string RunProcess(string name, string args, bool cmd) {
         ProcessStartInfo start = new() {
-            FileName = PY_EXE_PATH,
-            Arguments = $"{SCRIPT_PATH}{name} {args}",
+            FileName = name,
+            Arguments = $"{(cmd ? "/c " : "")}{args}",
             UseShellExecute = false,
             RedirectStandardOutput = true
         };
 
         using Process? process = Process.Start(start);
         if (process == null) {
-            Console.WriteLine($"script {name} failed");
+            Console.WriteLine($"running {name} failed");
             return string.Empty;
         }
 
-        using StreamReader reader = process.StandardOutput;
-        return reader.ReadToEnd();
+        return process.StandardOutput.ReadToEnd() ?? "";
     }
 }
