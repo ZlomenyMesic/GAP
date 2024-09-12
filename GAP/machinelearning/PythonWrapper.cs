@@ -14,20 +14,20 @@ internal static class PythonWrapper {
 
     // script must be located in directory machinelearning
     internal static string RunPythonScript(string name, string args = "")
-        => RunProcess("cmd.exe", $"python {SCRIPT_DIR}{name} {args}");
+        => ExecuteCMD($"python {SCRIPT_DIR}{name} {args}");
 
     // cmd.exe arguments have to start with /c
-    private static string RunProcess(string name, string args) {
+    private static string ExecuteCMD(string cmd) {
         ProcessStartInfo start = new() {
-            FileName = name,
-            Arguments = $"/c {args}",
+            FileName = "cmd.exe",
+            Arguments = $"/c {cmd}",
             UseShellExecute = false,
             RedirectStandardOutput = true
         };
 
         using Process? process = Process.Start(start);
         if (process == null) {
-            Console.WriteLine($"running {name} failed");
+            Console.WriteLine($"running cmd.exe failed");
             return string.Empty;
         }
 
