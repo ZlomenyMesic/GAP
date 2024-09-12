@@ -14,16 +14,13 @@ internal static class PythonWrapper {
 
     // script must be located in directory machinelearning
     internal static string RunPythonScript(string name, string args = "")
-         => RunProcess(GetPythonExecutablePath(), $"{SCRIPT_DIR}{name} {args}", false);
-
-    private static string GetPythonExecutablePath()
-        => RunProcess("cmd.exe", "python -c \"import sys; print(sys.executable)\"", true);
+        => RunProcess("cmd.exe", $"python {SCRIPT_DIR}{name} {args}");
 
     // cmd.exe arguments have to start with /c
-    private static string RunProcess(string name, string args, bool cmd) {
+    private static string RunProcess(string name, string args) {
         ProcessStartInfo start = new() {
             FileName = name,
-            Arguments = $"{(cmd ? "/c " : "")}{args}",
+            Arguments = $"/c {args}",
             UseShellExecute = false,
             RedirectStandardOutput = true
         };
