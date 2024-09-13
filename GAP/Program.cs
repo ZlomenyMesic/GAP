@@ -11,7 +11,7 @@ class Program {
     static int Main() {
         //Console.WriteLine("Hello, World");
 
-        MLGenControl.RunGenerator();
+        DeepDream.RunGenerator();
 
         return 0;
     }
