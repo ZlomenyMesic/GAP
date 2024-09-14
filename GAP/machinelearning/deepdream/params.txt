@@ -1,0 +1,8 @@
+coast.jpg
+https://img-datasets.s3.amazonaws.com/coast.jpg
+True
+20
+3
+1.4
+30
+2147483647
