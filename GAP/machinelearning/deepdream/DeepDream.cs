@@ -20,6 +20,7 @@ internal static class DeepDream {
     private static readonly string PARAMS = @"..\..\..\machinelearning\deepdream\params.txt";
     private static readonly string SCRIPT = @"deepdream\DeepDream.py";
 
+    // save the parameters into params.txt
     private static void WriteParameters() {
         using StreamWriter sw = new(PARAMS);
         sw.Write($"{IMG_NAME}\n" +
