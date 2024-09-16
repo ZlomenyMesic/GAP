@@ -15,7 +15,7 @@ internal static class MLGenControl {
     internal static void RunGenerator() {
         string args = "";
 
-        string output = PythonWrapper.RunScript(ML_GEN_SCRIPT_NAME, args);
+        string output = PythonWrapper.RunPythonScript(ML_GEN_SCRIPT_NAME, args);
 
         Console.WriteLine(output);
     }
