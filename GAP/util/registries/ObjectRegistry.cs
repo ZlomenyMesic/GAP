@@ -3,9 +3,10 @@
 //   by ZlomenyMesic & KryKom
 //
 
+using GAP.util.registries.exceptions;
 using Kolors;
 
-namespace GAP.util;
+namespace GAP.util.registries;
 
 /// <summary>
 /// registry for large amounts of instances of a class
@@ -13,7 +14,7 @@ namespace GAP.util;
 /// <typeparam name="T">type of stored object</typeparam>
 public abstract class ObjectRegistry<T> {
     
-    private static IDictionary<string, T> REGISTRY { get; } = new Dictionary<string, T>();
+    protected static IDictionary<string, T> REGISTRY { get; } = new Dictionary<string, T>();
     
     /// <summary>
     /// registers new object
@@ -21,22 +22,26 @@ public abstract class ObjectRegistry<T> {
     /// <param name="id">id of the instance</param>
     /// <param name="registeredItem">the instance</param>
     /// <returns>the instance with the id</returns>
-    public static T Register(string id, T registeredItem) {
+    protected static T Register(string id, T registeredItem) {
         
         if (REGISTRY.TryAdd(id, registeredItem)) return registeredItem;
-        Debug.error($"Could not add registry object \'{id}\' of type \'{registeredItem!.GetType()}\' to the registry! " +
-                    $"Object with the same id already exists.");
-        return registeredItem;
+        
+        throw new RegistryCouldNotAddException(id, registeredItem!.GetType());
+        
+        // Debug.error($"Could not add registry object \'{id}\' of type \'{registeredItem!.GetType()}\' to a registry! " +
+        //             $"Object with the same id already exists.");
+        // return registeredItem;
     }
 
     /// <summary>
     /// returns the registered object of <c>id</c>
     /// </summary>
-    public static T? Get(string id) {
+    protected static T? Get(string id) {
         if (REGISTRY.TryGetValue(id, out T? value)) {
             return value;
         }
         else {
+            throw new RegistryItemNotFoundException($"Could not find registry object '{id}'");
             Debug.error($"Could not find registry object \'{id}\'.");
             return default;
         }
