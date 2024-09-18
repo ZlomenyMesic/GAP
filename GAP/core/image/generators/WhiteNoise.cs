@@ -14,7 +14,15 @@ public class WhiteNoise : ImageGenerator {
     public override int width { get; }
     public override int height { get; }
     public override int seed { get; }
-    public bool grayscale { get; private set; }
+
+    public double hueFactor { get; private set; } = 1d;
+    public bool allowHueRandom { get; private set; }
+    public double saturationFactor { get; private set; } = 1d;
+    public bool allowSaturationRandom { get; private set; }
+    public double brightnessFactor { get; private set; } = 1d;
+    public bool allowBrightnessRandom { get; private set; }
+    
+    
     public ColorPalette palette { get; private set; }
 
     // private static SettingsBuilder SETTING = new SettingsBuilder();
@@ -23,6 +31,51 @@ public class WhiteNoise : ImageGenerator {
         this.width = width;
         this.height = height;
         this.seed = seed;
+    }
+
+    public WhiteNoise(int width, int height, int seed, WhiteNoisePresets presets) {
+        this.width = width;
+        this.height = height;
+        this.seed = seed;
+        switch (presets) {
+            case WhiteNoisePresets.GRAYSCALE:
+                allowHueRandom = true;
+                allowSaturationRandom = false;
+                saturationFactor = 0d;
+                allowBrightnessRandom = true;
+                break;
+            case WhiteNoisePresets.RANDOM_HUE:
+                allowHueRandom = true;
+                allowSaturationRandom = false;
+                allowBrightnessRandom = false;
+                break;
+            case WhiteNoisePresets.RANDOM_HUE_DARKNESS:
+                allowHueRandom = true;
+                allowSaturationRandom = false;
+                allowBrightnessRandom = true;
+                break;
+            case WhiteNoisePresets.FULL_RANDOM:
+                allowHueRandom = true;
+                allowSaturationRandom = true;
+                allowBrightnessRandom = true;
+                break;
+            default:
+                allowHueRandom = true;
+                allowSaturationRandom = true;
+                allowBrightnessRandom = true;
+                break;
+        }
+    }
+
+    public WhiteNoise(int width, int height, int seed, double hueFactor, double saturationFactor,
+        double brightnessFactor) {
+        
+        this.width = width;
+        this.height = height;
+        this.seed = seed;
+        this.hueFactor = hueFactor;
+        this.saturationFactor = saturationFactor;
+        this.brightnessFactor = brightnessFactor;
     }
 
     // public override SettingsBuilder GetSettings() {
@@ -38,21 +91,22 @@ public class WhiteNoise : ImageGenerator {
         Random random = new Random(seed);
         Bitmap image = new Bitmap(width, height);
         
-        if (grayscale) {
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    image.SetPixel(x, y, new Color());
-                }
-            }
-        }
-        else {
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    image.SetPixel(x, y, Color.White);
-                }
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                image.SetPixel(x, y, ColorFormat.ColorFromHsv(
+                    allowHueRandom ? hueFactor * random.NextDouble() * 360: hueFactor * 360, 
+                    allowSaturationRandom ? saturationFactor * random.NextDouble() : saturationFactor, 
+                    allowBrightnessRandom ? brightnessFactor * random.NextDouble(): brightnessFactor));
             }
         }
         
         return image;
     }
+}
+
+public enum WhiteNoisePresets {
+    FULL_RANDOM,
+    RANDOM_HUE,
+    RANDOM_HUE_DARKNESS,
+    GRAYSCALE
 }
