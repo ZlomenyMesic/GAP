@@ -4,16 +4,15 @@
 //
 
 using System.Drawing;
-using GAP.core.input;
-using GAP.util;
+using System.Text.Json;
 using Kolors;
 
-namespace GAP.core.image.generators;
+namespace GAP.core.image.generation.generators;
 
-public class WhiteNoise : ImageGenerator {
-    public override int width { get; }
-    public override int height { get; }
-    public override int seed { get; }
+public sealed class WhiteNoise : ImageGenerator {
+    public override int width { get; protected set; }
+    public override int height { get; protected set; }
+    public override int seed { get; protected set; }
 
     public double hueFactor { get; private set; } = 1d;
     public bool allowHueRandom { get; private set; }
@@ -22,12 +21,7 @@ public class WhiteNoise : ImageGenerator {
     public double brightnessFactor { get; private set; } = 1d;
     public bool allowBrightnessRandom { get; private set; }
     
-    
-    public ColorPalette palette { get; private set; }
-
-    // private static SettingsBuilder SETTING = new SettingsBuilder();
-    
-    public WhiteNoise(int width, int height, int seed/*, Settings settings*/) {
+    public WhiteNoise(int width, int height, int seed) {
         this.width = width;
         this.height = height;
         this.seed = seed;
@@ -78,15 +72,18 @@ public class WhiteNoise : ImageGenerator {
         this.brightnessFactor = brightnessFactor;
     }
 
-    // public override SettingsBuilder GetSettings() {
-    //     return SETTING;
-    // }
-
-    public override ImageGenerator GetInstance(int width, int height, int seed/*, Settings settings*/) {
-        return new WhiteNoise(width, height, seed/*, settings*/);
+    private void Copy(WhiteNoise whiteNoise) {
+        width = whiteNoise.width;
+        height = whiteNoise.height;
+        seed = whiteNoise.seed;
+        allowHueRandom = whiteNoise.allowHueRandom;
+        hueFactor = whiteNoise.hueFactor;
+        saturationFactor = whiteNoise.saturationFactor;
+        allowSaturationRandom = whiteNoise.allowSaturationRandom;
+        brightnessFactor = whiteNoise.brightnessFactor;
+        allowBrightnessRandom = whiteNoise.allowBrightnessRandom;
     }
 
-    // Todo finish fuckin generation!!!
     public override Bitmap GenerateImage() {
         Random random = new Random(seed);
         Bitmap image = new Bitmap(width, height);
@@ -101,6 +98,20 @@ public class WhiteNoise : ImageGenerator {
         }
         
         return image;
+    }
+
+    public override void LoadFromJson(string settings) {
+        WhiteNoise? wiener = JsonSerializer.Deserialize<WhiteNoise>(settings) ?? null;
+        
+        if (wiener == null) {
+            throw new JsonException("Deserialization of settings of WhiteNoise failed");
+        }
+        
+        Copy(wiener);
+    }
+
+    public override string ToString() {
+        return JsonSerializer.Serialize(this);
     }
 }
 

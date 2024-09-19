@@ -22,25 +22,26 @@ public abstract class ClassRegistry<T> {
     /// <param name="id">id of the reference</param>
     /// <param name="registeredType">the reference</param>
     /// <returns>the reference</returns>
-    /// <exception cref="ArgumentException">when base class of <c>typeof(registeredType)</c> does not match <c>T</c></exception>
+    /// <exception cref="RegistryInvalidTypeException">
+    /// when base class of <c>typeof(registeredType)</c> does not match <c>T</c>
+    /// </exception>
+    /// <exception cref="RegistryCouldNotAddException">
+    /// if failed to add the type due to a type with the same id already registered
+    /// </exception>
     protected static Type BaseRegister(string id, Type registeredType) {
         if (registeredType.BaseType != typeof(T)) {
-            Debug.error($"Registering type {registeredType.FullName} is not a {typeof(T).FullName}");
-            throw new ArgumentException();
+            throw new RegistryInvalidTypeException(registeredType, typeof(T));
         }
         
         if (REGISTRY.TryAdd(id, registeredType)) return registeredType;
         
         throw new RegistryCouldNotAddException(id, registeredType);
-        
-        // Debug.error($"Could not add registry object \'{id}\' of type \'{registeredType}\' to a registry! " +
-        //             $"Object with the same id already exists.");
-        // return registeredType;
     }
 
     /// <summary>
     /// returns a new instance of a type stored behind id
     /// </summary>
+    /// <exception cref="RegistryItemNotFoundException">if desired object is not found</exception>
     protected static T? BaseGetInstance(string id, params object[] args) {
         T? instance = default;
         
@@ -49,8 +50,6 @@ public abstract class ClassRegistry<T> {
         }
         else {
             throw new RegistryItemNotFoundException($"Could not find registry object \'{id}\'.");
-            Debug.error($"Could not find registry object \'{id}\'.");
-            return default;
         }
         
         return instance;

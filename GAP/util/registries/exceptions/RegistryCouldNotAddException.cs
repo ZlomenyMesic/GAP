@@ -1,3 +1,8 @@
+//
+// GAP - Generative Art Producer
+//   by ZlomenyMesic & KryKom
+//
+
 namespace GAP.util.registries.exceptions;
 
 public class RegistryCouldNotAddException : Exception {

@@ -1,5 +1,5 @@
 //
-// made for VoxelsCoreSharp
+// made for VoxelsCoreSharp and gap-core
 // by KryKom and ChatGPT
 //
 

@@ -4,7 +4,6 @@
 //
 
 using GAP.util.registries.exceptions;
-using Kolors;
 
 namespace GAP.util.registries;
 
@@ -22,28 +21,25 @@ public abstract class ObjectRegistry<T> {
     /// <param name="id">id of the instance</param>
     /// <param name="registeredItem">the instance</param>
     /// <returns>the instance with the id</returns>
+    /// <exception cref="RegistryCouldNotAddException">
+    /// if an object with the same id has already been registered
+    /// </exception>
     protected static T Register(string id, T registeredItem) {
         
         if (REGISTRY.TryAdd(id, registeredItem)) return registeredItem;
         
         throw new RegistryCouldNotAddException(id, registeredItem!.GetType());
-        
-        // Debug.error($"Could not add registry object \'{id}\' of type \'{registeredItem!.GetType()}\' to a registry! " +
-        //             $"Object with the same id already exists.");
-        // return registeredItem;
     }
 
     /// <summary>
     /// returns the registered object of <c>id</c>
     /// </summary>
-    protected static T? Get(string id) {
+    /// <exception cref="RegistryItemNotFoundException">if desired object is not found</exception>
+    protected static T Get(string id) {
         if (REGISTRY.TryGetValue(id, out T? value)) {
             return value;
         }
-        else {
-            throw new RegistryItemNotFoundException($"Could not find registry object '{id}'");
-            Debug.error($"Could not find registry object \'{id}\'.");
-            return default;
-        }
+
+        throw new RegistryItemNotFoundException($"Could not find registry object '{id}'");
     }
 }

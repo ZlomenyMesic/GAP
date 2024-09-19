@@ -1,9 +1,13 @@
-using GAP.core.image.generators;
-using GAP.core.input;
+//
+// GAP - Generative Art Producer
+//   by ZlomenyMesic & KryKom
+//
+
+using GAP.core.image.generation.generators;
 using GAP.util.registries;
 using Kolors;
 
-namespace GAP.core.image;
+namespace GAP.core.image.generation;
 
 public abstract class ImageGeneratorRegistry : ClassRegistry<ImageGenerator> {
 
