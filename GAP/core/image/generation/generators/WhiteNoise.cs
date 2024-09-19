@@ -14,12 +14,12 @@ public sealed class WhiteNoise : ImageGenerator {
     public override int height { get; protected set; }
     public override int seed { get; protected set; }
 
-    public double hueFactor { get; private set; } = 1d;
-    public bool allowHueRandom { get; private set; }
-    public double saturationFactor { get; private set; } = 1d;
-    public bool allowSaturationRandom { get; private set; }
-    public double brightnessFactor { get; private set; } = 1d;
-    public bool allowBrightnessRandom { get; private set; }
+    public double hueFactor { get; set; } = 1d;
+    public bool allowHueRandom { get; set; }
+    public double saturationFactor { get; set; } = 1d;
+    public bool allowSaturationRandom { get; set; }
+    public double brightnessFactor { get; set; } = 1d;
+    public bool allowBrightnessRandom { get; set; }
     
     public WhiteNoise(int width, int height, int seed) {
         this.width = width;
