@@ -1,8 +1,9 @@
-coast.jpg
-https://img-datasets.s3.amazonaws.com/coast.jpg
+input.jpg
+..\..\..\machinelearning\deepdream\input.jpg
+0
 True
 20
-3
-1,4
-30
+8
+1.3
+35
 2147483647

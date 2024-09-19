@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # number of parameters passed in params.txt
-PARAMS_LEN = 8
+PARAMS_LEN = 9
 
 # neural network model pretrained on imagenet database
 # used to save time and work, training a network ourselves would be inefficient
@@ -26,10 +26,17 @@ model = inception_v3.InceptionV3(weights = "imagenet", include_top = False)
 
 # importances of different layers
 layer_settings = {
-    "mixed4": 1.0,
-    "mixed5": 1.5,
-    "mixed6": 2.0,
-    "mixed7": 2.5,
+    "mixed0": 12.0,
+    "mixed1": 8.0,
+    "mixed2": 3.0,
+    "mixed3": 2.0,
+    "mixed4": 2.0,
+    "mixed5": 2.5,
+    "mixed6": 3.5,
+    "mixed7": 5.5,
+    "mixed8": 8.0,
+    "mixed9": 15.0,
+    "mixed10": 25.0
 }
 
 outputs_dict = dict(
@@ -53,27 +60,32 @@ def read_params_file():
 
 # update the local variables depending on the imported parameters
 def import_params():
-    global IMG_NAME, IMG_ORIGIN, VERBOSE, LEARNING_RATE, NUM_OCTAVE, OCTAVE_SCALE, ITERATIONS, MAX_LOSS
+    global IMG_NAME, IMG_ORIGIN, IMG_ORIGIN_FORMAT, VERBOSE, LEARNING_RATE, OCTAVES, OCT_SCALE, ITERATIONS, MAX_LOSS
     params = read_params_file()
 
-    IMG_NAME = "coast.jpg"
-    IMG_ORIGIN = "https://img-datasets.s3.amazonaws.com/coast.jpg"
+    IMG_NAME = params[0]
+    IMG_ORIGIN = params[1]
+    IMG_ORIGIN_FORMAT = int(params[2])
 
-    VERBOSE = params[2] == "True"
-    LEARNING_RATE = float(params[3])
-    NUM_OCTAVE = int(params[4])
-    OCTAVE_SCALE = float(params[5])
-    ITERATIONS = int(params[6])
-    MAX_LOSS = float(params[7])
+    VERBOSE = params[3] == "True"
+    LEARNING_RATE = float(params[4])
+    OCTAVES = int(params[5])
+    OCT_SCALE = float(params[6])
+    ITERATIONS = int(params[7])
+    MAX_LOSS = float(params[8])
 
 # used to download the image
-def get_file(name, origin):
+def get_url_file(name, origin):
     return keras.utils.get_file(name, origin = origin)
 
 # returns the image and its shape
-def get_img_shape(name, origin):
-    base_image_path = get_file(name, origin)
-    o_img = preprocess_image(base_image_path)
+# origin format: 0 = file path, 1 = url
+def get_img_shape(name, origin, format):
+    img_path = origin
+    if format == 1:
+        img_path = get_url_file(name, origin)
+
+    o_img = preprocess_image(img_path)
     o_shape = o_img.shape[1:3]
     return o_img, o_shape
 
@@ -98,8 +110,8 @@ def deprocess_image(img):
 # (during each octave, the image resolution is multiplied by OCTAVE_SCALE)
 def calculate_consecutive_shapes(original):
     shapes = [original]
-    for i in range(1, NUM_OCTAVE):
-        shape = tuple([int(dim / (OCTAVE_SCALE ** i)) for dim in original])
+    for i in range(1, OCTAVES):
+        shape = tuple([int(dim / (OCT_SCALE ** i)) for dim in original])
         shapes.append(shape)
     return shapes[::-1]
 
@@ -162,14 +174,14 @@ def loop_octaves(original_img, original_shape):
         shrunk_original_img = tf.image.resize(original_img, shape)
     return img
 
-# simplifying function
-def generate(img_name, img_origin):
-    o_img, o_shape = get_img_shape(img_name, img_origin)
+# wrapper function
+def generate(img_name, img_origin, img_origin_format):
+    o_img, o_shape = get_img_shape(img_name, img_origin, img_origin_format)
     return loop_octaves(o_img, o_shape)
 
 import_params()
 
-output_img = generate(IMG_NAME, IMG_ORIGIN)
+output_img = generate(IMG_NAME, IMG_ORIGIN, IMG_ORIGIN_FORMAT)
 
 # save the output image
 keras.utils.save_img(r"..\..\..\machinelearning\deepdream\output\dream.png", deprocess_image(output_img.numpy()))
