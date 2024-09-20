@@ -10,9 +10,9 @@ using Kolors;
 namespace GAP.core.image.generation.generators;
 
 public sealed class WhiteNoise : ImageGenerator {
-    public override int width { get; protected set; }
-    public override int height { get; protected set; }
-    public override int seed { get; protected set; }
+    public override int width { get; set; }
+    public override int height { get; set; }
+    public override int seed { get; set; }
 
     public double hueFactor { get; set; } = 1d;
     public bool allowHueRandom { get; set; }
@@ -26,6 +26,8 @@ public sealed class WhiteNoise : ImageGenerator {
         this.height = height;
         this.seed = seed;
     }
+    
+    public WhiteNoise() { }
 
     public WhiteNoise(int width, int height, int seed, WhiteNoisePresets presets) {
         this.width = width;
