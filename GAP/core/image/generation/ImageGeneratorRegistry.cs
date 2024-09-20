@@ -3,6 +3,7 @@
 //   by ZlomenyMesic & KryKom
 //
 
+using System.Reflection;
 using GAP.core.image.generation.generators;
 using GAP.util.registries;
 using Kolors;
@@ -15,24 +16,36 @@ public abstract class ImageGeneratorRegistry : ClassRegistry<ImageGenerator> {
         return BaseRegister(id, type);
     }
     
-    public static ImageGenerator GetInstance(string id, int width, int height, int seed/*, Settings settings*/) {
-        ImageGenerator instance;
-        
+    public static ImageGenerator GetInstance(string id, string jsonSettings) {
         Debug.info(REGISTRY.Count.ToString());
         
         if (REGISTRY.TryGetValue(id, out Type? value)) {
-            if (value != null) 
-                instance = (ImageGenerator)Activator.CreateInstance(value, width, height, seed/*, settings*/)!;
+            if (value != null) {
+                
+                ImageGenerator? instance = (ImageGenerator?)Activator.CreateInstance(value);
+                if (instance == null) {
+                    throw new NullReferenceException($"Failed to create instance of type {value}");
+                }
+                
+                MethodInfo? method = value.GetMethod("LoadFromJson");
+                if (method == null) {
+                    throw new NullReferenceException($"Can't find method LoadFromJson in type {value}"); 
+                }
+                
+                instance.LoadFromJson(jsonSettings);
+                return instance;
+            }
             else throw new NullReferenceException(
                 "Cannot create an instance of ImageGenerator. Requested type is null.");
         }
         else {
-            // Debug.error($"Could not find registry object \'{id}\'.");
             throw new KeyNotFoundException($"Could not find registry object \'{id}\'.");
         }
-        
-        return instance;
     }
-    
-    public static readonly Type WHITE_NOISE = Register("gap:white_noise", typeof(WhiteNoise));
+
+    static ImageGeneratorRegistry() {
+        WHITE_NOISE = Register("gap:white_noise", typeof(WhiteNoise));
+    }
+
+    public static readonly Type WHITE_NOISE;
 }
