@@ -24,19 +24,21 @@ PARAMS_LEN = 9
 # used to save time and work, training a network ourselves would be inefficient
 model = inception_v3.InceptionV3(weights = "imagenet", include_top = False)
 
-# importances of different layers
+#print([layer.name for layer in model.layers])
+
+# activations of different layers
 layer_settings = {
-    "mixed0": 12.0,
-    "mixed1": 8.0,
-    "mixed2": 3.0,
-    "mixed3": 2.0,
-    "mixed4": 2.0,
-    "mixed5": 2.5,
-    "mixed6": 3.5,
-    "mixed7": 5.5,
-    "mixed8": 8.0,
-    "mixed9": 15.0,
-    "mixed10": 25.0
+    "mixed0": 0.0,
+    "mixed1": 0.0,
+    "mixed2": 0.0,
+    "mixed3": 0.0,
+    "mixed4": 0.0,
+    "mixed5": 5.0,
+    "mixed6": 0.0,
+    "mixed7": 0.0,
+    "mixed8": 0.0,
+    "mixed9": 0.0,
+    "mixed10": 0.0
 }
 
 outputs_dict = dict(

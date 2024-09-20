@@ -10,45 +10,60 @@ namespace GAP;
 internal static class DeepDream {
     // not necessary when using a file path, however, when using
     // an URL, image name has to be specified, e. g. "image.jpg"
-    private static readonly string IMG_NAME = "input.jpg";
+    internal static string ImageName { get; set; } = "input.jpg";
 
 
     // the origin of the image; can either be a file path (both
     // absolute and relative) or an URL link (both including name)
     // e. g. "https://img-datasets.s3.amazonaws.com/coast.jpg"
-    private static readonly string IMG_ORIGIN = @"..\..\..\machinelearning\deepdream\input.jpg";
+    internal static string ImageOrigin { get; set; } = @"..\..\..\machinelearning\deepdream\input.jpg";
 
 
     // format of the image origin:
     // 0 = file path; 1 = URL link
-    private static readonly int IMG_ORIGIN_FORMAT = 0;
+    internal static int ImageOriginFormat { get; set; } = 0;
 
 
     // print interim results during the training process, includes
     // current octave and iteration info + current loss value
-    private static readonly bool VERBOSE = true;
+    internal static bool Verbose { get; set; } = true;
 
 
-    // rate at which the image gets distorted (theoretically not a "learning rate")
-    private static readonly float LEARNING_RATE = 20.0f;
+    // rate at which the image gets distorted
+    internal static float DistortionRate { get; set; } = 20.0f;
 
 
     // total number of octaves (loops), each octave
     // involves image resizing + adding "dream effect"
-    private static readonly int OCTAVES = 8;
+    internal static int Octaves { get; set; } = 8;
 
 
     // ration of image resizing, e. g. 1.4f => resolution 40 % larger
-    private static readonly float OCTAVE_SCALE = 1.3f;
+    internal static float OctaveScale { get; set; } = 1.3f;
 
 
     // number of iterations per octave
-    private static readonly int ITERATIONS = 35;
+    internal static int Iterations { get; set; } = 5;
 
 
     // maximum loss cap per octave, ensures the dream effect doesn't
     // get too strong; for better effect, no cap is recommended
-    private static readonly int MAX_LOSS = int.MaxValue;    // maximum loss cap per octave
+    internal static int MaxLoss { get; set; } = int.MaxValue;
+
+
+    // activations of different layers
+    // 
+    internal static float Mixed0 { get; set; } = 12.0f;
+    internal static float Mixed1 { get; set; } = 8.0f;
+    internal static float Mixed2 { get; set; } = 3.0f;
+    internal static float Mixed3 { get; set; } = 2.0f;
+    internal static float Mixed4 { get; set; } = 2.0f;
+    internal static float Mixed5 { get; set; } = 2.5f;
+    internal static float Mixed6 { get; set; } = 3.5f;
+    internal static float Mixed7 { get; set; } = 5.5f;
+    internal static float Mixed8 { get; set; } = 8.0f;
+    internal static float Mixed9 { get; set; } = 15.0f;
+    internal static float Mixed10 { get; set; } = 25.0f;
 
 
     private static readonly string PARAMS = @"..\..\..\machinelearning\deepdream\params.txt";
@@ -59,7 +74,7 @@ internal static class DeepDream {
     // python; changing the order also has to be done in DeepDream.py
     private static void SaveParameters() {
         using StreamWriter sw = new(PARAMS);
-        sw.Write($"{IMG_NAME}\n{IMG_ORIGIN}\n{IMG_ORIGIN_FORMAT}\n{VERBOSE}\n{LEARNING_RATE}\n{OCTAVES}\n{OCTAVE_SCALE}\n{ITERATIONS}\n{MAX_LOSS}");
+        sw.Write($"{ImageName}\n{ImageOrigin}\n{ImageOriginFormat}\n{Verbose}\n{DistortionRate}\n{Octaves}\n{OctaveScale}\n{Iterations}\n{MaxLoss}");
     }
 
     // simple wrapper function
