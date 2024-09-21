@@ -14,7 +14,7 @@ public class Grid : ImageTransformer {
     public uint scaleFactor { get; set; }
     
 
-    public Grid(int seed, uint scaleFactor, InterpolationType interpolationType = InterpolationType.LINEAR) {
+    public Grid(int seed, uint scaleFactor) {
 
         if (scaleFactor == 0) throw new ArgumentException("Scale factor for Grid transform must be greater than zero");
 
