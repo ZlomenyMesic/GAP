@@ -12,7 +12,6 @@ namespace GAP.core.image.transformation.transformers;
 public class Grid : ImageTransformer {
     public sealed override int seed { get; set; }
     public uint scaleFactor { get; set; }
-    public InterpolationType interpolationType { get; set; }
     
 
     public Grid(int seed, uint scaleFactor, InterpolationType interpolationType = InterpolationType.LINEAR) {
@@ -21,7 +20,6 @@ public class Grid : ImageTransformer {
 
         this.seed = seed;
         this.scaleFactor = scaleFactor;
-        this.interpolationType = interpolationType;
     }
     
     public override Bitmap TransformImage(Bitmap image) {
@@ -44,7 +42,6 @@ public class Grid : ImageTransformer {
     private void Copy(Grid grid) {
         seed = grid.seed;
         scaleFactor = grid.scaleFactor;
-        interpolationType = grid.interpolationType;
     }
 
     public override void LoadFromJson(string settings) {
