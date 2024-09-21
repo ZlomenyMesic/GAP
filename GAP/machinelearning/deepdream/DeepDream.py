@@ -5,7 +5,6 @@
 #      founded 11.9.2024
 #
 
-
 # disable annoying warnings
 import os
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
@@ -18,37 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # number of parameters passed in params.txt
-PARAMS_LEN = 9
-
-# neural network model pretrained on imagenet database
-# used to save time and work, training a network ourselves would be inefficient
-model = inception_v3.InceptionV3(weights = "imagenet", include_top = False)
-
-#print([layer.name for layer in model.layers])
-
-# activations of different layers
-layer_settings = {
-    "mixed0": 0.0,
-    "mixed1": 0.0,
-    "mixed2": 0.0,
-    "mixed3": 0.0,
-    "mixed4": 0.0,
-    "mixed5": 5.0,
-    "mixed6": 0.0,
-    "mixed7": 0.0,
-    "mixed8": 0.0,
-    "mixed9": 0.0,
-    "mixed10": 0.0
-}
-
-outputs_dict = dict(
-    [
-        (layer.name, layer.output)
-        for layer in [model.get_layer(name) for name in layer_settings.keys()]
-    ]
-)
-
-feature_extractor = keras.Model(inputs = model.inputs, outputs = outputs_dict)
+PARAMS_LEN = 13
 
 # read the content of params.txt and split it into separate lines
 # each line represents a single parameter
@@ -62,19 +31,24 @@ def read_params_file():
 
 # update the local variables depending on the imported parameters
 def import_params():
-    global IMG_NAME, IMG_ORIGIN, IMG_ORIGIN_FORMAT, VERBOSE, LEARNING_RATE, OCTAVES, OCT_SCALE, ITERATIONS, MAX_LOSS
+    global IMG_NAME, IMG_ORIGIN, IMG_ORIGIN_FORMAT, OUTPUT_PATH, VERBOSE, LEARNING_RATE, OCTAVES, OCT_SCALE, ITERATIONS, MAX_LOSS, CUR_LAYER, CUR_LAYER_ACTIVATION, ITER_NUM
     params = read_params_file()
 
     IMG_NAME = params[0]
     IMG_ORIGIN = params[1]
     IMG_ORIGIN_FORMAT = int(params[2])
+    OUTPUT_PATH = params[3]
 
-    VERBOSE = params[3] == "True"
-    LEARNING_RATE = float(params[4])
-    OCTAVES = int(params[5])
-    OCT_SCALE = float(params[6])
-    ITERATIONS = int(params[7])
-    MAX_LOSS = float(params[8])
+    VERBOSE = params[4] == "True"
+    LEARNING_RATE = float(params[5])
+    OCTAVES = int(params[6])
+    OCT_SCALE = float(params[7])
+    ITERATIONS = int(params[8])
+    MAX_LOSS = float(params[9])
+
+    CUR_LAYER = params[10]
+    CUR_LAYER_ACTIVATION = int(params[11])
+    ITER_NUM = int(params[12])
 
 # used to download the image
 def get_url_file(name, origin):
@@ -148,9 +122,6 @@ def gradient_ascent_loop(image, iterations, learning_rate, max_loss):
         loss, image = gradient_ascent_step(image, learning_rate)
         if max_loss is not None and loss > max_loss:
             break
-
-        if VERBOSE:
-            print(f"loss value at step {i + 1}: {loss:.2f}")
     return image
 
 # the main cycle, loops NUM_OCTAVE times
@@ -162,7 +133,7 @@ def loop_octaves(original_img, original_shape):
 
     for i, shape in enumerate(consecutive_shapes):
         if VERBOSE:
-            print(f"processing octave {i + 1} with shape {shape}")
+            print(f"   octave {i + 1}/{OCTAVES} with shape {shape}")
 
         # resize the image and apply "dream effect"
         img = tf.image.resize(img, shape)
@@ -183,7 +154,38 @@ def generate(img_name, img_origin, img_origin_format):
 
 import_params()
 
+# neural network model pretrained on imagenet database
+# used to save time and work, training a network ourselves would be inefficient
+model = inception_v3.InceptionV3(weights = "imagenet", include_top = False)
+
+#print([layer.name for layer in model.layers])
+
+# activations of different layers
+layer_settings = {
+    CUR_LAYER: CUR_LAYER_ACTIVATION
+}
+if VERBOSE:
+    print(f"iteration: {ITER_NUM}, layer name: {CUR_LAYER}, layer activation: {CUR_LAYER_ACTIVATION}")
+
+outputs_dict = dict(
+    [
+        (layer.name, layer.output)
+        for layer in [model.get_layer(name) for name in layer_settings.keys()]
+    ]
+)
+
+feature_extractor = keras.Model(inputs = model.inputs, outputs = outputs_dict)
+
 output_img = generate(IMG_NAME, IMG_ORIGIN, IMG_ORIGIN_FORMAT)
 
 # save the output image
-keras.utils.save_img(r"..\..\..\machinelearning\deepdream\output\dream.png", deprocess_image(output_img.numpy()))
+keras.utils.save_img(fr"..\..\..\machinelearning\deepdream\output\dream.png", deprocess_image(output_img.numpy()))
+
+# create a file named after the current iteration number
+# this lets the main C# program know that the work here is done
+f = open(fr"..\..\..\machinelearning\deepdream\output\{ITER_NUM}", "w")
+f.close()
+
+
+if VERBOSE:
+    print("\n")

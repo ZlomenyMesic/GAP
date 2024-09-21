@@ -1,9 +1,13 @@
-input.jpg
-..\..\..\machinelearning\deepdream\input.jpg
+dream.png
+..\..\..\machinelearning\deepdream\output\dream.png
 0
+..\..\..\machinelearning\deepdream\output\dream.png
 True
 20
 8
 1.3
 5
 2147483647
+mixed3
+15
+4
