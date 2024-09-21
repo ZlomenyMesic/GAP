@@ -5,7 +5,6 @@
 
 using System.Drawing;
 using System.Text.Json;
-using GAP.util.math;
 
 namespace GAP.core.image.transformation.transformers;
 
