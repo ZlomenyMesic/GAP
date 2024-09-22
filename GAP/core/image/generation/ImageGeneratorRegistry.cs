@@ -22,15 +22,11 @@ public abstract class ImageGeneratorRegistry : ClassRegistry<ImageGenerator> {
         if (REGISTRY.TryGetValue(id, out Type? value)) {
             if (value != null) {
                 
-                ImageGenerator? instance = (ImageGenerator?)Activator.CreateInstance(value);
-                if (instance == null) {
-                    throw new NullReferenceException($"Failed to create instance of type {value}");
-                }
+                ImageGenerator? instance = (ImageGenerator?)Activator.CreateInstance(value)
+                    ?? throw new NullReferenceException($"Failed to create instance of type {value}");
                 
-                MethodInfo? method = value.GetMethod("LoadFromJson");
-                if (method == null) {
-                    throw new NullReferenceException($"Can't find method LoadFromJson in type {value}"); 
-                }
+                MethodInfo? method = value.GetMethod("LoadFromJson")
+                    ?? throw new NullReferenceException($"Can't find method LoadFromJson in type {value}"); 
                 
                 instance.LoadFromJson(jsonSettings);
                 return instance;

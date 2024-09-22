@@ -14,7 +14,6 @@ class Program {
     static int Main() {
         //Console.WriteLine("Hello, World");
 
-        //DeepDream.RunGenerator();
         DeepDream.RunGeneratorRandom(4);
 
         return 0;
