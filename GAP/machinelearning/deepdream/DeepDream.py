@@ -5,7 +5,6 @@
 #      founded 11.9.2024
 #
 
-
 # disable annoying warnings
 import os
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
@@ -18,37 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # number of parameters passed in params.txt
-PARAMS_LEN = 9
-
-# neural network model pretrained on imagenet database
-# used to save time and work, training a network ourselves would be inefficient
-model = inception_v3.InceptionV3(weights = "imagenet", include_top = False)
-
-#print([layer.name for layer in model.layers])
-
-# activations of different layers
-layer_settings = {
-    "mixed0": 0.0,
-    "mixed1": 0.0,
-    "mixed2": 0.0,
-    "mixed3": 0.0,
-    "mixed4": 0.0,
-    "mixed5": 5.0,
-    "mixed6": 0.0,
-    "mixed7": 0.0,
-    "mixed8": 0.0,
-    "mixed9": 0.0,
-    "mixed10": 0.0
-}
-
-outputs_dict = dict(
-    [
-        (layer.name, layer.output)
-        for layer in [model.get_layer(name) for name in layer_settings.keys()]
-    ]
-)
-
-feature_extractor = keras.Model(inputs = model.inputs, outputs = outputs_dict)
+PARAMS_LEN = 13
 
 # read the content of params.txt and split it into separate lines
 # each line represents a single parameter
@@ -62,19 +31,24 @@ def read_params_file():
 
 # update the local variables depending on the imported parameters
 def import_params():
-    global IMG_NAME, IMG_ORIGIN, IMG_ORIGIN_FORMAT, VERBOSE, LEARNING_RATE, OCTAVES, OCT_SCALE, ITERATIONS, MAX_LOSS
+    global IMG_NAME, IMG_ORIGIN, IMG_ORIGIN_FORMAT, OUTPUT_PATH, VERBOSE, DISTORTION_RATE, OCTAVES, OCT_SCALE, ITERATIONS, MAX_LOSS, CUR_LAYER, CUR_LAYER_ACTIVATION, ITER_NUM
     params = read_params_file()
 
     IMG_NAME = params[0]
     IMG_ORIGIN = params[1]
     IMG_ORIGIN_FORMAT = int(params[2])
+    OUTPUT_PATH = params[3]
 
-    VERBOSE = params[3] == "True"
-    LEARNING_RATE = float(params[4])
-    OCTAVES = int(params[5])
-    OCT_SCALE = float(params[6])
-    ITERATIONS = int(params[7])
-    MAX_LOSS = float(params[8])
+    VERBOSE = params[4] == "True"
+    DISTORTION_RATE = float(params[5])
+    OCTAVES = int(params[6])
+    OCT_SCALE = float(params[7])
+    ITERATIONS = int(params[8])
+    MAX_LOSS = float(params[9])
+
+    CUR_LAYER = params[10]
+    CUR_LAYER_ACTIVATION = int(params[11])
+    ITER_NUM = int(params[12])
 
 # used to download the image
 def get_url_file(name, origin):
@@ -119,56 +93,92 @@ def calculate_consecutive_shapes(original):
 
 # loss function
 def calculate_loss(input_image):
+    # features is just a fancy name for the extracted layers
+    # this processes the input image with the given layers
     features = feature_extractor(input_image)
+
     loss = tf.zeros(shape=())
 
+    # loop through the extracted features (in our case just a single layer)
     for name in features.keys():
+        # coefficient - how much it should affect the final image
         coefficient = layer_settings[name]
+
+        # activations on the current extracted layer
         activation = features[name]
 
+        # crop/trim off the edges & square the activations
+        sq_act = tf.square(activation[: 2:-2, 2:-2, :]);
+
+        # calculate the mean (average) of the squared activations
+        mean = tf.reduce_mean(sq_act)
+
+        # update the loss value
         loss += coefficient * tf.reduce_mean(tf.square(activation[:, 2:-2, 2:-2, :]))
     return loss
 
-# single gradient ascent step
-# the goal is to maximize the loss function
+# as opposed to most neural networks, we actually try to maximize the 
+# loss function instead of minimizing it. this is called gradient ascent
 @tf.function
-def gradient_ascent_step(image, learning_rate):
+def gradient_ascent_step(image, distortion_rate):
+    # GradientTape record all tensor operations made with the image.
+    # it is a very useful tool for automatic differentiation
     with tf.GradientTape() as tape:
         tape.watch(image)
         loss = calculate_loss(image)
 
+    # retroactively calculate the loss gradient with respect to the different parts of the image
     gradients = tape.gradient(loss, image)
+
+    # without normalizing the gradients, layers with lower activations would become unnoticeable
     gradients = tf.math.l2_normalize(gradients)
-    image += learning_rate * gradients
+
+    # update the image using the calculated gradients
+    image += distortion_rate * gradients
     return loss, image
 
 # loop repeats NUM_OCTAVE times with ITERATIONS steps
-def gradient_ascent_loop(image, iterations, learning_rate, max_loss):
+def gradient_ascent_loop(image, iterations, distortion_rate, max_loss):
     for i in range(iterations):
-        loss, image = gradient_ascent_step(image, learning_rate)
-        if max_loss is not None and loss > max_loss:
-            break
+        loss, image = gradient_ascent_step(image, distortion_rate)
 
-        if VERBOSE:
-            print(f"loss value at step {i + 1}: {loss:.2f}")
+        # break the loop when maximum allowed loss is met
+        if max_loss is not None and loss >= max_loss:
+            break
     return image
 
-# the main cycle, loops NUM_OCTAVE times
-# image resolution gets gradually bigger and "dream effect" gets applied using gradient ascent loop
+# this is the main loop. the idea is that first smaller and smaller
+# versions of the original image are calculated and then consecutively
+# put together. this means that in the first octave the image starts
+# on the lowest resolution and progressively gets larger each octave
+# until reaching the original size on the last octave. during each 
+# octave, the "dream effect" also gets applied. the reason for changing
+# the resolution is that the dream patterns will not be the same size.
 def loop_octaves(original_img, original_shape):
+    # calculate the consecutive sizes going from the smallest to largest
     consecutive_shapes = calculate_consecutive_shapes(original_shape)
+
+    # create a copy of the original image with the initial (smallest) resolution
     shrunk_original_img = tf.image.resize(original_img, consecutive_shapes[0])
+
+    # clone the original image
     img = tf.identity(original_img)
 
     for i, shape in enumerate(consecutive_shapes):
         if VERBOSE:
-            print(f"processing octave {i + 1} with shape {shape}")
+            print(f"   octave {i + 1}/{OCTAVES} with shape {shape}")
 
-        # resize the image and apply "dream effect"
+        # resize the image
         img = tf.image.resize(img, shape)
-        img = gradient_ascent_loop(img, iterations = ITERATIONS, learning_rate = LEARNING_RATE, max_loss = MAX_LOSS)
 
-        # puts back details lost during the resolution change
+        # apply the "dream effect"
+        img = gradient_ascent_loop(img, iterations = ITERATIONS, distortion_rate = DISTORTION_RATE, max_loss = MAX_LOSS)
+
+        # 1. upscale the original image clone without any effect added
+        # 2. downscale the original image to the same size
+        # 3. calculate the difference between the two same sized images
+        # 4. add the lost detail back to the image with the dream effect
+        # 5. resize the shrunk clone to another size for the next octave
         upscaled_shrunk_original_img = tf.image.resize(shrunk_original_img, shape)
         same_size_original = tf.image.resize(original_img, shape)
         lost_detail = same_size_original - upscaled_shrunk_original_img
@@ -183,7 +193,53 @@ def generate(img_name, img_origin, img_origin_format):
 
 import_params()
 
+if VERBOSE:
+    print(f"iteration: {ITER_NUM}, layer name: {CUR_LAYER}, layer activation: {CUR_LAYER_ACTIVATION}")
+
+# neural network model pretrained on imagenet database
+# pretrained weights save time and work, training out own network would be too difficult
+model = inception_v3.InceptionV3(weights = "imagenet", include_top = False)
+
+#print([layer.name for layer in model.layers])
+
+# activations of different layers
+layer_settings = {
+    CUR_LAYER: CUR_LAYER_ACTIVATION
+}
+
+# feature extraction is a process during which an intermediate output
+# of a given layer is extracted. this means stopping the model in one
+# of its hidden layers and taking the current result without continuing
+# the forward pass. outputs_dict assignes each layer to its extracted
+# features. in our case we only extract a single layer at a time, so
+# this implementation is unnecessarily complex. however, it will make
+# work easier if we ever decide to use more layers at a time
+outputs_dict = dict(
+    # assign the layers name and its respective extracted feature layer
+    [(layer.name, layer.output)
+        # extract the layer out of the InceptionV3 model
+        for layer in [model.get_layer(name)
+            # loop through the layer we want to extract (in this case just a single layer)
+            for name in layer_settings.keys()
+        ]
+    ]
+)
+
+# create a new extraction model starting with the same input as the
+# original model, but ending in each of the required extraction layers
+feature_extractor = keras.Model(inputs = model.inputs, outputs = outputs_dict)
+
+# run the generator
 output_img = generate(IMG_NAME, IMG_ORIGIN, IMG_ORIGIN_FORMAT)
 
 # save the output image
-keras.utils.save_img(r"..\..\..\machinelearning\deepdream\output\dream.png", deprocess_image(output_img.numpy()))
+keras.utils.save_img(fr"..\..\..\machinelearning\deepdream\output\dream.png", deprocess_image(output_img.numpy()))
+
+# create a file named after the current iteration number
+# this lets the main C# program know that the work here is done
+f = open(fr"..\..\..\machinelearning\deepdream\output\{ITER_NUM}", "w")
+f.close()
+
+
+if VERBOSE:
+    print("\n")
