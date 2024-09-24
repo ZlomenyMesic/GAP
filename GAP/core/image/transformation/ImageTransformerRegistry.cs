@@ -42,12 +42,4 @@ public class ImageTransformerRegistry : ClassRegistry<ImageTransformer> {
             throw new KeyNotFoundException($"Could not find registry object \'{id}\'.");
         }
     }
-
-    static ImageTransformerRegistry() {
-        PIXELIZE = Register("gap:pixelize", typeof(Pixelize));
-        GRID = Register("gap:grid", typeof(Grid));
-    }
-
-    public static readonly Type PIXELIZE;
-    public static readonly Type GRID;
 }

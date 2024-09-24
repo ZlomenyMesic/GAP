@@ -4,18 +4,39 @@
 //
 
 using System.Reflection;
-using GAP.core.image.generation.generators;
 using GAP.util.registries;
 using Kolors;
 
 namespace GAP.core.image.generation;
 
+/// <summary>
+/// Image Generator Registry <br/>
+/// holds references to all registered generators using the <see cref="ClassRegistry{T}"/> class registry class
+/// </summary>
 public abstract class ImageGeneratorRegistry : ClassRegistry<ImageGenerator> {
 
+    /// <summary>
+    /// registers new <see cref="ImageGenerator"/>-implementing class
+    /// </summary>
+    /// <param name="id">id of the class</param>
+    /// <param name="type"><c>typeof(&lt;YourClassName&gt;)</c></param>
+    /// <returns><see cref="type"/></returns>
     internal static Type Register(string id, Type type) {
         return BaseRegister(id, type);
     }
     
+    /// <summary>
+    /// returns new instance of the searched <see cref="ImageGenerator"/>-implementing class using the
+    /// <see cref="jsonSettings"/> 
+    /// </summary>
+    /// <param name="id">id of the searched class</param>
+    /// <param name="jsonSettings">json arguments</param>
+    /// <returns>new instance of the searched <see cref="ImageGenerator"/>-implementing class</returns>
+    /// <exception cref="NullReferenceException">
+    /// if failed to create an instance or
+    /// could not find the method <see cref="ImageGenerator.LoadFromJson"/> or
+    /// registered reference to class is null</exception>
+    /// <exception cref="KeyNotFoundException">no class with id of <see cref="id"/> was not found</exception>
     public static ImageGenerator GetInstance(string id, string jsonSettings) {
         Debug.info(REGISTRY.Count.ToString());
         
@@ -42,10 +63,4 @@ public abstract class ImageGeneratorRegistry : ClassRegistry<ImageGenerator> {
             throw new KeyNotFoundException($"Could not find registry object \'{id}\'.");
         }
     }
-
-    static ImageGeneratorRegistry() {
-        WHITE_NOISE = Register("gap:white_noise", typeof(WhiteNoise));
-    }
-
-    public static readonly Type WHITE_NOISE;
 }
