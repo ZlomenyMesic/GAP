@@ -9,18 +9,31 @@ using Kolors;
 
 namespace GAP.core.image.transformation.transformers;
 
+/// <summary>
+/// Pixelize Image Transform <br/>
+/// creates a poor pixel effect over the image
+/// </summary>
 public class Pixelize : ImageTransformer {
-    public override int seed { get; set; }
     public PixelType pixelType { get; set; }
     
-    
+    /// <summary>
+    /// empty constructor
+    /// </summary>
     public Pixelize() { }
     
-    public Pixelize(int seed, PixelType pixelType) {
-        this.seed = seed;
+    /// <summary>
+    /// constructor
+    /// </summary>
+    /// <param name="pixelType">type of pixel color arrangement</param>
+    public Pixelize(PixelType pixelType) {
         this.pixelType = pixelType;
     }
     
+    /// <summary>
+    /// main transform method
+    /// </summary>
+    /// <param name="image">input image</param>
+    /// <returns>transformed image as <see cref="Bitmap"/></returns>
     public override Bitmap TransformImage(Bitmap image) {
         if (pixelType == PixelType.STRIPES) {
             return PixelizeStripes(image);
@@ -29,7 +42,7 @@ public class Pixelize : ImageTransformer {
             return PixelizeSquares(image);
         }
     }
-
+    
     private static Bitmap PixelizeStripes(Bitmap image) {
         Bitmap result = new Bitmap(image.Width * 3, image.Height * 3);
             
@@ -64,11 +77,26 @@ public class Pixelize : ImageTransformer {
         
         return result;
     }
+    
+    /// <summary>
+    /// copies all fields into itself from another instance
+    /// </summary>
+    /// <param name="pixelize">other instance</param>
     private void Copy(Pixelize pixelize) {
-        seed = pixelize.seed;
         pixelType = pixelize.pixelType;
     }
 
+    /// <summary>
+    /// loads settings from a json string into an instance that called this method
+    /// </summary>
+    /// <param name="settings">json string</param>
+    /// <exception cref="JsonException">
+    /// if inputted json is invalid or if value returned by the
+    /// <see cref="JsonSerializer.Deserialize{TValue}(System.IO.Stream,System.Text.Json.JsonSerializerOptions?)"/>
+    /// returns null
+    /// </exception>
+    /// <exception cref="ArgumentException">if <see cref="settings"/> is null</exception>
+    /// <exception cref="NotSupportedException">if no deserializer is available</exception>
     public override void LoadFromJson(string settings) {
         Pixelize? pixelize = JsonSerializer.Deserialize<Pixelize>(settings) ?? null;
         

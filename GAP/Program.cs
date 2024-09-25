@@ -11,6 +11,9 @@ using System.Drawing;
 namespace GAP;
 
 class Program {
+
+    public const string PROJECT_ID = "gap";
+    
     static int Main() {
         //Console.WriteLine("Hello, World");
 

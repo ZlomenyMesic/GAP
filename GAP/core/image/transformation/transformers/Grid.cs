@@ -8,19 +8,35 @@ using System.Text.Json;
 
 namespace GAP.core.image.transformation.transformers;
 
+/// <summary>
+/// Grid Image Transformation <br/>
+/// transforms the picture by separating its pixels and placing transparent color between them 
+/// </summary>
 public class Grid : ImageTransformer {
-    public sealed override int seed { get; set; }
     public uint scaleFactor { get; set; }
     
-
-    public Grid(int seed, uint scaleFactor) {
+    /// <summary>
+    /// constructor
+    /// </summary>
+    /// <param name="scaleFactor"></param>
+    /// <exception cref="ArgumentException"></exception>
+    public Grid(uint scaleFactor) {
 
         if (scaleFactor == 0) throw new ArgumentException("Scale factor for Grid transform must be greater than zero");
 
-        this.seed = seed;
         this.scaleFactor = scaleFactor;
     }
     
+    /// <summary>
+    /// empty constructor
+    /// </summary>
+    public Grid() { }
+    
+    /// <summary>
+    /// main transform method
+    /// </summary>
+    /// <param name="image">input image</param>
+    /// <returns>transformed image as <see cref="Bitmap"/></returns>
     public override Bitmap TransformImage(Bitmap image) {
 
         if (scaleFactor == 1) return image;
@@ -38,11 +54,25 @@ public class Grid : ImageTransformer {
         return result;
     }
 
+    /// <summary>
+    /// copies all fields into itself from another instance
+    /// </summary>
+    /// <param name="grid">other instance</param>
     private void Copy(Grid grid) {
-        seed = grid.seed;
         scaleFactor = grid.scaleFactor;
     }
 
+    /// <summary>
+    /// loads settings from a json string into an instance that called this method
+    /// </summary>
+    /// <param name="settings">json string</param>
+    /// <exception cref="JsonException">
+    /// if inputted json is invalid or if value returned by the
+    /// <see cref="JsonSerializer.Deserialize{TValue}(System.IO.Stream,System.Text.Json.JsonSerializerOptions?)"/>
+    /// returns null
+    /// </exception>
+    /// <exception cref="ArgumentException">if <see cref="settings"/> is null</exception>
+    /// <exception cref="NotSupportedException">if no deserializer is available</exception>
     public override void LoadFromJson(string settings) {
         Grid? grid = JsonSerializer.Deserialize<Grid>(settings) ?? null;
         

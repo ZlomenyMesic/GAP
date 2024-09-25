@@ -16,7 +16,8 @@ namespace GAP.core.image.generation;
 public abstract class ImageGeneratorRegistry : ClassRegistry<ImageGenerator> {
 
     /// <summary>
-    /// registers new <see cref="ImageGenerator"/>-implementing class
+    /// registers new <see cref="ImageGenerator"/>-implementing class using the
+    /// <see cref="ClassRegistry{T}.BaseRegister"/> method
     /// </summary>
     /// <param name="id">id of the class</param>
     /// <param name="type"><c>typeof(&lt;YourClassName&gt;)</c></param>

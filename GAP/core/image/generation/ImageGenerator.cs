@@ -17,6 +17,10 @@ public abstract class ImageGenerator {
     public abstract int height { get; set; }
     public abstract int seed { get; set; }
 
+    /// <summary>
+    /// empty constructor, all child classes must have an empty constructor,
+    /// otherwise automatic instance creation can fail
+    /// </summary>
     public ImageGenerator() { }
     
     /// <summary>
