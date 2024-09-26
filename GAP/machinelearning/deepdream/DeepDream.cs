@@ -5,6 +5,8 @@
 //      founded 11.9.2024
 //
 
+using GAP.util.exceptions;
+
 namespace GAP;
 
 internal static class DeepDream {
@@ -63,15 +65,16 @@ internal static class DeepDream {
     internal static readonly string[] UGLY_LAYERS = ["activation", "activation_1", "activation_2", "batch_normalization", "batch_normalization_1", "batch_normalization_2", "conv2d", "conv2d_1", "conv2d_2", "input_layer"];
 
     // current layer name in the sequence
-    internal static string CurrentLayer { get; set; } = "mixed0";
+    private static string CurrentLayer { get; set; } = "mixed0";
     // current layer's activation
-    internal static int CurrentLayerActivation { get; set; } = 15;
+    private static int CurrentLayerActivation { get; set; } = 15;
     // current iteration in the sequence
-    internal static int CurrentIterationNumber { get; set; } = 0;
+    private static int CurrentIterationNumber { get; set; } = 0;
 
 
     private static readonly string PARAMS = @"..\..\..\machinelearning\deepdream\params.txt";
     private static readonly string SCRIPT = @"deepdream\DeepDream.py";
+    private static readonly string DONE   = @"..\..\..\machinelearning\deepdream\output\";
 
 
     // save the parameters into params.txt to make them accessible from python
@@ -82,7 +85,7 @@ internal static class DeepDream {
     }
 
     // simple wrapper function
-    internal static void RunGenerator(bool firstIteration) {
+    private static void RunGenerator(bool firstIteration) {
         // input for the first layer is the input image
         // input for all oncoming layer is the previous layer's output
         SaveParameters(
@@ -94,15 +97,28 @@ internal static class DeepDream {
         PythonWrapper.RunPythonScript(SCRIPT);
     }
 
-    // transforms the input image based on randomly selected layers
+    // some layers are removed as they look terrible
+    private static IEnumerable<string> CleanLayers() {
+        foreach (string layer in ALL_LAYERS) {
+            if (!UGLY_LAYERS.Contains(layer))
+                yield return layer;
+        }
+    }
+
+    // waits for a file named after the current iteration
+    // this file is created by the python script after saving the dream image
+    private static void WaitForPy(int i) {
+        string done = $"{DONE}{i + 1}";
+        while (!File.Exists(done))
+            Thread.Sleep(500);
+        File.Delete(done);
+    }
+
+    // transforms the input image using randomly selected layers
     internal static void RunGeneratorRandom(int layers) {
         if (layers <= 0) throw new Exception();
 
-        // some layers are removed as they look terrible
-        List<string> allLayers = [.. ALL_LAYERS];
-        foreach (string layer in UGLY_LAYERS) {
-            allLayers.Remove(layer);
-        }
+        List<string> allLayers = CleanLayers().ToList();
 
         Random r = new();
         for (int i = 0; i < layers; i++) {
@@ -124,13 +140,26 @@ internal static class DeepDream {
             CurrentLayerActivation = i == layers - 1 ? 15 : 6;
 
             RunGenerator(i == 0);
+            WaitForPy(i);
+        }
+    }
 
-            // waits for a file named after the current iteration
-            // this file is created by the python script after saving the dream image
-            string done = $@"..\..\..\machinelearning\deepdream\output\{i + 1}";
-            while (!File.Exists(done))
-                Thread.Sleep(500);
-            File.Delete(done);
+    // transforms the input image using custom specified layers
+    internal static void RunGeneratorCustom(params string[] layers) {
+        if (layers.Length <= 0) throw new UnknownLayerException($"deepdream cannot be run: {layers.Length} layers passed");
+        foreach (string layer in layers) {
+            if (!ALL_LAYERS.Contains(layer))
+                throw new UnknownLayerException($"deepdream cannot be run: layer {layer} not found");
+        }
+
+        // identical process as described above
+        for (int i = 0; i < layers.Length; i++) {
+            CurrentIterationNumber = i + 1;
+            CurrentLayerActivation = i == layers.Length - 1 ? 15 : 6;
+            CurrentLayer = layers[i];
+
+            RunGenerator(i == 0);
+            WaitForPy(i);
         }
     }
 }
