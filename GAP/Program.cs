@@ -5,9 +5,6 @@
 //      founded 11.9.2024
 //
 
-using GAP.core.image.generation.generators;
-using System.Drawing;
-
 namespace GAP;
 
 class Program {
