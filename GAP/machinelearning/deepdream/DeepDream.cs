@@ -6,6 +6,8 @@
 //
 
 using GAP.util.exceptions;
+using System.Diagnostics;
+using System.Text;
 
 namespace GAP;
 
@@ -64,37 +66,31 @@ internal static class DeepDream {
     internal static readonly string[] FINAL_LAYERS = ["mixed2", "mixed3", "mixed5", "activation_19", "activation_26", "activation_30"];
     internal static readonly string[] UGLY_LAYERS = ["activation", "activation_1", "activation_2", "batch_normalization", "batch_normalization_1", "batch_normalization_2", "conv2d", "conv2d_1", "conv2d_2", "input_layer"];
 
-    // current layer name in the sequence
-    private static string CurrentLayer { get; set; } = "mixed0";
-    // current layer's activation
-    private static int CurrentLayerActivation { get; set; } = 15;
-    // current iteration in the sequence
-    private static int CurrentIterationNumber { get; set; } = 0;
+    // current sequence of layers
+    private static List<string> LayerSequence = ["mixed0"];
 
 
     private static readonly string PARAMS = @"..\..\..\machinelearning\deepdream\params.txt";
     private static readonly string SCRIPT = @"deepdream\DeepDream.py";
-    private static readonly string DONE   = @"..\..\..\machinelearning\deepdream\output\";
+    private static readonly string DONE   = @"..\..\..\machinelearning\deepdream\output\DONE";
 
 
     // save the parameters into params.txt to make them accessible from python
     // changing the order also has to be done in DeepDream.py
-    private static void SaveParameters(string inputName, string inputOrigin, int inputOriginFormat, string outputPath) {
+    private static void SaveParameters(/*string inputName, string inputOrigin, int inputOriginFormat, string outputPath*/) {
+        StringBuilder sb = new();
+        for (int i = 0; i < LayerSequence.Count; i++) {
+            sb.Append($"{(i != 0 ? " " : "")}{LayerSequence[i]}");
+        }
+        string layers = sb.ToString();
+
         using StreamWriter sw = new(PARAMS);
-        sw.Write($"{inputName}\n{inputOrigin}\n{inputOriginFormat}\n{outputPath}\n{Verbose}\n{DistortionRate}\n{Octaves}\n{OctaveScale}\n{Iterations}\n{MaxLoss}\n{CurrentLayer}\n{CurrentLayerActivation}\n{CurrentIterationNumber}");
+        sw.Write($"{ImageName}\n{ImageOrigin}\n{ImageOriginFormat}\n{OutputPath}\n{Verbose}\n{DistortionRate}\n{Octaves}\n{OctaveScale}\n{Iterations}\n{MaxLoss}\n{layers}");
     }
 
     // simple wrapper function
-    private static void RunGenerator(bool firstIteration) {
-        // input for the first layer is the input image
-        // input for all oncoming layer is the previous layer's output
-        SaveParameters(
-            firstIteration ? ImageName : "dream.png",
-            firstIteration ? ImageOrigin : OutputPath,
-            firstIteration ? ImageOriginFormat : 0,
-            OutputPath);
+    private static void RunGenerator() {
 
-        PythonWrapper.RunPythonScript(SCRIPT);
     }
 
     // some layers are removed as they look terrible
@@ -107,59 +103,58 @@ internal static class DeepDream {
 
     // waits for a file named after the current iteration
     // this file is created by the python script after saving the dream image
-    private static void WaitForPy(int i) {
-        string done = $"{DONE}{i + 1}";
-        while (!File.Exists(done))
+    private static void WaitForPy() {
+        while (!File.Exists(DONE))
             Thread.Sleep(500);
-        File.Delete(done);
+        File.Delete(DONE);
+    }
+
+    // transforms the input using specified layers
+    internal static void RunGeneratorCustom(params string[] layers) {
+        if (layers.Length <= 0) throw new UnknownLayerException($"deepdream can not run: {layers.Length} layers passed");
+        foreach (string layer in layers) {
+            if (!ALL_LAYERS.Contains(layer))
+                throw new UnknownLayerException($"deepdream can not run: layer {layer} not found");
+        }
+
+        // in case of a bug
+        File.Delete(DONE);
+
+        // measure the time spent to generate the image
+        Stopwatch sw = new();
+        sw.Start();
+
+        LayerSequence = [.. layers];
+        SaveParameters();
+
+        PythonWrapper.RunPythonScript(SCRIPT);
+        WaitForPy();
+
+        // print the time spent
+        sw.Stop();
+        Console.WriteLine($"time spent: {sw.ElapsedMilliseconds / 1000} s");
     }
 
     // transforms the input image using randomly selected layers
     internal static void RunGeneratorRandom(int layers) {
-        if (layers <= 0) throw new Exception();
-
         List<string> allLayers = CleanLayers().ToList();
+
+        string[] selectedLayers = new string[layers];
 
         Random r = new();
         for (int i = 0; i < layers; i++) {
-            CurrentIterationNumber = i + 1;
-
             // 1. all layers except the last two are chosen randomly from the ALL_LAYERS - UGLY_LAYERS array
             // 2. the second to last layer is only selected from the ALMOST_FINAL_LAYERS array
             // 3. the last layer gets chosen from the FINAL_LAYERS array
             // the reason for shortening the last two selections is that most of the layers are too repetitive,
             // periodical, boring or just not very good looking. this ensures the final result looks interesting
-            CurrentLayer = i < layers - 2
+            selectedLayers[i] = i < layers - 2
                 ? allLayers[r.Next(0, allLayers.Count)]
                 : i != layers - 1
-                    ? ALMOST_FINAL_LAYERS[r.Next(0, ALMOST_FINAL_LAYERS.Length)] 
+                    ? ALMOST_FINAL_LAYERS[r.Next(0, ALMOST_FINAL_LAYERS.Length)]
                     : FINAL_LAYERS[r.Next(0, FINAL_LAYERS.Length)];
-
-            // all layers get activation 6, last layer gets 15;
-            // if all layers got more activation, the result would get too crammed
-            CurrentLayerActivation = i == layers - 1 ? 15 : 6;
-
-            RunGenerator(i == 0);
-            WaitForPy(i);
-        }
-    }
-
-    // transforms the input image using custom specified layers
-    internal static void RunGeneratorCustom(params string[] layers) {
-        if (layers.Length <= 0) throw new UnknownLayerException($"deepdream cannot be run: {layers.Length} layers passed");
-        foreach (string layer in layers) {
-            if (!ALL_LAYERS.Contains(layer))
-                throw new UnknownLayerException($"deepdream cannot be run: layer {layer} not found");
         }
 
-        // identical process as described above
-        for (int i = 0; i < layers.Length; i++) {
-            CurrentIterationNumber = i + 1;
-            CurrentLayerActivation = i == layers.Length - 1 ? 15 : 6;
-            CurrentLayer = layers[i];
-
-            RunGenerator(i == 0);
-            WaitForPy(i);
-        }
+        RunGeneratorCustom(selectedLayers);
     }
 }

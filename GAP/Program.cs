@@ -15,7 +15,7 @@ class Program {
         //Console.WriteLine("Hello, World");
 
         DeepDream.RunGeneratorRandom(4);
-        //DeepDream.RunGeneratorCustom("mixed3", "mixed2", "mixed5");
+        //DeepDream.RunGeneratorCustom("mixed2", "activation_5");
 
         return 0;
     }

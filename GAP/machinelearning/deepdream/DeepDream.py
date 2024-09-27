@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # number of parameters passed in params.txt
-PARAMS_LEN = 13
+PARAMS_LEN = 11
 
 # read the content of params.txt and split it into separate lines
 # each line represents a single parameter
@@ -31,7 +31,7 @@ def read_params_file():
 
 # update the local variables depending on the imported parameters
 def import_params():
-    global IMG_NAME, IMG_ORIGIN, IMG_ORIGIN_FORMAT, OUTPUT_PATH, VERBOSE, DISTORTION_RATE, OCTAVES, OCT_SCALE, ITERATIONS, MAX_LOSS, CUR_LAYER, CUR_LAYER_ACTIVATION, ITER_NUM
+    global IMG_NAME, IMG_ORIGIN, IMG_ORIGIN_FORMAT, OUTPUT_PATH, VERBOSE, DISTORTION_RATE, OCTAVES, OCT_SCALE, ITERATIONS, MAX_LOSS, LAYERS
     params = read_params_file()
 
     IMG_NAME = params[0]
@@ -46,9 +46,7 @@ def import_params():
     ITERATIONS = int(params[8])
     MAX_LOSS = float(params[9])
 
-    CUR_LAYER = params[10]
-    CUR_LAYER_ACTIVATION = int(params[11])
-    ITER_NUM = int(params[12])
+    LAYERS = params[10].split(" ")
 
 # used to download the image
 def get_url_file(name, origin):
@@ -119,8 +117,8 @@ def calculate_loss(input_image):
 
 # as opposed to most neural networks, we actually try to maximize the 
 # loss function instead of minimizing it. this is called gradient ascent
-@tf.function
-def gradient_ascent_step(image, distortion_rate):
+#@tf.function
+def gradient_ascent_step(image, distortion_rate, i):
     # GradientTape record all tensor operations made with the image.
     # it is a very useful tool for automatic differentiation
     with tf.GradientTape() as tape:
@@ -140,7 +138,7 @@ def gradient_ascent_step(image, distortion_rate):
 # loop repeats NUM_OCTAVE times with ITERATIONS steps
 def gradient_ascent_loop(image, iterations, distortion_rate, max_loss):
     for i in range(iterations):
-        loss, image = gradient_ascent_step(image, distortion_rate)
+        loss, image = gradient_ascent_step(image, distortion_rate, i)
 
         # break the loop when maximum allowed loss is met
         if max_loss is not None and loss >= max_loss:
@@ -186,15 +184,65 @@ def loop_octaves(original_img, original_shape):
         shrunk_original_img = tf.image.resize(original_img, shape)
     return img
 
-# wrapper function
-def generate(img_name, img_origin, img_origin_format):
-    o_img, o_shape = get_img_shape(img_name, img_origin, img_origin_format)
-    return loop_octaves(o_img, o_shape)
+# creates the feature extractor for each layer
+def extract_layer(name):
+    # feature extraction is a process during which an intermediate output
+    # of a given layer is extracted. this means stopping the model in one
+    # of its hidden layers and taking the current result without continuing
+    # the forward pass. outputs_dict assignes each layer to its extracted
+    # features. in our case we only extract a single layer at a time.
+    outputs_dict = {
+        name : model.get_layer(name).output
+    }
+
+    # create a new extraction model starting with the same input as the
+    # original model, but ending in the required extraction layer
+    global feature_extractor
+    feature_extractor = keras.Model(inputs = model.inputs, outputs = outputs_dict)
+
+def create_layer_dict():
+    global layer_settings
+    layer_settings = dict()
+
+    for i in range(len(LAYERS)):
+        activation = 6
+        if (i == len(LAYERS) - 1): 
+            activation = 15
+
+        layer_settings[LAYERS[i]] = activation
+
+def loop_layers():
+    global CUR_LAYER, CUR_LAYER_ACTIVATION
+
+    img, shape = get_img_shape(IMG_NAME, IMG_ORIGIN, IMG_ORIGIN_FORMAT)
+
+    i = 0
+    for layer in layer_settings.keys():
+        CUR_LAYER = layer
+        CUR_LAYER_ACTIVATION = layer_settings[layer]
+
+        if VERBOSE:
+            print(f"iteration: {i + 1}, layer name: {CUR_LAYER}, layer activation: {CUR_LAYER_ACTIVATION}")
+
+        extract_layer(layer)
+
+        output = loop_octaves(img, shape)
+
+        # save the current image into output folder, if this isn't the' last iteration,
+        # the saved image will be reused as the input for the next cycle (layer)
+        keras.utils.save_img(OUTPUT_PATH, deprocess_image(output.numpy()))
+        if (i != len(LAYERS) - 1):
+            img, shape = get_img_shape(IMG_NAME, OUTPUT_PATH, 0)
+
+        if VERBOSE:
+            print("\n")
+
+        i += 1
+    return img
 
 import_params()
 
-if VERBOSE:
-    print(f"iteration: {ITER_NUM}, layer name: {CUR_LAYER}, layer activation: {CUR_LAYER_ACTIVATION}")
+create_layer_dict()
 
 # neural network model pretrained on imagenet database
 # pretrained weights save time and work, training out own network would be too difficult
@@ -202,44 +250,13 @@ model = inception_v3.InceptionV3(weights = "imagenet", include_top = False)
 
 #print([layer.name for layer in model.layers])
 
-# activations of different layers
-layer_settings = {
-    CUR_LAYER: CUR_LAYER_ACTIVATION
-}
-
-# feature extraction is a process during which an intermediate output
-# of a given layer is extracted. this means stopping the model in one
-# of its hidden layers and taking the current result without continuing
-# the forward pass. outputs_dict assignes each layer to its extracted
-# features. in our case we only extract a single layer at a time, so
-# this implementation is unnecessarily complex. however, it will make
-# work easier if we ever decide to use more layers at a time
-outputs_dict = dict(
-    # assign the layers name and its respective extracted feature layer
-    [(layer.name, layer.output)
-        # extract the layer out of the InceptionV3 model
-        for layer in [model.get_layer(name)
-            # loop through the layer we want to extract (in this case just a single layer)
-            for name in layer_settings.keys()
-        ]
-    ]
-)
-
-# create a new extraction model starting with the same input as the
-# original model, but ending in each of the required extraction layers
-feature_extractor = keras.Model(inputs = model.inputs, outputs = outputs_dict)
-
 # run the generator
-output_img = generate(IMG_NAME, IMG_ORIGIN, IMG_ORIGIN_FORMAT)
-
-# save the output image
-keras.utils.save_img(fr"..\..\..\machinelearning\deepdream\output\dream.png", deprocess_image(output_img.numpy()))
+output_img = loop_layers()
 
 # create a file named after the current iteration number
 # this lets the main C# program know that the work here is done
-f = open(fr"..\..\..\machinelearning\deepdream\output\{ITER_NUM}", "w")
+f = open(fr"..\..\..\machinelearning\deepdream\output\DONE", "w")
 f.close()
-
 
 if VERBOSE:
     print("\n")
