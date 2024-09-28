@@ -8,4 +8,4 @@ True
 1.3
 5
 2147483647
-batch_normalization_28 batch_normalization_20 conv2d_22 activation_19
+mixed2 activation_55 conv2d_26 conv2d_15
