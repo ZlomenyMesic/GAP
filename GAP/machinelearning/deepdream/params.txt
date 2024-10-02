@@ -1,5 +1,5 @@
-dream.png
-..\..\..\machinelearning\deepdream\output\dream.png
+input.jpg
+..\..\..\machinelearning\deepdream\input.jpg
 0
 ..\..\..\machinelearning\deepdream\output\dream.png
 True
@@ -8,6 +8,4 @@ True
 1.3
 5
 2147483647
-mixed2
-15
-4
+mixed2 activation_55 conv2d_26 conv2d_15
