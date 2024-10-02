@@ -57,4 +57,20 @@ public class NameIdConverter {
         
         return name;
     }
+
+    public static string EnumValueToName(string enumValue) {
+        enumValue = enumValue.Replace("_", " ");
+        enumValue = enumValue.ToLower();
+
+        string name = "";
+        
+        name += Char.ToUpper(enumValue[0]);
+        
+        for (int i = 1; i < enumValue.Length; i++) {
+            if (enumValue[i - 1] == ' ') name += Char.ToUpper(enumValue[i]);
+            else name += enumValue[i];
+        }
+        
+        return name;
+    }
 }
