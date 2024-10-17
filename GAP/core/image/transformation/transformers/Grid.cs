@@ -5,6 +5,7 @@
 
 using System.Drawing;
 using System.Text.Json;
+using GAP.util.settings;
 
 namespace GAP.core.image.transformation.transformers;
 
@@ -12,7 +13,7 @@ namespace GAP.core.image.transformation.transformers;
 /// Grid Image Transformation <br/>
 /// transforms the picture by separating its pixels and placing transparent color between them 
 /// </summary>
-public class Grid : ImageTransformer {
+public class Grid : ImageTransformer, SettingsObject {
     public uint scaleFactor { get; set; }
     
     /// <summary>
@@ -84,4 +85,13 @@ public class Grid : ImageTransformer {
     }
 
     public override string ToString() => JsonSerializer.Serialize(this);
+    
+    public void Deserialize((string name, object value)[] input) {
+        foreach ((string name, object value) i in input) {
+            scaleFactor = i.name switch {
+                "scale_factor" => (uint)i.value,
+                _ => scaleFactor
+            };
+        }
+    }
 }

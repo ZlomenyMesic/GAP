@@ -38,6 +38,6 @@ public class ImageGeneratorDispatcher {
     /// <param name="id">id of the generator class</param>
     /// <param name="type"><c>typeof(&lt;YourClassName&gt;)</c></param>
     public void Register(string id, Type type) {
-        ImageGeneratorRegistry.Register($"image:{projectId}:{id}", type);
+        ImageGeneratorRegistry.Register($"{projectId}:{id}", type);
     }
 }

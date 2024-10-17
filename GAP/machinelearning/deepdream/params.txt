@@ -5,7 +5,13 @@ input.jpg
 True
 20
 8
-1.3
+1,3
 5
 2147483647
+<<<<<<< HEAD
 mixed2 activation_55 conv2d_26 conv2d_15
+=======
+activation_87
+6
+1
+>>>>>>> settings
