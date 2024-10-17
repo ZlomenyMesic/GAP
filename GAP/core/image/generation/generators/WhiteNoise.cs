@@ -13,7 +13,7 @@ namespace GAP.core.image.generation.generators;
 /// White Noise Image Generation <br/>
 /// generates purely random set of pixels with color properties set manually or with the <see cref="WhiteNoisePresets"/>
 /// </summary>
-public sealed class WhiteNoise : ImageGenerator {
+public class WhiteNoise : ImageGenerator {
     public override int width { get; set; }
     public override int height { get; set; }
     public override int seed { get; set; }
@@ -65,7 +65,7 @@ public sealed class WhiteNoise : ImageGenerator {
                 allowRandomSaturation = false;
                 allowRandomBrightness = false;
                 break;
-            case WhiteNoisePresets.RANDOM_HUE_DARKNESS:
+            case WhiteNoisePresets.RANDOM_HUE_AND_DARKNESS:
                 allowRandomHue = true;
                 allowRandomSaturation = false;
                 allowRandomBrightness = true;
@@ -168,6 +168,6 @@ public sealed class WhiteNoise : ImageGenerator {
 public enum WhiteNoisePresets {
     FULL_RANDOM,
     RANDOM_HUE,
-    RANDOM_HUE_DARKNESS,
+    RANDOM_HUE_AND_DARKNESS,
     GRAYSCALE
 }

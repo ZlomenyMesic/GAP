@@ -38,6 +38,6 @@ public class ImageTransformerDispatcher {
     /// <param name="id">id of the transformer class</param>
     /// <param name="type"><c>typeof(&lt;YourClassName&gt;)</c></param>
     public void Register(string id, Type type) {
-        ImageTransformerRegistry.Register($"image:{projectId}:{id}", type);
+        ImageTransformerRegistry.Register($"{projectId}:{id}", type);
     }
 }

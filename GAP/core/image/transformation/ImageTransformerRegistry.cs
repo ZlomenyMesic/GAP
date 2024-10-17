@@ -65,4 +65,8 @@ public class ImageTransformerRegistry : ClassRegistry<ImageTransformer> {
             throw new KeyNotFoundException($"Could not find registry object \'{id}\'.");
         }
     }
+
+    public static Type?[] GetAllInstances() {
+        return REGISTRY.Values.ToArray();
+    }
 }
