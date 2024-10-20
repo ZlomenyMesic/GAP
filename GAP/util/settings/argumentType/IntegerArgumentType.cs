@@ -57,7 +57,7 @@ public sealed class IntegerArgumentType : ArgumentType {
         return $"{{\"type\": \"int\", " +
                $"\"min\": {min}, " +
                $"\"max\": {max}, " +
-               $"\"value\": {(value == null ? "\"null\"" : value)}}}}}";
+               $"\"value\": {(value == null ? "\"null\"" : value)}}}";
     }
 }
 

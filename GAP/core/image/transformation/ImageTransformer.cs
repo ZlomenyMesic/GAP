@@ -5,6 +5,7 @@
 
 using System.Drawing;
 using System.Text.Json;
+using GAP.util.settings;
 
 namespace GAP.core.image.transformation;
 
@@ -38,5 +39,11 @@ public abstract class ImageTransformer {
     /// <exception cref="ArgumentException">if <see cref="settings"/> is null</exception>
     /// <exception cref="NotSupportedException">if no deserializer is available</exception>
     public abstract void LoadFromJson(string settings);
+    
+    /// <summary>
+    /// returns copy of settings available for the transformer
+    /// </summary>
+    public abstract SettingsBuilder<T> GetSettings<T>() where T : ImageTransformer;
+    
     public override string ToString() => JsonSerializer.Serialize(this);
 }

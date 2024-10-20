@@ -36,6 +36,24 @@ public static class Arguments {
     }
 
     /// <summary>
+    /// validates the value using the <see cref="argument"/> value and returns it if valid
+    /// </summary>
+    /// <exception cref="ArgumentException">unknown argument type inputted</exception>
+    public static object Parse(object value, ArgumentType argument) {
+        return argument switch {
+            IntegerArgumentType type => ParseInteger((int)value, type),
+            UnsignedIntegerArgumentType type => ParseUInteger((uint)value, type),
+            LongArgumentType type => ParseLong((long)value, type),
+            UnsignedLongArgumentType type => ParseULong((ulong)value, type),
+            FloatArgumentType type => ParseFloat((float)value, type),
+            DoubleArgumentType type => ParseDouble((double)value, type),
+            StringArgumentType type => ParseString((string)value, type),
+            BoolArgumentType => ParseBool((bool)value),
+            _ => throw new ArgumentException($"Unknown argument type: {argument.GetType().Name}")
+        };
+    }
+
+    /// <summary>
     /// copies value of an argument to another argument
     /// </summary>
     /// <param name="from">source argument</param>
@@ -79,10 +97,24 @@ public static class Arguments {
 
         if (output < argument.min || output > argument.max) {
             throw new SettingsArgumentException(argument, 
-                $"Invalid value: {value}, must be between {argument.min} and {argument.max}.");
+                $"Invalid value. Value must be between {argument.min} and {argument.max}.");
         }
         
         return output;
+    }
+
+    /// <summary>
+    /// validates a value using an argument
+    /// </summary>
+    /// <returns>the validated value</returns>
+    /// <exception cref="SettingsArgumentException">value is invalid</exception>
+    public static int ParseInteger(int value, IntegerArgumentType argument) {
+        if (value < argument.min || value > argument.max) {
+            throw new SettingsArgumentException(argument, 
+                $"Invalid value. Value must be between {argument.min} and {argument.max}.");
+        }
+        
+        return value;
     }
     
     
@@ -122,6 +154,20 @@ public static class Arguments {
         return output;
     } 
     
+    /// <summary>
+    /// validates a value using an argument
+    /// </summary>
+    /// <returns>the validated value</returns>
+    /// <exception cref="SettingsArgumentException">value is invalid</exception>
+    public static uint ParseUInteger(uint value, UnsignedIntegerArgumentType argument) {
+        if (value < argument.min || value > argument.max) {
+            throw new SettingsArgumentException(argument, 
+                $"Invalid value. Value must be between {argument.min} and {argument.max}.");
+        }
+        
+        return value;
+    }
+    
     
     
     // --- long things ---
@@ -156,6 +202,20 @@ public static class Arguments {
         }
         
         return output;
+    }
+    
+    /// <summary>
+    /// validates a value using an argument
+    /// </summary>
+    /// <returns>the validated value</returns>
+    /// <exception cref="SettingsArgumentException">value is invalid</exception>
+    public static long ParseLong(long value, LongArgumentType argument) {
+        if (value < argument.min || value > argument.max) {
+            throw new SettingsArgumentException(argument, 
+                $"Invalid value. Value must be between {argument.min} and {argument.max}.");
+        }
+        
+        return value;
     }
     
     
@@ -195,6 +255,20 @@ public static class Arguments {
         return output;
     } 
     
+    /// <summary>
+    /// validates a value using an argument
+    /// </summary>
+    /// <returns>the validated value</returns>
+    /// <exception cref="SettingsArgumentException">value is invalid</exception>
+    public static ulong ParseULong(ulong value, UnsignedLongArgumentType argument) {
+        if (value < argument.min || value > argument.max) {
+            throw new SettingsArgumentException(argument, 
+                $"Invalid value. Value must be between {argument.min} and {argument.max}.");
+        }
+        
+        return value;
+    }
+    
     
     
     // --- float things ---
@@ -229,6 +303,20 @@ public static class Arguments {
         }
         
         return output;
+    }
+    
+    /// <summary>
+    /// validates a value using an argument
+    /// </summary>
+    /// <returns>the validated value</returns>
+    /// <exception cref="SettingsArgumentException">value is invalid</exception>
+    public static float ParseFloat(float value, FloatArgumentType argument) {
+        if (value < argument.min || value > argument.max) {
+            throw new SettingsArgumentException(argument, 
+                $"Invalid value. Value must be between {argument.min} and {argument.max}.");
+        }
+        
+        return value;
     }
     
     
@@ -268,6 +356,20 @@ public static class Arguments {
         return output;
     }
     
+    /// <summary>
+    /// validates a value using an argument
+    /// </summary>
+    /// <returns>the validated value</returns>
+    /// <exception cref="SettingsArgumentException">value is invalid</exception>
+    public static double ParseDouble(double value, DoubleArgumentType argument) {
+        if (value < argument.min || value > argument.max) {
+            throw new SettingsArgumentException(argument, 
+                $"Invalid value. Value must be between {argument.min} and {argument.max}.");
+        }
+        
+        return value;
+    }
+    
     
     
     // --- bool things ---
@@ -292,6 +394,15 @@ public static class Arguments {
             Console.WriteLine(e);
             throw;
         }
+    }
+    
+    /// <summary>
+    /// validates a value using an argument
+    /// </summary>
+    /// <returns>the validated value</returns>
+    /// <exception cref="SettingsArgumentException">value is invalid</exception>
+    public static bool ParseBool(bool value) {
+        return value;
     }
     
     
@@ -397,4 +508,13 @@ public static class Arguments {
     /// </summary>
     public static FreeListArgumentType FreeList(ArgumentType type, int maxItemCount = Int32.MaxValue) => 
         new(type, maxItemCount);
+    
+    
+    
+    // --- plain text things ---
+    
+    /// <summary>
+    /// returns a new plain text argument
+    /// </summary>
+    internal static PlainTextArgumentType PlainText(string text) => new(text);
 }

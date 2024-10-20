@@ -44,7 +44,7 @@ public sealed class DoubleArgumentType : ArgumentType {
     }
 
     public void SetParsedValue(object value) {
-        if (value.GetType() != typeof(bool)) throw new SettingsArgumentException(value.GetType(), typeof(double));
+        if (value.GetType() != typeof(double)) throw new SettingsArgumentException(value.GetType(), typeof(double));
         if ((double)value < min || (double)value > max) 
             throw new SettingsArgumentException($"Value of {value} must be greater than {min} and smaller than {max}.");
 

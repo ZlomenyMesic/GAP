@@ -16,6 +16,7 @@ public sealed class FreeListArgumentType : ArgumentType {
     private int maxItemCount { get; }
     private ArgumentType type { get; }
     private List<ArgumentType>? values { get; set; } = null;
+    private List<object>? parsedValues { get; set; } = null;
 
     /// <summary>
     /// constructor that sources values from an enum
@@ -69,28 +70,66 @@ public sealed class FreeListArgumentType : ArgumentType {
     }
 
     public void SetValue(string value) {
-        value = value.Replace(",", "");
-        value = value.Replace("[", "");
-        string[] singleValues = value.Split(' ');
+        throw new SettingsBuilderException("This method is not supported for FreeListArgumentType. " +
+                                           "Use AddValue(<ArgumentType> item) and PopValue(<int> index)" +
+                                           " methods instead.");
         
-        values = new List<ArgumentType>();
-
-        foreach (string v in singleValues) {
-            ArgumentType a = type.Clone();
-            a.SetValue(v);
-            values.Add(a);
-        }
+        // value = value.Replace(",", "");
+        // value = value.Replace("[", "");
+        // string[] singleValues = value.Split(' ');
+        //
+        // values = new List<ArgumentType>();
+        //
+        // foreach (string v in singleValues) {
+        //     ArgumentType a = type.Clone();
+        //     a.SetValue(v);
+        //     values.Add(a);
+        // }
     }
 
     public void SetParsedValue(object? value) {
-        values = value switch {
-            null => null,
-            List<ArgumentType> list => list,
-            ArgumentType[] array => array.ToList(),
-            _ => throw new SettingsArgumentException(
-                "Cannot set value of free list argument to a value of type that is not " +
-                "System.Collections.Generic.List<GAP.util.settings.ArgumentType>.")
-        };
+        throw new SettingsBuilderException("This method is not supported for FreeListArgumentType. " +
+                                           "Use AddValue(<object> item) and PopValue(<int> index)" +
+                                           " methods instead.");
+        
+        // values = value switch {
+        //     null => null,
+        //     List<ArgumentType> list => list,
+        //     ArgumentType[] array => array.ToList(),
+        //     _ => throw new SettingsArgumentException(
+        //         "Cannot set value of free list argument to a value of type that is not " +
+        //         "System.Collections.Generic.List<GAP.util.settings.ArgumentType>.")
+        // };
+    }
+
+    /// <summary>
+    /// adds a new value to the argument values
+    /// </summary>
+    public void AddValue(object value) {
+        parsedValues ??= new List<object>();
+        
+        parsedValues.Add(Arguments.Parse(value, type));
+    }
+
+    /// <summary>
+    /// removes a value using an index
+    /// </summary>
+    /// <exception cref="SettingsBuilderException">no values have been set, index out of bounds</exception>
+    public void PopValue(int index) {
+        if (parsedValues is null) throw new SettingsBuilderException("Accessing value that has not been set.");
+        if (index < 0 || index >= parsedValues.Count) throw new SettingsBuilderException("Index is out of range.");
+        
+        parsedValues.RemoveAt(index);
+    }
+
+    /// <summary>
+    /// removes a value using the actual object
+    /// </summary>
+    /// <exception cref="SettingsBuilderException">no values have been set, object does not exist</exception>
+    public void PopValue(object value) {
+        if (parsedValues is null) throw new SettingsBuilderException("Accessing value that has not been set.");
+        
+        if (parsedValues.Remove(value)) throw new SettingsBuilderException("Tried to pop an nonexistent element.");
     }
 
     public ArgumentType Clone() {

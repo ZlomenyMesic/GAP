@@ -23,8 +23,19 @@ namespace GAP;
 class GAP : Mod {
 
     public const string PROJECT_ID = "gap";
-    public const Debug.DebugLevel DEBUG_LEVEL = Debug.DebugLevel.ALL;
+    private const Debug.DebugLevel DEBUG_LEVEL = Debug.DebugLevel.ALL;
 
+    //
+    // NOTE:
+    // to count lines in project call " git ls-files | xargs wc -l " in a linux shell
+    // for a specific file type " git ls-files | grep '\.<file-extension>' | xargs wc -l "
+    //
+    
+    //
+    // TODOS:
+    // slider argument type
+    //
+    
     static int Main() {
         
         Debug.debugLevel = DEBUG_LEVEL;
@@ -36,31 +47,21 @@ class GAP : Mod {
         // foreach (var modName in ModLoader.GetRegisteredMods()) Debug.info($"Loaded mod '{modName}'");
         // Debug.info($"Loaded {modCount} mods total");
         
-        // SettingsBuilder<Grid> settingsBuilder = new SettingsBuilder<Grid>("grid");
-        //
-        // settingsBuilder.Build(SettingsNode<Grid>
-        //     .New("default")
-        //     .Argument("argument", String())
-        //     .Group(SettingsGroup
-        //         .New("group", ("s", String()))
-        //         .Option(SettingsGroupOption
-        //             .New("option1")
-        //             .Argument("value", String())
-        //             .Convert((cin, cout) => {
-        //                 cout["s"].SetValue(cin["value"].GetValue());
-        //             })
-        //         )
-        //         .Option(SettingsGroupOption
-        //             .New("option2")
-        //             .Argument("value", String())
-        //             .Convert((cin, cout) => {
-        //                 cout["s"].SetValue(cin["value"].GetValue());
-        //             })
-        //         )
-        //     )
-        // );
-        //
-        // Console.WriteLine(settingsBuilder.ToString());
+        WhiteNoise wn = new WhiteNoise();
+        // Console.WriteLine(wn.GetSettings<WhiteNoise>());
+        
+        var settings = wn.GetSettings<WhiteNoise>();
+        
+        settings["advanced"].SetValue("width", 123);
+        settings["advanced"].SetValue("height", 456);
+        settings["advanced"].SetValue("seed", 789);
+        settings["advanced"].SetGroupOptionValue("advanced", "presets", "presets", WhiteNoisePresets.GRAYSCALE);
+
+        Console.WriteLine(settings.ToString());
+        
+        var whiteNoise = settings.Execute("advanced", ("advanced", "presets"));
+        Bitmap bmp = whiteNoise.GenerateImage();
+        bmp.Save("gap.png");
         
         // DeepDream.RunGeneratorRandom(4);
         // DeepDream.RunGeneratorCustom("mixed3", "mixed2", "mixed5");

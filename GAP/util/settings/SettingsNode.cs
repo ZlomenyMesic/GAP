@@ -13,13 +13,15 @@ namespace GAP.util.settings;
 /// single settings node object
 /// </summary>
 /// <typeparam name="TResult">result class</typeparam>
-public class SettingsNode<TResult> : ICloneable where TResult : SettingsObject {
+public class SettingsNode<TResult> : ICloneable {
     
     public string name { get; }
-    public Context context { get; private init; } = new();
+    public Context context { get; private set; } = new();
     public List<SettingsGroup>? groups { get; private set; } = null;
-    
-    
+    private Func<Context, TResult>? executionDelegate = null;
+    private bool isEmpty = false;
+
+
     /// <summary>
     /// creates a new instance
     /// </summary>
@@ -73,30 +75,81 @@ public class SettingsNode<TResult> : ICloneable where TResult : SettingsObject {
 
         return this;
     }
+
+
+    /// <summary>
+    /// sets the <see cref="executionDelegate"/> that creates a
+    /// <see cref="TResult"/> instance from <see cref="context"/>
+    /// </summary>
+    public SettingsNode<TResult> OnParse(Func<Context, TResult> execute) {
+        executionDelegate = execute;
+        return this;
+    }
+
+
+    /// <summary>
+    /// creates a new empty <see cref="SettingsNode{TResult}"/>, <b>ONLY for FALLBACK values!</b> 
+    /// </summary>
+    internal static SettingsNode<T> Empty<T>() {
+        SettingsNode<T> empty = SettingsNode<T>.New("empty");
+        empty.isEmpty = true;
+        empty.Argument("empty", Arguments.
+            PlainText("This node is empty. " +
+                      "For more information watch this video: https://youtu.be/dQw4w9WgXcQ?si=7aQZOGrCBTLmLRih"));
+        
+        return empty;
+    }
     
 
     /// <summary>
     /// parses the arguments to an object of type <see cref="TResult"/>
     /// </summary>
-    /// <returns>an instance of the <see cref="TResult"/> type</returns>
-    public TResult Execute((string name, string value)[] input) {
+    public TResult Execute(params (string groupName, string optionName)[] config) {
+        
+        if (executionDelegate is null)
+            throw new SettingsBuilderException("Execution delegate is not set.");
 
-        (string name, object value)[] output = new (string, object)[input.Length];
+        if (groups is null || groups.Count == 0)
+            return executionDelegate(context);
+        
+        foreach (SettingsGroup group in groups) {
+            foreach ((string groupName, string optionName) c in config) {
+                if (group.name != c.groupName) continue;
+                
+                group.Execute(c.optionName, context);
+            }
+        }
 
-        for (int i = 0; i < input.Length; i++) {
-            output[i].name = input[i].name;
-            output[i].value = Arguments.Parse(input[i].value, context[input[i].name]);
+        return executionDelegate(context);
+    }
+
+
+    /// <summary>
+    /// sets the value of an argument
+    /// </summary>
+    public void SetValue(string argumentName, object value) {
+        context[argumentName].SetParsedValue(value);
+    }
+
+
+    public void SetGroupOptionValue(string groupName, string optionName, string argumentName, object value) {
+        if (groups is null) {
+            throw new SettingsBuilderException("No groups have been set.");
         }
         
-        TResult result = Activator.CreateInstance<TResult>();
-        result.Deserialize(output);
-        
-        return result;
+        foreach (var g in groups) {
+            if (g.name == groupName) {
+                g[optionName].SetValue(argumentName, value);
+                return;
+            }
+        }
     }
+    
 
     public object Clone() {
         SettingsNode<TResult> clone = new SettingsNode<TResult>(name) {
-            context = (Context)context.Clone()
+            context = (Context)context.Clone(),
+            executionDelegate = executionDelegate
         };
 
         if (groups == null) return clone;
@@ -121,7 +174,7 @@ public class SettingsNode<TResult> : ICloneable where TResult : SettingsObject {
         output += "], \"groups\": [";
 
         if (groups == null) {
-            output += "]";
+            output += "]}";
             return output;
         }
         

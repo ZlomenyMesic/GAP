@@ -50,6 +50,6 @@ public sealed class BoolArgumentType : ArgumentType {
     }
 
     public override string ToString() {
-        return $"{{\"type\": \"bool\", \"value\": \"{(value == null ? "\"null\"" : value)}\"}}";
+        return $"{{\"type\": \"bool\", \"value\": \"{(value == null ? "null" : value)}\"}}";
     }
 }

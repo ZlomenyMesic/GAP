@@ -3,9 +3,9 @@
 //   by ZlomenyMesic & KryKom
 //
 
-using System.Text.Json;
 using GAP.util.exceptions;
 using GAP.util.settings.argumentType;
+using Kolors;
 
 namespace GAP.util.settings;
 
@@ -15,8 +15,25 @@ namespace GAP.util.settings;
 public sealed class SettingsGroup : ICloneable {
     public string name { get; private set; }
     public Context? outputContext { get; private init; } = null;
-    public List<SettingsGroupOption>? options { get; private set; } = null;
+    private List<SettingsGroupOption>? options { get; set; } = null;
+    public SettingsGroupOption[] Options => 
+        options?.ToArray() ?? throw new SettingsBuilderException("No options have been set.");
 
+    private Action<Context, Context>? onParse = null;
+    
+    public SettingsGroupOption this[string name] {
+        get {
+            if (options is null) {
+                throw new SettingsBuilderException("No options have been set.");
+            }
+            
+            foreach (var o in options) {
+                if (o.name == name) return o;
+            }
+            
+            throw new SettingsBuilderException($"Option with name '{name}' doesn't exist in group '{this.name}'.");
+        }
+    }
 
     /// <summary>
     /// creates a new instance of <see cref="SettingsGroup"/>
@@ -25,14 +42,26 @@ public sealed class SettingsGroup : ICloneable {
     /// <param name="outputContext">unified output context of the group</param>
     public static SettingsGroup New(string name, params (string name, ArgumentType argument)[] outputContext) {
 
-        if (outputContext == null || outputContext.Length == 0)
-            throw new SettingsBuilderException($"Output context of group '{name}' is empty.");
+        if (outputContext == null)
+            throw new SettingsBuilderException($"Output context is not initialized for group '{name}'.");
         
         SettingsGroup sg = new SettingsGroup(name) {
             outputContext = new Context()
         };
         
         sg.outputContext.Add(outputContext);
+        
+        return sg;
+    }
+
+    public static SettingsGroup New(string name, Context outputContext) {
+        if (outputContext is null) {
+            throw new SettingsBuilderException($"Output context is not initialized for group '{name}'.");
+        }
+        
+        SettingsGroup sg = new SettingsGroup(name) {
+            outputContext = outputContext
+        };
         
         return sg;
     }
@@ -73,13 +102,71 @@ public sealed class SettingsGroup : ICloneable {
         return this;
     }
 
+
+    /// <summary>
+    /// sets the node context variables to group context variables 
+    /// </summary>
+    /// <param name="parse">parameter 1: group context, parameter 2: node context</param>
+    public SettingsGroup OnParse(Action<Context, Context> parse) {
+        onParse = parse;
+        return this;
+    }
+    
+
+    /// <summary>
+    /// parses the arguments to a context
+    /// </summary>
+    /// <exception cref="SettingsBuilderException">
+    /// no available options exist, no option with provided name exists
+    /// </exception>
+    public void Execute(string optionName, in Context outputContext) {
+        
+        if (options == null)
+            throw new SettingsBuilderException($"No options have been set for group '{name}'.");
+
+        if (onParse is null)
+            throw new SettingsBuilderException($"No parsing method has been set for group '{name}'.");
+        
+        if (this.outputContext is null)
+            throw new SettingsBuilderException($"Output context is not initialized for group '{name}'.");
+
+        foreach (var o in options) {
+            if (o.name == optionName) {
+                o.Execute(outputContext);
+                onParse(this.outputContext, outputContext);
+                return;
+            }
+        }
+        
+        throw new SettingsBuilderException($"Option '{optionName}' does not exist in group '{name}'.");
+    }
+
     /// <summary>
     /// whether all properties have been properly initialized
     /// </summary>
     public bool IsFullyInitialized() => outputContext is { Length: > 0 } && options is { Count: > 0 };
-
+    
+    /// <summary>
+    /// sets the value of an argument of an option
+    /// </summary>
+    public void SetValue(string optionName, string argumentName, object value) {
+        if (options is null) {
+            throw new SettingsBuilderException($"No options have been set in group '{name}'.");
+        }
+        
+        foreach (var o in options) {
+            if (o.name == optionName) {
+                o.SetValue(argumentName, value);
+                return;
+            }
+        }
+        
+        throw new SettingsBuilderException($"No option named '{optionName}' found in group '{name}'.");
+    }
+    
     public object Clone() {
         SettingsGroup sg = new SettingsGroup(name) {
+            onParse = onParse,
             outputContext = (Context?)outputContext?.Clone()
         };
 

@@ -25,6 +25,12 @@ public sealed class Context : ICloneable {
             }
         }
     }
+
+    public ArgumentType this[int index] => GetAtIndex(index).value;
+
+    public Context(params (string name, ArgumentType argument)[] arguments) {
+        Add(arguments);
+    }
     
     public void Add(string name, ArgumentType argument) {
         if (!arguments.TryAdd(name, argument))
@@ -62,5 +68,9 @@ public sealed class Context : ICloneable {
     public (string name, ArgumentType value) GetAtIndex(int index) {
         if (index >= Length) throw new ContextException($"Context at index {index} out of range.");
         return (arguments.Keys.ElementAt(index), arguments.Values.ElementAt(index));
+    }
+
+    public static Context New(params (string name, ArgumentType argument)[] arguments) {
+        return new Context(arguments);
     }
 }

@@ -6,6 +6,7 @@
 using System.Text.Json;
 using GAP.util.exceptions;
 using GAP.util.settings.argumentType;
+using Kolors;
 
 namespace GAP.util.settings;
 
@@ -38,15 +39,28 @@ public sealed class SettingsGroupOption : ICloneable {
     }
 
     /// <summary>
-    /// describes how to convert arguments from this option to arguments of the whole group
+    /// describes how to convert arguments from this option to shared group context
     /// </summary>
-    public SettingsGroupOption Convert(Action<Context, Context> parse) {
+    /// <param name="parse">parameter 1: option context, parameter 2: shared group context</param>
+    public SettingsGroupOption OnParse(Action<Context, Context> parse) {
         parseContext = parse;
         return this;
     }
 
-    public Context Execute((string name, string value)[] arguments) {
-        throw new NotImplementedException();
+    /// <summary>
+    /// parses the option context into the shared group context  
+    /// </summary>
+    /// <exception cref="SettingsBuilderException">
+    /// no parsing delegate has been provided through the <see cref="OnParse"/> method
+    /// </exception>
+    public void Execute(in Context context) {
+        
+        if (parseContext == null) {
+            throw new SettingsBuilderException(
+                "Parsing delegate has not been provided. Use OnParse(Action<Context,Context> parse) method to do so.");
+        }
+        
+        parseContext(this.context, context);
     }
 
     /// <summary>
@@ -54,6 +68,13 @@ public sealed class SettingsGroupOption : ICloneable {
     /// </summary>
     public bool IsFullyInitialized() {
         return parseContext != null;
+    }
+    
+    /// <summary>
+    /// sets the value of an argument
+    /// </summary>
+    public void SetValue(string argumentName, object value) {
+        context[argumentName].SetParsedValue(value);
     }
     
     public object Clone() {

@@ -5,6 +5,7 @@
 
 using System.Drawing;
 using System.Text.Json;
+using GAP.util.exceptions;
 using GAP.util.settings;
 
 namespace GAP.core.image.transformation.transformers;
@@ -13,7 +14,7 @@ namespace GAP.core.image.transformation.transformers;
 /// Grid Image Transformation <br/>
 /// transforms the picture by separating its pixels and placing transparent color between them 
 /// </summary>
-public class Grid : ImageTransformer, SettingsObject {
+public class Grid : ImageTransformer {
     public uint scaleFactor { get; set; }
     
     /// <summary>
@@ -83,15 +84,22 @@ public class Grid : ImageTransformer, SettingsObject {
         
         Copy(grid);
     }
+    
+    
+    private static readonly SettingsBuilder<Grid> SETTINGS = SettingsBuilder<Grid>.Build("grid", 
+        SettingsNode<Grid>.New("default")
+            .Argument("scale_factor", Arguments.UInteger(0, 100))
+            .OnParse(context => new Grid((uint)context["scale_factor"].GetParsedValue()))
+    );
+    
+
+    public override SettingsBuilder<T> GetSettings<T>() {
+        if (typeof(T) != typeof(Grid)) {
+            throw new SettingsBuilderException("Invalid type inputted.");
+        }
+        
+        return SETTINGS.Clone() as SettingsBuilder<T> ?? SettingsBuilder<T>.Empty<T>("white_noise");
+    }
 
     public override string ToString() => JsonSerializer.Serialize(this);
-    
-    public void Deserialize((string name, object value)[] input) {
-        foreach ((string name, object value) i in input) {
-            scaleFactor = i.name switch {
-                "scale_factor" => (uint)i.value,
-                _ => scaleFactor
-            };
-        }
-    }
 }

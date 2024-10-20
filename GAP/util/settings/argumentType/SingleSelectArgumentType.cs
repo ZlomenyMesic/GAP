@@ -42,7 +42,7 @@ public class SingleSelectArgumentType : ArgumentType {
 
     public string GetValue() {
         if (values == null || values.Length == 0) {
-            throw new SettingsBuilderException("No values provided argument.");
+            throw new SettingsBuilderException("No values provided to argument.");
         }
 
         if (selectedIndex == null) {
@@ -54,7 +54,7 @@ public class SingleSelectArgumentType : ArgumentType {
 
     public object GetParsedValue() {
         if (values == null || values.Length == 0)
-            throw new SettingsBuilderException("No values provided argument.");
+            throw new SettingsBuilderException("No values provided to argument.");
 
         if (selectedIndex == null)
             throw new SettingsBuilderException("No value has been selected.");
@@ -78,6 +78,11 @@ public class SingleSelectArgumentType : ArgumentType {
     }
 
     public void SetParsedValue(object value) {
+        if (value.GetType() == type) {
+            SetValue(Enum.GetName(type, value));
+            return;
+        }
+        
         SetValue((string)value);
     }
 
@@ -99,7 +104,7 @@ public class SingleSelectArgumentType : ArgumentType {
 
     public ArgumentType Clone() {
         if (values == null || values.Length == 0)
-            throw new SettingsArgumentException("No values provided to source argument.");
+            throw new SettingsArgumentException("No values provided to argument.");
 
         SingleSelectArgumentType clone = type == null ? 
             new SingleSelectArgumentType(values) : new SingleSelectArgumentType(type);
@@ -107,5 +112,18 @@ public class SingleSelectArgumentType : ArgumentType {
         clone.selectedIndex = selectedIndex;
         
         return clone;
+    }
+
+    public override string ToString() {
+        string output = $"{{\"type\": \"single_select\", \"value\": " +
+                        $"{(selectedIndex == null ? "\"null\"" : selectedIndex.ToString())}, \"values\": [";
+
+        for (int i = 0; i < values.Length; i++) {
+            output += "\"" + values[i] + "\"" + (i != values.Length - 1 ? ", " : "");
+        }
+        
+        output += "]}";
+        
+        return output;
     }
 }

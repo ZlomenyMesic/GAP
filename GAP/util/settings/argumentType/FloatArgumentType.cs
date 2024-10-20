@@ -48,7 +48,7 @@ public sealed class FloatArgumentType : ArgumentType {
     }
 
     public void SetParsedValue(object value) {
-        if (value.GetType() != typeof(bool)) throw new SettingsArgumentException(value.GetType(), typeof(float));
+        if (value.GetType() != typeof(float)) throw new SettingsArgumentException(value.GetType(), typeof(float));
         if ((float)value < min || (float)value > max) 
             throw new SettingsArgumentException($"Value of {value} must be greater than {min} and smaller than {max}.");
 
