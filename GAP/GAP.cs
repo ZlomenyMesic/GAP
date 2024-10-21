@@ -23,7 +23,13 @@ namespace GAP;
 class GAP : Mod {
 
     public const string PROJECT_ID = "gap";
+    public const string DESCRIPTION = "official vanilla GAP generators";
     private const Debug.DebugLevel DEBUG_LEVEL = Debug.DebugLevel.ALL;
+    private static readonly string[] EXCLUDED_BINARIES = [
+        "Kolors", 
+        "Microsoft.Win32.SystemEvents",
+        "System.Drawing.Common"
+    ];
 
     //
     // NOTE:
@@ -39,29 +45,10 @@ class GAP : Mod {
     static int Main() {
         
         Debug.debugLevel = DEBUG_LEVEL;
-
+        
         // Mod loading
-        // Totally harmless, and totally doesn't load itself as a mod
-        int modCount = ModLoader.LoadMods(".");
-        
-        // foreach (var modName in ModLoader.GetRegisteredMods()) Debug.info($"Loaded mod '{modName}'");
-        // Debug.info($"Loaded {modCount} mods total");
-        
-        WhiteNoise wn = new WhiteNoise();
-        // Console.WriteLine(wn.GetSettings<WhiteNoise>());
-        
-        var settings = wn.GetSettings<WhiteNoise>();
-        
-        settings["advanced"].SetValue("width", 123);
-        settings["advanced"].SetValue("height", 456);
-        settings["advanced"].SetValue("seed", 789);
-        settings["advanced"].SetGroupOptionValue("advanced", "presets", "presets", WhiteNoisePresets.GRAYSCALE);
-
-        Console.WriteLine(settings.ToString());
-        
-        var whiteNoise = settings.Execute("advanced", ("advanced", "presets"));
-        Bitmap bmp = whiteNoise.GenerateImage();
-        bmp.Save("gap.png");
+        int modCount = ModLoader.LoadMods(".", EXCLUDED_BINARIES);
+        ModLoader.WriteRegisteredMods();
         
         // DeepDream.RunGeneratorRandom(4);
         // DeepDream.RunGeneratorCustom("mixed3", "mixed2", "mixed5");
@@ -75,5 +62,9 @@ class GAP : Mod {
 
     public void Initialize() {
         DefaultRegistries.Register();
+    }
+
+    public string GetInfo() {
+        return "official vanilla GAP generators";
     }
 }

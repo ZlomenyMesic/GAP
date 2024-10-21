@@ -21,4 +21,9 @@ public interface Mod {
     /// method called at mod initialization
     /// </summary>
     public void Initialize();
+
+    /// <summary>
+    /// returns the description of the mod
+    /// </summary>
+    public string GetInfo();
 }
