@@ -43,11 +43,11 @@ internal static class ModLoader {
             if (result) {
                 modCount++;
                 
-                ConsoleColors.printColored("   (+) ", Debug.infoColor);
+                ConsoleColors.printColored("   \u25cf ", Debug.infoColor);
                 Console.WriteLine(file.Replace(path + "\\", ""));
             }
             else {
-                ConsoleColors.printColored("   (-) ", Debug.errorColor);
+                ConsoleColors.printColored("   \u25cb ", Debug.errorColor);
                 Console.WriteLine(file.Replace(path + "\\", ""));
             }
         }
@@ -121,7 +121,8 @@ internal static class ModLoader {
         Console.WriteLine($"\x1B[1mRegistered Mods ({MOD_IDS.Count}):\x1B[0m");
         
         for (int i = 0; i < MOD_IDS.Count; i++) {
-            Console.WriteLine($"   {MOD_IDS[i]}: {MOD_DESCRIPTIONS[i]}");
+            ConsoleColors.printColored($"   \u25cf {MOD_IDS[i]}", Debug.warnColor);
+            Console.WriteLine($": {MOD_DESCRIPTIONS[i]}");
         }
         
         Console.WriteLine();

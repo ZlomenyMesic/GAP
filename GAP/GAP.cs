@@ -22,6 +22,8 @@ namespace GAP;
 
 class GAP : Mod {
 
+    // constants
+    
     public const string PROJECT_ID = "gap";
     public const string DESCRIPTION = "official vanilla GAP generators";
     private const Debug.DebugLevel DEBUG_LEVEL = Debug.DebugLevel.ALL;
@@ -44,6 +46,9 @@ class GAP : Mod {
     
     static int Main() {
         
+        Console.Title = "GAP: cli";
+        Console.OutputEncoding = System.Text.Encoding.Unicode;
+        
         Debug.debugLevel = DEBUG_LEVEL;
         
         // Mod loading
@@ -65,6 +70,6 @@ class GAP : Mod {
     }
 
     public string GetInfo() {
-        return "official vanilla GAP generators";
+        return DESCRIPTION;
     }
 }
