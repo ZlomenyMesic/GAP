@@ -7,7 +7,6 @@ using System.Drawing;
 using System.Text.Json;
 using GAP.util.exceptions;
 using GAP.util.settings;
-using Kolors;
 
 namespace GAP.core.image.transformation.transformers;
 

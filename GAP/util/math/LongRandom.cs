@@ -3,7 +3,7 @@
 //   by ZlomenyMesic & KryKom
 //
 
-namespace GAP.util;
+namespace GAP.util.math;
 
 public class LongRandom {
     public readonly long seed;

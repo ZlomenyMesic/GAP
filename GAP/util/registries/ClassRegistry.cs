@@ -4,7 +4,6 @@
 //
 
 using GAP.util.registries.exceptions;
-using Kolors;
 
 namespace GAP.util.registries;
 
@@ -14,6 +13,7 @@ namespace GAP.util.registries;
 /// <typeparam name="T">type of stored object</typeparam>
 public abstract class ClassRegistry<T> {
     
+    // ReSharper disable once StaticMemberInGenericType
     protected static IDictionary<string, Type?> REGISTRY { get; } = new Dictionary<string, Type?>();
 
     /// <summary>

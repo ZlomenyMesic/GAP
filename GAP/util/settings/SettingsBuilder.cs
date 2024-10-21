@@ -82,6 +82,8 @@ public class SettingsBuilder<TResult> {
     /// no matching settings node was found
     /// </exception>
     public TResult Execute(string nodeName, params (string groupName, string optionName)[] selectedOptions) {
+        if (isEmpty)
+            throw new SettingsBuilderException("SettingsBuilder is empty. Cannot execute.");
         
         if (nodes == null) 
             throw new SettingsBuilderException("Cannot execute settings before building them.");

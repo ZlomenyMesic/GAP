@@ -105,6 +105,8 @@ public class SettingsNode<TResult> : ICloneable {
     /// parses the arguments to an object of type <see cref="TResult"/>
     /// </summary>
     public TResult Execute(params (string groupName, string optionName)[] config) {
+        if (isEmpty)
+            throw new SettingsBuilderException("Node is empty. Cannot execute.");
         
         if (executionDelegate is null)
             throw new SettingsBuilderException("Execution delegate is not set.");

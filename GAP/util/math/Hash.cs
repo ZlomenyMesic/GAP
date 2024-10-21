@@ -6,7 +6,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace GAP.util;
+namespace GAP.util.math;
 
 public static class Hash {
     
@@ -19,11 +19,10 @@ public static class Hash {
         byte[] bytes = Encoding.UTF8.GetBytes(input);
 
         // Compute the hash code using SHA-256
-        using (SHA256 sha256 = SHA256.Create())
-        {
-            byte[] hashBytes = sha256.ComputeHash(bytes);
-            // Take the first 4 bytes of the hash as the integer hash code
-            return BitConverter.ToInt32(hashBytes, 0);
-        }
+        using SHA256 sha256 = SHA256.Create();
+        
+        byte[] hashBytes = sha256.ComputeHash(bytes);
+        // Take the first 4 bytes of the hash as the integer hash code
+        return BitConverter.ToInt32(hashBytes, 0);
     }
 }

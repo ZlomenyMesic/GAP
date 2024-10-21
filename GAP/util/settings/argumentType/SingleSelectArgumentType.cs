@@ -79,7 +79,7 @@ public class SingleSelectArgumentType : ArgumentType {
 
     public void SetParsedValue(object value) {
         if (value.GetType() == type) {
-            SetValue(Enum.GetName(type, value));
+            SetValue(Enum.GetName(type, value) ?? string.Empty);
             return;
         }
         

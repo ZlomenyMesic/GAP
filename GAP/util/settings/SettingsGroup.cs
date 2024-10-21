@@ -5,7 +5,6 @@
 
 using GAP.util.exceptions;
 using GAP.util.settings.argumentType;
-using Kolors;
 
 namespace GAP.util.settings;
 

@@ -7,15 +7,15 @@
 
 using System.Diagnostics;
 
-namespace GAP;
+namespace GAP.machineLearning;
 
 internal static class PythonWrapper {
-    private static readonly string SCRIPT_DIR = $@"..\..\..\machinelearning\";
+    private static readonly string SCRIPT_DIR = $@"..\..\..\machineLearning\";
 
-    // script must be located in directory machinelearning
+    // script must be located in directory machineLearning
     /// <summary>
     /// executes a python script.
-    /// the script MUST be located in machinelearning directory!
+    /// the script MUST be located in machineLearning directory!
     /// </summary>
     /// <param name="name">script/file name</param>
     /// <param name="args">optional arguments</param>

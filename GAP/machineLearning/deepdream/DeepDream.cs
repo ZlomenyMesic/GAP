@@ -5,11 +5,11 @@
 //      founded 11.9.2024
 //
 
-using GAP.util.exceptions;
 using System.Diagnostics;
 using System.Text;
+using GAP.util.exceptions;
 
-namespace GAP;
+namespace GAP.machineLearning.deepdream;
 
 
 /// <summary>
@@ -38,9 +38,10 @@ namespace GAP;
 ///  
 /// </summary>
 internal static class DeepDream {
+    
     /// <summary>
     /// not necessary when using a file path. however, when using
-    /// an URL, image name has to be specified, e.g. "image.jpg"
+    /// a URL, image name has to be specified, e.g. "image.jpg"
     /// </summary>
     internal static string ImageName { get; set; } = "input.jpg";
 
@@ -50,7 +51,7 @@ internal static class DeepDream {
     /// absolute or relative) or an URL (both including image name)
     /// e.g. "https://img-datasets.s3.amazonaws.com/coast.jpg"
     /// </summary>
-    internal static string ImageOrigin { get; set; } = @"..\..\..\machinelearning\deepdream\input.jpg";
+    internal static string ImageOrigin { get; set; } = @"..\..\..\machineLearning\deepdream\input.jpg";
 
 
     /// <summary>
@@ -64,7 +65,7 @@ internal static class DeepDream {
     /// <summary>
     /// location where the output image will be saved
     /// </summary>
-    internal static string OutputPath { get; set; } = @"..\..\..\machinelearning\deepdream\output\dream.png";
+    internal static string OutputPath { get; set; } = @"..\..\..\machineLearning\deepdream\output\dream.png";
 
 
     /// <summary>
@@ -140,9 +141,9 @@ internal static class DeepDream {
     internal static List<string> LayerSequence = ["mixed0"];
 
 
-    private static readonly string PARAMS = @"..\..\..\machinelearning\deepdream\params.txt";
+    private static readonly string PARAMS = @"..\..\..\machineLearning\deepdream\params.txt";
     private static readonly string SCRIPT = @"deepdream\DeepDream.py";
-    private static readonly string DONE   = @"..\..\..\machinelearning\deepdream\output\DONE";
+    private static readonly string DONE   = @"..\..\..\machineLearning\deepdream\output\DONE";
 
 
     /// <summary>
