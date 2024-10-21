@@ -13,7 +13,6 @@ namespace GAP;
 internal class GAP : Mod {
 
     // constants
-    
     public const string PROJECT_ID = "gap";
     private const string DESCRIPTION = "official vanilla GAP generators";
     private const Debug.DebugLevel DEBUG_LEVEL = Debug.DebugLevel.ALL;
@@ -31,7 +30,7 @@ internal class GAP : Mod {
     
     //
     // TODOS:
-    // slider argument type
+    //
     //
     
     static int Main() {

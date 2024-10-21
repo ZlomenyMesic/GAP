@@ -29,6 +29,7 @@ public static class Arguments {
             UnsignedLongArgumentType type => ParseULong(value, type),
             FloatArgumentType type => ParseFloat(value, type),
             DoubleArgumentType type => ParseDouble(value, type),
+            SliderArgumentType type => ParseSlider(value, type),
             StringArgumentType type => ParseString(value, type),
             BoolArgumentType => ParseBool(value),
             _ => throw new ArgumentException($"Unknown argument type: {argumentType.GetType().Name}")
@@ -47,6 +48,7 @@ public static class Arguments {
             UnsignedLongArgumentType type => ParseULong((ulong)value, type),
             FloatArgumentType type => ParseFloat((float)value, type),
             DoubleArgumentType type => ParseDouble((double)value, type),
+            SliderArgumentType type => ParseSlider((int)value, type),
             StringArgumentType type => ParseString((string)value, type),
             BoolArgumentType => ParseBool((bool)value),
             _ => throw new ArgumentException($"Unknown argument type: {argument.GetType().Name}")
@@ -115,6 +117,127 @@ public static class Arguments {
         }
         
         return value;
+    }
+    
+    
+    
+    // --- slider things ---
+
+    /// <summary>
+    /// returns a new integer slider argument
+    /// </summary>
+    public static SliderArgumentType NaturalSlider(int min = Int32.MinValue, int max = Int32.MaxValue, uint step = 1) => 
+        new(min, max, step);
+    
+    
+    /// <summary>
+    /// returns a new integer slider argument
+    /// </summary>
+    public static SliderArgumentType DecimalSlider(double min = System.Double.MinValue, 
+        double max = System.Double.MaxValue, double step = 1) => new(min, max, step);
+
+    /// <summary>
+    /// parses a string using a slider argument
+    /// </summary>
+    /// <exception cref="FormatException">could not parse the value</exception>
+    /// <exception cref="SettingsArgumentException">number is out of bounds</exception>
+    public static int ParseNaturalSlider(string value, SliderArgumentType argument) {
+        int output;
+        
+        try {
+            output = int.Parse(value);
+        }
+        catch (FormatException e) {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        if (output < argument.nmin || output > argument.nmax) { 
+            throw new SettingsArgumentException(argument, 
+                $"Invalid value. Value must be between {argument.nmin} and {argument.nmax}.");
+        }
+            
+        return output;
+    }
+
+    /// <summary>
+    /// parses a string using a slider argument
+    /// </summary>
+    /// <exception cref="FormatException">could not parse the value</exception>
+    /// <exception cref="SettingsArgumentException">number is out of bounds</exception>
+    public static double ParseDecimalSlider(string value, SliderArgumentType argument) {
+        double output;
+        
+        try {
+            output = double.Parse(value);
+        }
+        catch (FormatException e) {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        if (output < argument.dmin || output > argument.dmax) { 
+            throw new SettingsArgumentException(argument, 
+                $"Invalid value. Value must be between {argument.dmin} and {argument.dmax}.");
+        }
+            
+        return output;
+    }
+
+    /// <summary>
+    /// parses a string using a slider argument 
+    /// </summary>
+    /// <exception cref="FormatException">could not parse the value</exception>
+    /// <exception cref="SettingsArgumentException">number is out of bounds</exception>
+    public static object ParseSlider(string value, SliderArgumentType argument) {
+        if (argument.isNatural) {
+            return ParseNaturalSlider(value, argument);
+        }
+        else {
+            return ParseDecimalSlider(value, argument);
+        }
+    }
+
+    /// <summary>
+    /// validates a value using an argument
+    /// </summary>
+    /// <returns>the validated value</returns>
+    /// <exception cref="SettingsArgumentException">value is invalid</exception>
+    public static int ParseNaturalSlider(int value, SliderArgumentType argument) {
+        if (value < argument.nmin || value > argument.nmax) {
+            throw new SettingsArgumentException(argument, 
+                $"Invalid value. Value must be between {argument.nmin} and {argument.nmax}.");
+        }
+        
+        return value;
+    }
+
+    /// <summary>
+    /// validates a value using a slider argument
+    /// </summary>
+    /// <returns>the validated value</returns>
+    /// <exception cref="SettingsArgumentException">value is invalid</exception>
+    public static double ParseDecimalSlider(double value, SliderArgumentType argument) {
+        if (value < argument.dmin || value > argument.dmax) {
+            throw new SettingsArgumentException(argument, 
+                $"Invalid value. Value must be between {argument.dmin} and {argument.dmax}.");
+        }
+        
+        return value;
+    }
+
+    /// <summary>
+    /// validates a value using a slider argument
+    /// </summary>
+    /// <returns>the validated value</returns>
+    /// <exception cref="SettingsArgumentException">value is invalid</exception>
+    public static object ParseSlider(object value, SliderArgumentType argument) {
+        if (argument.isNatural) {
+            return ParseNaturalSlider((int)value, argument);
+        }
+        else {
+            return ParseDecimalSlider((double)value, argument);
+        }
     }
     
     
