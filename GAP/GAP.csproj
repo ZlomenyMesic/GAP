@@ -14,13 +14,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Brigadier.NET" Version="1.2.13" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.8" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="core\audio\" />
-    <Folder Include="machinelearning\deepdream\output\layers\" />
+    <Folder Include="machineLearning\deepdream\output\layers\" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <SuppressImplicitPlatformCompatibilityWarnings>true</SuppressImplicitPlatformCompatibilityWarnings>
+  </PropertyGroup>
 
 </Project>

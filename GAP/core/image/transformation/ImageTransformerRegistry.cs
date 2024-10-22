@@ -4,7 +4,6 @@
 //
 
 using System.Reflection;
-using GAP.core.image.transformation.transformers;
 using GAP.util.registries;
 using Kolors;
 
@@ -64,5 +63,9 @@ public class ImageTransformerRegistry : ClassRegistry<ImageTransformer> {
         else {
             throw new KeyNotFoundException($"Could not find registry object \'{id}\'.");
         }
+    }
+
+    public static Type?[] GetAllInstances() {
+        return REGISTRY.Values.ToArray();
     }
 }

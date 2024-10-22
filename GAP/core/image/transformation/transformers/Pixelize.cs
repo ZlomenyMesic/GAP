@@ -5,7 +5,8 @@
 
 using System.Drawing;
 using System.Text.Json;
-using Kolors;
+using GAP.util.exceptions;
+using GAP.util.settings;
 
 namespace GAP.core.image.transformation.transformers;
 
@@ -105,6 +106,20 @@ public class Pixelize : ImageTransformer {
         }
         
         Copy(pixelize);
+    }
+    
+    private static readonly SettingsBuilder<Pixelize> SETTINGS = SettingsBuilder<Pixelize>.Build("pixelize", 
+        SettingsNode<Pixelize>.New("default")
+            .Argument("pixel_type", Arguments.SingleSelect(typeof(PixelType)))
+            .OnParse(context => new Pixelize((PixelType)context["pixel_type"].GetParsedValue()))
+    );
+
+    public override SettingsBuilder<T> GetSettings<T>() {
+        if (typeof(T) != typeof(Pixelize)) {
+            throw new SettingsBuilderException("Invalid type inputted.");
+        }
+        
+        return SETTINGS.Clone() as SettingsBuilder<T> ?? SettingsBuilder<T>.Empty<T>("white_noise");
     }
 
     public override string ToString() => JsonSerializer.Serialize(this);

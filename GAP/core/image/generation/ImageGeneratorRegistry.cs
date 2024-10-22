@@ -3,7 +3,6 @@
 //   by ZlomenyMesic & KryKom
 //
 
-using System.Reflection;
 using GAP.util.registries;
 using Kolors;
 
@@ -44,10 +43,10 @@ public abstract class ImageGeneratorRegistry : ClassRegistry<ImageGenerator> {
         if (REGISTRY.TryGetValue(id, out Type? value)) {
             if (value != null) {
                 
-                ImageGenerator? instance = (ImageGenerator?)Activator.CreateInstance(value)
-                    ?? throw new NullReferenceException($"Failed to create instance of type {value}");
+                ImageGenerator instance = (ImageGenerator?)Activator.CreateInstance(value)
+                                          ?? throw new NullReferenceException($"Failed to create instance of type {value}");
                 
-                MethodInfo? method = value.GetMethod("LoadFromJson")
+                _ = value.GetMethod("LoadFromJson")
                     ?? throw new NullReferenceException($"Can't find method LoadFromJson in type {value}"); 
                 
                 instance.LoadFromJson(jsonSettings);
