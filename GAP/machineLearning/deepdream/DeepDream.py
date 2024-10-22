@@ -16,6 +16,18 @@ import tensorflow.keras.applications.inception_v3 as inception_v3
 import matplotlib.pyplot as plt
 import numpy as np
 
+WHITE = "\033[0;37;40m"
+GRAY = "\033[1;30;40m"
+RED = "\033[1;31;40m"
+GREEN = "\033[1;32;40m"
+YELLOW = "\033[1;33;40m"
+BLUE = "\033[1;34;40m"
+MAGENTA = "\033[1;35;40m"
+CYAN = "\033[0;36;40m"
+
+BULLET = "\u25cf"
+CIRCLE = "\u25cb"
+
 # number of parameters passed in params.txt
 PARAMS_LEN = 12
 
@@ -165,7 +177,7 @@ def loop_octaves(original_img, original_shape):
 
     for i, shape in enumerate(consecutive_shapes):
         if VERBOSE:
-            print(f"   octave {i + 1}/{OCTAVES} with shape {shape}")
+            print(f"   Processing octave {YELLOW}{i + 1}/{OCTAVES}{WHITE} with shape {shape}    ", end = '\r')
 
         # resize the image
         img = tf.image.resize(img, shape)
@@ -183,6 +195,10 @@ def loop_octaves(original_img, original_shape):
         lost_detail = same_size_original - upscaled_shrunk_original_img
         img += lost_detail
         shrunk_original_img = tf.image.resize(original_img, shape)
+
+    if VERBOSE:
+        print(f"   Finished octave {YELLOW}{OCTAVES}/{OCTAVES}{WHITE}                                       ")
+
     return img
 
 # creates the feature extractor for each layer
@@ -219,7 +235,7 @@ def loop_layers():
         CUR_LAYER_ACTIVATION = layer_settings[layer]
 
         if VERBOSE:
-            print(f"iteration: {i + 1}, layer name: {CUR_LAYER}, layer activation: {CUR_LAYER_ACTIVATION}")
+            print(f"{CYAN}LAYER {i + 1}{WHITE} - Name: {GREEN}{CUR_LAYER}{WHITE}; Activation: {CUR_LAYER_ACTIVATION}")
 
         extract_layer(layer)
 
@@ -232,12 +248,19 @@ def loop_layers():
             img, shape = get_img_shape(IMG_NAME, OUTPUT_PATH, 0)
 
         if VERBOSE:
-            print("\n")
+            print("")
 
         i += 1
     return img
 
 import_params()
+
+if VERBOSE:
+    print(f"Running DeepDream:")
+    print(f"   {GREEN}{CIRCLE}{WHITE} Input source: {IMG_ORIGIN}")
+    print(f"   {GREEN}{CIRCLE}{WHITE} Output path: {OUTPUT_PATH}")
+    print(f"   {GREEN}{CIRCLE}{WHITE} Layers to iterate: {RED}{len(LAYERS)}{WHITE}")
+    print("")
 
 create_layer_dict()
 

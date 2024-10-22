@@ -6,6 +6,7 @@
 //
 
 using GAP.core.modLoader;
+using GAP.machinelearning.deepdream;
 using Kolors;
 
 namespace GAP;
@@ -50,17 +51,16 @@ internal class GAP : Mod {
         Debug.debugLevel = DEBUG_LEVEL;
         
         // Mod loading
-<<<<<<< HEAD
         // Totally harmless, and totally doesn't load itself as a mod
         //int modCount = ModLoader.LoadMods(".");
 
-        DeepDream.RunGeneratorRandom(4);
-=======
         ModLoader.LoadMods(".", EXCLUDED_BINARIES);
         ModLoader.WriteRegisteredMods();
-        
-        // DeepDream.RunGeneratorRandom(4);
->>>>>>> refs/remotes/origin/master
+
+
+
+
+        DeepDream.RunGeneratorFilteredRandom(4);
         // DeepDream.RunGeneratorCustom("mixed3", "mixed2", "mixed5");
 
         return 0;

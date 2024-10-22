@@ -9,16 +9,12 @@ using System.Diagnostics;
 using System.Text;
 using GAP.util.exceptions;
 
-<<<<<<< HEAD:GAP/machinelearning/deepdream/DeepDream.cs
 namespace GAP.machinelearning.deepdream;
-=======
-namespace GAP.machineLearning.deepdream;
->>>>>>> refs/remotes/origin/master:GAP/machineLearning/deepdream/DeepDream.cs
 
 
 /// <summary>
 /// 
-/// PARAMETERS POSSIBLE TO CHANGE:
+/// CHANGEABLE PARAMETERS:
 /// 
 ///   ImageName
 ///   ImageOrigin
@@ -33,7 +29,7 @@ namespace GAP.machineLearning.deepdream;
 ///   LayerSequence
 ///  
 /// HOW TO RUN THE GENERATOR?
-/// using one of the following functions:
+/// use one of the following functions:
 /// 
 ///   RunGenerator()
 ///   RunGeneratorCustom()
@@ -42,7 +38,7 @@ namespace GAP.machineLearning.deepdream;
 ///  
 /// </summary>
 internal static class DeepDream {
-    
+
     /// <summary>
     /// not necessary when using a file path. however, when using
     /// a URL, image name has to be specified, e.g. "image.jpg"
@@ -114,26 +110,23 @@ internal static class DeepDream {
     internal static bool Verbose { get; set; } = true;
 
 
-    internal static int[] LayerActivations { get; set; } = [ 0 ];
-
-
     /// <summary>
     /// all 311 layers from the InceptionV3 model
     /// </summary>
     internal static readonly string[] ALL_LAYERS = ["input_layer", "conv2d", "batch_normalization", "activation", "conv2d_1", "batch_normalization_1", "activation_1", "conv2d_2", "batch_normalization_2", "activation_2", "max_pooling2d", "conv2d_3", "batch_normalization_3", "activation_3", "conv2d_4", "batch_normalization_4", "activation_4", "max_pooling2d_1", "conv2d_8", "batch_normalization_8", "activation_8", "conv2d_6", "conv2d_9", "batch_normalization_6", "batch_normalization_9", "activation_6", "activation_9", "average_pooling2d", "conv2d_5", "conv2d_7", "conv2d_10", "conv2d_11", "batch_normalization_5", "batch_normalization_7", "batch_normalization_10", "batch_normalization_11", "activation_5", "activation_7", "activation_10", "activation_11", "mixed0", "conv2d_15", "batch_normalization_15", "activation_15", "conv2d_13", "conv2d_16", "batch_normalization_13", "batch_normalization_16", "activation_13", "activation_16", "average_pooling2d_1", "conv2d_12", "conv2d_14", "conv2d_17", "conv2d_18", "batch_normalization_12", "batch_normalization_14", "batch_normalization_17", "batch_normalization_18", "activation_12", "activation_14", "activation_17", "activation_18", "mixed1", "conv2d_22", "batch_normalization_22", "activation_22", "conv2d_20", "conv2d_23", "batch_normalization_20", "batch_normalization_23", "activation_20", "activation_23", "average_pooling2d_2", "conv2d_19", "conv2d_21", "conv2d_24", "conv2d_25", "batch_normalization_19", "batch_normalization_21", "batch_normalization_24", "batch_normalization_25", "activation_19", "activation_21", "activation_24", "activation_25", "mixed2", "conv2d_27", "batch_normalization_27", "activation_27", "conv2d_28", "batch_normalization_28", "activation_28", "conv2d_26", "conv2d_29", "batch_normalization_26", "batch_normalization_29", "activation_26", "activation_29", "max_pooling2d_2", "mixed3", "conv2d_34", "batch_normalization_34", "activation_34", "conv2d_35", "batch_normalization_35", "activation_35", "conv2d_31", "conv2d_36", "batch_normalization_31", "batch_normalization_36", "activation_31", "activation_36", "conv2d_32", "conv2d_37", "batch_normalization_32", "batch_normalization_37", "activation_32", "activation_37", "average_pooling2d_3", "conv2d_30", "conv2d_33", "conv2d_38", "conv2d_39", "batch_normalization_30", "batch_normalization_33", "batch_normalization_38", "batch_normalization_39", "activation_30", "activation_33", "activation_38", "activation_39", "mixed4", "conv2d_44", "batch_normalization_44", "activation_44", "conv2d_45", "batch_normalization_45", "activation_45", "conv2d_41", "conv2d_46", "batch_normalization_41", "batch_normalization_46", "activation_41", "activation_46", "conv2d_42", "conv2d_47", "batch_normalization_42", "batch_normalization_47", "activation_42", "activation_47", "average_pooling2d_4", "conv2d_40", "conv2d_43", "conv2d_48", "conv2d_49", "batch_normalization_40", "batch_normalization_43", "batch_normalization_48", "batch_normalization_49", "activation_40", "activation_43", "activation_48", "activation_49", "mixed5", "conv2d_54", "batch_normalization_54", "activation_54", "conv2d_55", "batch_normalization_55", "activation_55", "conv2d_51", "conv2d_56", "batch_normalization_51", "batch_normalization_56", "activation_51", "activation_56", "conv2d_52", "conv2d_57", "batch_normalization_52", "batch_normalization_57", "activation_52", "activation_57", "average_pooling2d_5", "conv2d_50", "conv2d_53", "conv2d_58", "conv2d_59", "batch_normalization_50", "batch_normalization_53", "batch_normalization_58", "batch_normalization_59", "activation_50", "activation_53", "activation_58", "activation_59", "mixed6", "conv2d_64", "batch_normalization_64", "activation_64", "conv2d_65", "batch_normalization_65", "activation_65", "conv2d_61", "conv2d_66", "batch_normalization_61", "batch_normalization_66", "activation_61", "activation_66", "conv2d_62", "conv2d_67", "batch_normalization_62", "batch_normalization_67", "activation_62", "activation_67", "average_pooling2d_6", "conv2d_60", "conv2d_63", "conv2d_68", "conv2d_69", "batch_normalization_60", "batch_normalization_63", "batch_normalization_68", "batch_normalization_69", "activation_60", "activation_63", "activation_68", "activation_69", "mixed7", "conv2d_72", "batch_normalization_72", "activation_72", "conv2d_73", "batch_normalization_73", "activation_73", "conv2d_70", "conv2d_74", "batch_normalization_70", "batch_normalization_74", "activation_70", "activation_74", "conv2d_71", "conv2d_75", "batch_normalization_71", "batch_normalization_75", "activation_71", "activation_75", "max_pooling2d_3", "mixed8", "conv2d_80", "batch_normalization_80", "activation_80", "conv2d_77", "conv2d_81", "batch_normalization_77", "batch_normalization_81", "activation_77", "activation_81", "conv2d_78", "conv2d_79", "conv2d_82", "conv2d_83", "average_pooling2d_7", "conv2d_76", "batch_normalization_78", "batch_normalization_79", "batch_normalization_82", "batch_normalization_83", "conv2d_84", "batch_normalization_76", "activation_78", "activation_79", "activation_82", "activation_83", "batch_normalization_84", "activation_76", "mixed9_0", "concatenate", "activation_84", "mixed9", "conv2d_89", "batch_normalization_89", "activation_89", "conv2d_86", "conv2d_90", "batch_normalization_86", "batch_normalization_90", "activation_86", "activation_90", "conv2d_87", "conv2d_88", "conv2d_91", "conv2d_92", "average_pooling2d_8", "conv2d_85", "batch_normalization_87", "batch_normalization_88", "batch_normalization_91", "batch_normalization_92", "conv2d_93", "batch_normalization_85", "activation_87", "activation_88", "activation_91", "activation_92", "batch_normalization_93", "activation_85", "mixed9_1", "concatenate_1", "activation_93", "mixed10"];
-    
+
     /// <summary>
     /// 23 good looking layer preferred to be the second to last layer
     /// in the sequence. used in RunGeneratorFilteredRandom()
     /// </summary>
     internal static readonly string[] ALMOST_FINAL_LAYERS = ["activation_19", "activation_22", "activation_23", "activation_26", "activation_27", "activation_30", "activation_40", "activation_49", "activation_50", "activation_51", "batch_normalization_28", "batch_normalization_29", "batch_normalization_30", "batch_normalization_31", "batch_normalization_34", "batch_normalization_39", "conv2d_22", "conv2d_28", "conv2d_29", "conv2d_30", "mixed2", "mixed3", "mixed5"];
-    
+
     /// <summary>
     /// 6 most interesting layers from which the last layer is selected.
     /// also used by RunGeneratorFilteredCustom()
     /// </summary>
     internal static readonly string[] FINAL_LAYERS = ["mixed2", "mixed3", "mixed5", "activation_19", "activation_26", "activation_30"];
-    
+
     /// <summary>
     /// 10 terrible looking layers that are removed from the layer selection.
     /// also used only in RunGeneratorFilteredRandom()
@@ -141,11 +134,25 @@ internal static class DeepDream {
     /// </summary>
     internal static readonly string[] UGLY_LAYERS = ["activation", "activation_1", "activation_2", "batch_normalization", "batch_normalization_1", "batch_normalization_2", "conv2d", "conv2d_1", "conv2d_2", "input_layer"];
 
-    
     /// <summary>
     /// the current sequence of layers used in the generator
     /// </summary>
-    internal static List<string> LayerSequence = ["mixed0"];
+    internal static string[] LayerSequence = ["mixed0"];
+
+
+    // different possible layer activation functions
+    // any custom function must take the current iteration and total number of layers as arguments
+
+    /// <summary>
+    /// all layer activations are equal to 10
+    /// </summary>
+    private static readonly Func<int, int, int> LFEqual = (iteration, count) => 10;
+
+    /// <summary>
+    /// all layer activations are equal to 6, last one is equal to 15
+    /// </summary>
+    private static readonly Func<int, int, int> LFLastPriority = (iteration, count) => iteration == count - 1 ? 15 : 6;
+
 
 
     private static readonly string PARAMS = @"..\..\..\machineLearning\deepdream\params.txt";
@@ -158,31 +165,42 @@ internal static class DeepDream {
     /// the python script. changing the order also has to be done in DeepDream.py
     /// </summary>
     private static void SaveParameters() {
-        // convert the layer sequence into a single line string
-        StringBuilder sb = new();
-        for (int i = 0; i < LayerSequence.Count; i++) {
-            sb.Append($"{(i != 0 ? " " : "")}{LayerSequence[i]}");
-        }
-        string layers = sb.ToString();
-
-        string activations = CreateActivationsArray(LayerSequence.Count);
+        // convert the layer sequence and the respective activations into two single line strings
+        string layers = ArrayToString(LayerSequence);
+        string activations = ArrayToString([..CreateLayerActivationsArray(LayerSequence.Length, LFLastPriority)]);
 
         // save the parameters to the file
         using StreamWriter sw = new(PARAMS);
         sw.Write($"{ImageName}\n{ImageOrigin}\n{ImageOriginFormat}\n{OutputPath}\n{Verbose}\n{DistortionRate}\n{Octaves}\n{OctaveScale}\n{Iterations}\n{MaxLoss}\n{layers}\n{activations}");
     }
 
+    /// <summary>
+    /// creates an array of successive layer activations base on LayerActivationFunction
+    /// </summary>
+    /// <param name="length">number of all layers</param>
+    /// <param name="layerActivationFunction">layer activation function</param>
+    /// <returns>array of layer activations</returns>
+    private static int[] CreateLayerActivationsArray(int length, Func<int, int, int> layerActivationFunction) {
+        int[] activations = new int[length];
+        for (int i = 0; i < length; i++) {
+            activations[i] = layerActivationFunction(i, length);
+        }
+        return activations;
+    }
 
-    private static string CreateActivationsArray(int count) {
+
+    /// <summary>
+    /// puts all array items separated by spaces into a single line string
+    /// </summary>
+    /// <param name="arr">array to convert</param>
+    /// <returns>single line string</returns>
+    private static string ArrayToString(object[] arr) {
         StringBuilder sb = new();
-        for (int i = 0; i < count; i++) {
-            sb.Append($"{(i != 0 ? " " : "")}{LayerActivationFunction(i, count)}");
+        for (int i = 0; i < arr.Length; i++) {
+            sb.Append($"{(i != 0 ? " " : "")}{arr[i]}");
         }
         return sb.ToString();
     }
-
-    private static int LayerActivationFunction(int i, int count)
-        => i == count - 1 ? 15 : 6;
 
 
     /// <summary>
@@ -242,7 +260,7 @@ internal static class DeepDream {
                 throw new InvalidLayerException(0, layer);
         }
 
-        LayerSequence = [.. layers];
+        LayerSequence = [..layers];
 
         RunGenerator();
     }
