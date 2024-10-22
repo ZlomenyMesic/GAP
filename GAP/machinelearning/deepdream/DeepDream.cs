@@ -9,7 +9,7 @@ using GAP.util.exceptions;
 using System.Diagnostics;
 using System.Text;
 
-namespace GAP;
+namespace GAP.machinelearning.deepdream;
 
 
 /// <summary>
@@ -40,7 +40,7 @@ namespace GAP;
 internal static class DeepDream {
     /// <summary>
     /// not necessary when using a file path. however, when using
-    /// an URL, image name has to be specified, e.g. "image.jpg"
+    /// a URL, image name has to be specified, e.g. "image.jpg"
     /// </summary>
     internal static string ImageName { get; set; } = "input.jpg";
 
@@ -109,6 +109,9 @@ internal static class DeepDream {
     internal static bool Verbose { get; set; } = true;
 
 
+    internal static int[] LayerActivations { get; set; } = [ 0 ];
+
+
     /// <summary>
     /// all 311 layers from the InceptionV3 model
     /// </summary>
@@ -157,10 +160,24 @@ internal static class DeepDream {
         }
         string layers = sb.ToString();
 
+        string activations = CreateActivationsArray(LayerSequence.Count);
+
         // save the parameters to the file
         using StreamWriter sw = new(PARAMS);
-        sw.Write($"{ImageName}\n{ImageOrigin}\n{ImageOriginFormat}\n{OutputPath}\n{Verbose}\n{DistortionRate}\n{Octaves}\n{OctaveScale}\n{Iterations}\n{MaxLoss}\n{layers}");
+        sw.Write($"{ImageName}\n{ImageOrigin}\n{ImageOriginFormat}\n{OutputPath}\n{Verbose}\n{DistortionRate}\n{Octaves}\n{OctaveScale}\n{Iterations}\n{MaxLoss}\n{layers}\n{activations}");
     }
+
+
+    private static string CreateActivationsArray(int count) {
+        StringBuilder sb = new();
+        for (int i = 0; i < count; i++) {
+            sb.Append($"{(i != 0 ? " " : "")}{LayerActivationFunction(i, count)}");
+        }
+        return sb.ToString();
+    }
+
+    private static int LayerActivationFunction(int i, int count)
+        => i == count - 1 ? 15 : 6;
 
 
     /// <summary>

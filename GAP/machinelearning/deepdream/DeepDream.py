@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # number of parameters passed in params.txt
-PARAMS_LEN = 11
+PARAMS_LEN = 12
 
 # read the content of params.txt and split it into separate lines
 # each line represents a single parameter
@@ -31,7 +31,7 @@ def read_params_file():
 
 # update the local variables depending on the imported parameters
 def import_params():
-    global IMG_NAME, IMG_ORIGIN, IMG_ORIGIN_FORMAT, OUTPUT_PATH, VERBOSE, DISTORTION_RATE, OCTAVES, OCT_SCALE, ITERATIONS, MAX_LOSS, LAYERS
+    global IMG_NAME, IMG_ORIGIN, IMG_ORIGIN_FORMAT, OUTPUT_PATH, VERBOSE, DISTORTION_RATE, OCTAVES, OCT_SCALE, ITERATIONS, MAX_LOSS, LAYERS, LAYER_ACTIVATIONS
     params = read_params_file()
 
     IMG_NAME = params[0]
@@ -47,6 +47,7 @@ def import_params():
     MAX_LOSS = float(params[9])
 
     LAYERS = params[10].split(" ")
+    LAYER_ACTIVATIONS = params[11].split(" ")
 
 # used to download the image
 def get_url_file(name, origin):
@@ -205,11 +206,7 @@ def create_layer_dict():
     layer_settings = dict()
 
     for i in range(len(LAYERS)):
-        activation = 6
-        if (i == len(LAYERS) - 1): 
-            activation = 15
-
-        layer_settings[LAYERS[i]] = activation
+        layer_settings[LAYERS[i]] = int(LAYER_ACTIVATIONS[i])
 
 def loop_layers():
     global CUR_LAYER, CUR_LAYER_ACTIVATION

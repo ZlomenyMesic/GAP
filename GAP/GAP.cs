@@ -19,9 +19,9 @@ class GAP : Mod {
 
         // Mod loading
         // Totally harmless, and totally doesn't load itself as a mod
-        int modCount = ModLoader.LoadMods(".");
+        //int modCount = ModLoader.LoadMods(".");
 
-        // DeepDream.RunGeneratorRandom(4);
+        DeepDream.RunGeneratorRandom(4);
         // DeepDream.RunGeneratorCustom("mixed3", "mixed2", "mixed5");
 
         return 0;
