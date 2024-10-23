@@ -9,13 +9,14 @@ using System.Diagnostics;
 using System.Text;
 using GAP.util.exceptions;
 
-namespace GAP.machinelearning.deepdream;
+namespace GAP.machineLearning.deepdream;
 
 
 /// <summary>
 /// 
 /// CHANGEABLE PARAMETERS:
 /// 
+///   Verbose
 ///   ImageName
 ///   ImageOrigin
 ///   ImageOriginFormat
@@ -25,8 +26,8 @@ namespace GAP.machinelearning.deepdream;
 ///   Iterations
 ///   DistortionRate
 ///   MaxLoss
-///   Verbose
 ///   LayerSequence
+///   LayerActivationFunction
 ///  
 /// HOW TO RUN THE GENERATOR?
 /// use one of the following functions:
@@ -38,6 +39,12 @@ namespace GAP.machinelearning.deepdream;
 ///  
 /// </summary>
 internal static class DeepDream {
+
+    /// <summary>
+    /// print interim stats or other information during the process
+    /// </summary>
+    internal static bool Verbose { get; set; } = true;
+
 
     /// <summary>
     /// not necessary when using a file path. however, when using
@@ -105,12 +112,6 @@ internal static class DeepDream {
 
 
     /// <summary>
-    /// print interim stats or other information during the process
-    /// </summary>
-    internal static bool Verbose { get; set; } = true;
-
-
-    /// <summary>
     /// all 311 layers from the InceptionV3 model
     /// </summary>
     internal static readonly string[] ALL_LAYERS = ["input_layer", "conv2d", "batch_normalization", "activation", "conv2d_1", "batch_normalization_1", "activation_1", "conv2d_2", "batch_normalization_2", "activation_2", "max_pooling2d", "conv2d_3", "batch_normalization_3", "activation_3", "conv2d_4", "batch_normalization_4", "activation_4", "max_pooling2d_1", "conv2d_8", "batch_normalization_8", "activation_8", "conv2d_6", "conv2d_9", "batch_normalization_6", "batch_normalization_9", "activation_6", "activation_9", "average_pooling2d", "conv2d_5", "conv2d_7", "conv2d_10", "conv2d_11", "batch_normalization_5", "batch_normalization_7", "batch_normalization_10", "batch_normalization_11", "activation_5", "activation_7", "activation_10", "activation_11", "mixed0", "conv2d_15", "batch_normalization_15", "activation_15", "conv2d_13", "conv2d_16", "batch_normalization_13", "batch_normalization_16", "activation_13", "activation_16", "average_pooling2d_1", "conv2d_12", "conv2d_14", "conv2d_17", "conv2d_18", "batch_normalization_12", "batch_normalization_14", "batch_normalization_17", "batch_normalization_18", "activation_12", "activation_14", "activation_17", "activation_18", "mixed1", "conv2d_22", "batch_normalization_22", "activation_22", "conv2d_20", "conv2d_23", "batch_normalization_20", "batch_normalization_23", "activation_20", "activation_23", "average_pooling2d_2", "conv2d_19", "conv2d_21", "conv2d_24", "conv2d_25", "batch_normalization_19", "batch_normalization_21", "batch_normalization_24", "batch_normalization_25", "activation_19", "activation_21", "activation_24", "activation_25", "mixed2", "conv2d_27", "batch_normalization_27", "activation_27", "conv2d_28", "batch_normalization_28", "activation_28", "conv2d_26", "conv2d_29", "batch_normalization_26", "batch_normalization_29", "activation_26", "activation_29", "max_pooling2d_2", "mixed3", "conv2d_34", "batch_normalization_34", "activation_34", "conv2d_35", "batch_normalization_35", "activation_35", "conv2d_31", "conv2d_36", "batch_normalization_31", "batch_normalization_36", "activation_31", "activation_36", "conv2d_32", "conv2d_37", "batch_normalization_32", "batch_normalization_37", "activation_32", "activation_37", "average_pooling2d_3", "conv2d_30", "conv2d_33", "conv2d_38", "conv2d_39", "batch_normalization_30", "batch_normalization_33", "batch_normalization_38", "batch_normalization_39", "activation_30", "activation_33", "activation_38", "activation_39", "mixed4", "conv2d_44", "batch_normalization_44", "activation_44", "conv2d_45", "batch_normalization_45", "activation_45", "conv2d_41", "conv2d_46", "batch_normalization_41", "batch_normalization_46", "activation_41", "activation_46", "conv2d_42", "conv2d_47", "batch_normalization_42", "batch_normalization_47", "activation_42", "activation_47", "average_pooling2d_4", "conv2d_40", "conv2d_43", "conv2d_48", "conv2d_49", "batch_normalization_40", "batch_normalization_43", "batch_normalization_48", "batch_normalization_49", "activation_40", "activation_43", "activation_48", "activation_49", "mixed5", "conv2d_54", "batch_normalization_54", "activation_54", "conv2d_55", "batch_normalization_55", "activation_55", "conv2d_51", "conv2d_56", "batch_normalization_51", "batch_normalization_56", "activation_51", "activation_56", "conv2d_52", "conv2d_57", "batch_normalization_52", "batch_normalization_57", "activation_52", "activation_57", "average_pooling2d_5", "conv2d_50", "conv2d_53", "conv2d_58", "conv2d_59", "batch_normalization_50", "batch_normalization_53", "batch_normalization_58", "batch_normalization_59", "activation_50", "activation_53", "activation_58", "activation_59", "mixed6", "conv2d_64", "batch_normalization_64", "activation_64", "conv2d_65", "batch_normalization_65", "activation_65", "conv2d_61", "conv2d_66", "batch_normalization_61", "batch_normalization_66", "activation_61", "activation_66", "conv2d_62", "conv2d_67", "batch_normalization_62", "batch_normalization_67", "activation_62", "activation_67", "average_pooling2d_6", "conv2d_60", "conv2d_63", "conv2d_68", "conv2d_69", "batch_normalization_60", "batch_normalization_63", "batch_normalization_68", "batch_normalization_69", "activation_60", "activation_63", "activation_68", "activation_69", "mixed7", "conv2d_72", "batch_normalization_72", "activation_72", "conv2d_73", "batch_normalization_73", "activation_73", "conv2d_70", "conv2d_74", "batch_normalization_70", "batch_normalization_74", "activation_70", "activation_74", "conv2d_71", "conv2d_75", "batch_normalization_71", "batch_normalization_75", "activation_71", "activation_75", "max_pooling2d_3", "mixed8", "conv2d_80", "batch_normalization_80", "activation_80", "conv2d_77", "conv2d_81", "batch_normalization_77", "batch_normalization_81", "activation_77", "activation_81", "conv2d_78", "conv2d_79", "conv2d_82", "conv2d_83", "average_pooling2d_7", "conv2d_76", "batch_normalization_78", "batch_normalization_79", "batch_normalization_82", "batch_normalization_83", "conv2d_84", "batch_normalization_76", "activation_78", "activation_79", "activation_82", "activation_83", "batch_normalization_84", "activation_76", "mixed9_0", "concatenate", "activation_84", "mixed9", "conv2d_89", "batch_normalization_89", "activation_89", "conv2d_86", "conv2d_90", "batch_normalization_86", "batch_normalization_90", "activation_86", "activation_90", "conv2d_87", "conv2d_88", "conv2d_91", "conv2d_92", "average_pooling2d_8", "conv2d_85", "batch_normalization_87", "batch_normalization_88", "batch_normalization_91", "batch_normalization_92", "conv2d_93", "batch_normalization_85", "activation_87", "activation_88", "activation_91", "activation_92", "batch_normalization_93", "activation_85", "mixed9_1", "concatenate_1", "activation_93", "mixed10"];
@@ -140,24 +141,42 @@ internal static class DeepDream {
     internal static string[] LayerSequence = ["mixed0"];
 
 
-    // different possible layer activation functions
-    // any custom function must take the current iteration and total number of layers as arguments
-
     /// <summary>
-    /// all layer activations are equal to 10
+    /// different possible layer activation functions
+    /// any custom function must take the current iteration and total number of layers as arguments
     /// </summary>
-    private static readonly Func<int, int, int> LFEqual = (iteration, count) => 10;
-
+    internal static class LayerActivationFunctions {
+        /// <summary>
+        /// all steps are equal to 10
+        /// </summary>
+        internal static readonly Func<int, int, int> Constant = (iteration, count) => 10;
+        /// <summary>
+        /// all steps except the last one are equal to 5, last one is equal to 15
+        /// </summary>
+        internal static readonly Func<int, int, int> LastPriority = (iteration, count) => iteration == count - 1 ? 15 : 5;
+        /// <summary>
+        /// linear function starting at 5 and increasing by one each step
+        /// </summary>
+        internal static readonly Func<int, int, int> LinearIncreasing = (iteration, count) => 4 + iteration;
+        /// <summary>
+        /// linear function decreasing by one each step and ending at 5
+        /// </summary>
+        internal static readonly Func<int, int, int> LinearDecreasing = (iteration, count) => 5 + count - iteration;
+        /// <summary>
+        /// 2 raised to the power of the current step
+        /// !!! TERRIBLE OPTION FOR MORE LAYERS !!!
+        /// </summary>
+        internal static readonly Func<int, int, int> Quadratic = (iteration, count) => (int)Math.Pow(2, iteration);
+    }
     /// <summary>
-    /// all layer activations are equal to 6, last one is equal to 15
+    /// currently used layer activation function
     /// </summary>
-    private static readonly Func<int, int, int> LFLastPriority = (iteration, count) => iteration == count - 1 ? 15 : 6;
+    internal static Func<int, int, int> LayerActivationFunction = LayerActivationFunctions.LastPriority;
 
 
-
-    private static readonly string PARAMS = @"..\..\..\machineLearning\deepdream\params.txt";
-    private static readonly string SCRIPT = @"deepdream\DeepDream.py";
-    private static readonly string DONE   = @"..\..\..\machineLearning\deepdream\output\DONE";
+    private static readonly string ParamsPath = @"..\..\..\machineLearning\deepdream\params.txt";
+    private static readonly string DDPythonScriptPath = @"deepdream\DeepDream.py";
+    private static readonly string FinishCheckPath   = @"..\..\..\machineLearning\deepdream\output\DONE";
 
 
     /// <summary>
@@ -167,11 +186,11 @@ internal static class DeepDream {
     private static void SaveParameters() {
         // convert the layer sequence and the respective activations into two single line strings
         string layers = ArrayToString(LayerSequence);
-        string activations = ArrayToString([..CreateLayerActivationsArray(LayerSequence.Length, LFLastPriority)]);
+        string activations = ArrayToString([..CreateLayerActivationsArray(LayerSequence.Length)]);
 
         // save the parameters to the file
-        using StreamWriter sw = new(PARAMS);
-        sw.Write($"{ImageName}\n{ImageOrigin}\n{ImageOriginFormat}\n{OutputPath}\n{Verbose}\n{DistortionRate}\n{Octaves}\n{OctaveScale}\n{Iterations}\n{MaxLoss}\n{layers}\n{activations}");
+        using StreamWriter sw = new(ParamsPath);
+        sw.Write($"{Verbose}\n{ImageName}\n{ImageOrigin}\n{ImageOriginFormat}\n{OutputPath}\n{FinishCheckPath}\n{DistortionRate}\n{Octaves}\n{OctaveScale}\n{Iterations}\n{MaxLoss}\n{layers}\n{activations}");
     }
 
     /// <summary>
@@ -180,10 +199,10 @@ internal static class DeepDream {
     /// <param name="length">number of all layers</param>
     /// <param name="layerActivationFunction">layer activation function</param>
     /// <returns>array of layer activations</returns>
-    private static int[] CreateLayerActivationsArray(int length, Func<int, int, int> layerActivationFunction) {
+    private static int[] CreateLayerActivationsArray(int length) {
         int[] activations = new int[length];
         for (int i = 0; i < length; i++) {
-            activations[i] = layerActivationFunction(i, length);
+            activations[i] = LayerActivationFunction(i, length);
         }
         return activations;
     }
@@ -220,9 +239,9 @@ internal static class DeepDream {
     /// script after finishing the generation and saving the output image
     /// </summary>
     private static void WaitForOutput() {
-        while (!File.Exists(DONE))
+        while (!File.Exists(FinishCheckPath))
             Thread.Sleep(500);
-        File.Delete(DONE);
+        File.Delete(FinishCheckPath);
     }
 
 
@@ -235,16 +254,16 @@ internal static class DeepDream {
         timer.Start();
 
         // in case of a bug
-        File.Delete(DONE);
+        File.Delete(FinishCheckPath);
 
         SaveParameters();
 
-        PythonWrapper.RunPythonScript(SCRIPT);
+        PythonWrapper.RunPythonScript(DDPythonScriptPath);
         WaitForOutput();
 
         // print the time spent
         timer.Stop();
-        if (Verbose) Console.WriteLine($"time spent: {timer.ElapsedMilliseconds / 1000} s");
+        if (Verbose) Console.WriteLine($"Time spent: {timer.ElapsedMilliseconds / 1000} s");
     }
 
 

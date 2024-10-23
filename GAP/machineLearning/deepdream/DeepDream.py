@@ -29,7 +29,7 @@ BULLET = "\u25cf"
 CIRCLE = "\u25cb"
 
 # number of parameters passed in params.txt
-PARAMS_LEN = 12
+PARAMS_LEN = 13
 
 # read the content of params.txt and split it into separate lines
 # each line represents a single parameter
@@ -43,23 +43,25 @@ def read_params_file():
 
 # update the local variables depending on the imported parameters
 def import_params():
-    global IMG_NAME, IMG_ORIGIN, IMG_ORIGIN_FORMAT, OUTPUT_PATH, VERBOSE, DISTORTION_RATE, OCTAVES, OCT_SCALE, ITERATIONS, MAX_LOSS, LAYERS, LAYER_ACTIVATIONS
+    global VERBOSE, IMG_NAME, IMG_ORIGIN, IMG_ORIGIN_FORMAT, OUTPUT_PATH, DONE, DISTORTION_RATE, OCTAVES, OCT_SCALE, ITERATIONS, MAX_LOSS, LAYERS, LAYER_ACTIVATIONS
     params = read_params_file()
 
-    IMG_NAME = params[0]
-    IMG_ORIGIN = params[1]
-    IMG_ORIGIN_FORMAT = int(params[2])
-    OUTPUT_PATH = params[3]
+    VERBOSE = params[0] == "True"
 
-    VERBOSE = params[4] == "True"
-    DISTORTION_RATE = float(params[5])
-    OCTAVES = int(params[6])
-    OCT_SCALE = float(params[7])
-    ITERATIONS = int(params[8])
-    MAX_LOSS = float(params[9])
+    IMG_NAME = params[1]
+    IMG_ORIGIN = params[2]
+    IMG_ORIGIN_FORMAT = int(params[3])
+    OUTPUT_PATH = params[4]
+    DONE = params[5]
 
-    LAYERS = params[10].split(" ")
-    LAYER_ACTIVATIONS = params[11].split(" ")
+    DISTORTION_RATE = float(params[6])
+    OCTAVES = int(params[7])
+    OCT_SCALE = float(params[8])
+    ITERATIONS = int(params[9])
+    MAX_LOSS = float(params[10])
+
+    LAYERS = params[11].split(" ")
+    LAYER_ACTIVATIONS = params[12].split(" ")
 
 # used to download the image
 def get_url_file(name, origin):
@@ -102,9 +104,13 @@ def calculate_consecutive_shapes(original):
         shapes.append(shape)
     return shapes[::-1]
 
-# loss function
+def mean_sq_act(activation):
+    return 
+
+
+# doesn't really calculate loss, but rather layer activation
 def calculate_loss(input_image):
-    # features is just a fancy name for the extracted layers
+    # the extracted layer
     # this processes the input image with the given layers
     features = feature_extractor(input_image)
 
@@ -112,26 +118,22 @@ def calculate_loss(input_image):
 
     # loop through the extracted features (in our case just a single layer)
     for name in features.keys():
-        # coefficient - how much it should affect the final image
+        # coefficient - how much should it affect the image
         coefficient = layer_settings[name]
 
-        # activations on the current extracted layer
+        # activations of the current extracted layer
         activation = features[name]
 
-        # crop/trim off the edges & square the activations
-        sq_act = tf.square(activation[: 2:-2, 2:-2, :]);
-
-        # calculate the mean (average) of the squared activations
-        mean = tf.reduce_mean(sq_act)
+        # mean squared activations
+        mean_sq_act = tf.reduce_mean(tf.square(activation))
 
         # update the loss value
-        loss += coefficient * tf.reduce_mean(tf.square(activation[:, 2:-2, 2:-2, :]))
+        loss += coefficient * mean_sq_act
     return loss
 
 # as opposed to most neural networks, we actually try to maximize the 
 # loss function instead of minimizing it. this is called gradient ascent
-#@tf.function
-def gradient_ascent_step(image, distortion_rate, i):
+def gradient_ascent_step(image, distortion_rate):
     # GradientTape record all tensor operations made with the image.
     # it is a very useful tool for automatic differentiation
     with tf.GradientTape() as tape:
@@ -151,7 +153,7 @@ def gradient_ascent_step(image, distortion_rate, i):
 # loop repeats NUM_OCTAVE times with ITERATIONS steps
 def gradient_ascent_loop(image, iterations, distortion_rate, max_loss):
     for i in range(iterations):
-        loss, image = gradient_ascent_step(image, distortion_rate, i)
+        loss, image = gradient_ascent_step(image, distortion_rate)
 
         # break the loop when maximum allowed loss is met
         if max_loss is not None and loss >= max_loss:
@@ -275,8 +277,8 @@ output_img = loop_layers()
 
 # create a file named after the current iteration number
 # this lets the main C# program know that the work here is done
-f = open(fr"..\..\..\machinelearning\deepdream\output\DONE", "w")
+f = open(DONE, "w")
 f.close()
 
 if VERBOSE:
-    print("\n")
+    print(f"Output image successfully saved to: {OUTPUT_PATH}")

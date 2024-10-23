@@ -1,12 +1,13 @@
+True
 input.jpg
 ..\..\..\machineLearning\deepdream\input.jpg
 0
 ..\..\..\machineLearning\deepdream\output\dream.png
-True
+..\..\..\machineLearning\deepdream\output\DONE
 20
 8
 1.3
 5
 2147483647
-batch_normalization_61 average_pooling2d_3 activation_40 mixed3
-6 6 6 15
+activation_92 mixed3 mixed2
+5 5 15

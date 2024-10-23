@@ -7,7 +7,7 @@
 
 using System.Diagnostics;
 
-namespace GAP.machinelearning;
+namespace GAP.machineLearning;
 
 internal static class PythonWrapper {
     private static readonly string SCRIPT_DIR = $@"..\..\..\machineLearning\";

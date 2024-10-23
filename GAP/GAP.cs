@@ -6,7 +6,7 @@
 //
 
 using GAP.core.modLoader;
-using GAP.machinelearning.deepdream;
+using GAP.machineLearning.deepdream;
 using Kolors;
 
 namespace GAP;
@@ -60,8 +60,13 @@ internal class GAP : Mod {
 
 
 
-        DeepDream.RunGeneratorFilteredRandom(4);
-        // DeepDream.RunGeneratorCustom("mixed3", "mixed2", "mixed5");
+
+        DeepDream.Iterations = 5;
+        DeepDream.Octaves = 8;
+        DeepDream.LayerActivationFunction = DeepDream.LayerActivationFunctions.LastPriority;
+        DeepDream.RunGeneratorFilteredRandom(3);
+
+        //DeepDream.RunGeneratorCustom("conv2d_26", "activation_26", "activation_19");
 
         return 0;
     }
