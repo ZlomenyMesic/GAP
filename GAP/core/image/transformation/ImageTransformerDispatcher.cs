@@ -10,7 +10,7 @@ namespace GAP.core.image.transformation;
 
 /// <summary>
 /// Image Transformer Dispatcher <br/>
-/// registers new <see cref="ImageTransformer"/> classes using the <see cref="ClassRegistry{T}"/> into the
+/// registers new <see cref="IImageTransformer"/> classes using the <see cref="ClassRegistry{T}"/> into the
 /// <see cref="ImageTransformerRegistry"/> class registry
 /// </summary>
 public class ImageTransformerDispatcher {
@@ -33,7 +33,7 @@ public class ImageTransformerDispatcher {
     }
     
     /// <summary>
-    /// registers new <see cref="ImageTransformer"/>-implementing class
+    /// registers new <see cref="IImageTransformer"/>-implementing class
     /// </summary>
     /// <param name="id">id of the transformer class</param>
     /// <param name="type"><c>typeof(&lt;YourClassName&gt;)</c></param>

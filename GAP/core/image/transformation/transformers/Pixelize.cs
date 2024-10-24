@@ -14,7 +14,7 @@ namespace GAP.core.image.transformation.transformers;
 /// Pixelize Image Transform <br/>
 /// creates a poor pixel effect over the image
 /// </summary>
-public class Pixelize : ImageTransformer {
+public class Pixelize : IImageTransformer, ICloneable {
     public PixelType pixelType { get; set; }
     
     /// <summary>
@@ -35,7 +35,7 @@ public class Pixelize : ImageTransformer {
     /// </summary>
     /// <param name="image">input image</param>
     /// <returns>transformed image as <see cref="Bitmap"/></returns>
-    public override Bitmap TransformImage(Bitmap image) {
+    public Bitmap TransformImage(Bitmap image) {
         if (pixelType == PixelType.STRIPES) {
             return PixelizeStripes(image);
         }
@@ -98,7 +98,7 @@ public class Pixelize : ImageTransformer {
     /// </exception>
     /// <exception cref="ArgumentException">if <see cref="settings"/> is null</exception>
     /// <exception cref="NotSupportedException">if no deserializer is available</exception>
-    public override void LoadFromJson(string settings) {
+    public void LoadFromJson(string settings) {
         Pixelize? pixelize = JsonSerializer.Deserialize<Pixelize>(settings) ?? null;
         
         if (pixelize == null) {
@@ -114,7 +114,7 @@ public class Pixelize : ImageTransformer {
             .OnParse(context => new Pixelize((PixelType)context["pixel_type"].GetParsedValue()))
     );
 
-    public override SettingsBuilder<T> GetSettings<T>() {
+    public SettingsBuilder<T> GetSettings<T>() {
         if (typeof(T) != typeof(Pixelize)) {
             throw new SettingsBuilderException("Invalid type inputted.");
         }
@@ -123,6 +123,10 @@ public class Pixelize : ImageTransformer {
     }
 
     public override string ToString() => JsonSerializer.Serialize(this);
+    
+    public object Clone() {
+        return MemberwiseClone();
+    }
 }
 
 public enum PixelType {

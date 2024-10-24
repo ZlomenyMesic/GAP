@@ -15,17 +15,17 @@ namespace GAP.core.image.generation.generators;
 /// White Noise Image Generation <br/>
 /// generates purely random set of pixels with color properties set manually or with the <see cref="WhiteNoisePresets"/>
 /// </summary>
-public sealed class WhiteNoise : ImageGenerator {
-    public int width { get; set; }
-    public int height { get; set; }
-    public int seed { get; set; }
+public sealed class WhiteNoise : IImageGenerator, ICloneable {
+    private int width { get; set; }
+    private int height { get; set; }
+    private int seed { get; set; }
 
-    public double hueFactor { get; set; } = 1d;
-    public bool allowRandomHue { get; set; }
-    public double saturationFactor { get; set; } = 1d;
-    public bool allowRandomSaturation { get; set; }
-    public double valueFactor { get; set; } = 1d;
-    public bool allowRandomBrightness { get; set; }
+    private double hueFactor { get; set; } = 1d;
+    private bool allowRandomHue { get; set; }
+    private double saturationFactor { get; set; } = 1d;
+    private bool allowRandomSaturation { get; set; }
+    private double valueFactor { get; set; } = 1d;
+    private bool allowRandomBrightness { get; set; }
     
     /// <summary>
     /// default constructor
@@ -38,11 +38,6 @@ public sealed class WhiteNoise : ImageGenerator {
         this.height = height;
         this.seed = seed;
     }
-    
-    /// <summary>
-    /// empty constructor
-    /// </summary>
-    public WhiteNoise() { }
 
     /// <summary>
     /// constructor using presets
@@ -89,23 +84,11 @@ public sealed class WhiteNoise : ImageGenerator {
         this.allowRandomBrightness = allowRandomBrightness;
     }
 
-    private void Copy(WhiteNoise whiteNoise) {
-        width = whiteNoise.width;
-        height = whiteNoise.height;
-        seed = whiteNoise.seed;
-        allowRandomHue = whiteNoise.allowRandomHue;
-        hueFactor = whiteNoise.hueFactor;
-        saturationFactor = whiteNoise.saturationFactor;
-        allowRandomSaturation = whiteNoise.allowRandomSaturation;
-        valueFactor = whiteNoise.valueFactor;
-        allowRandomBrightness = whiteNoise.allowRandomBrightness;
-    }
-
     /// <summary>
     /// generates the output image
     /// </summary>
     /// <returns><see cref="Bitmap"/> object with the final image</returns>
-    public override Bitmap GenerateImage() {
+    public Bitmap GenerateImage() {
         Random random = new Random(seed);
         Bitmap image = new Bitmap(width, height);
         
@@ -121,15 +104,6 @@ public sealed class WhiteNoise : ImageGenerator {
         return image;
     }
 
-    public override void LoadFromJson(string settings) {
-        WhiteNoise? wiener = JsonSerializer.Deserialize<WhiteNoise>(settings) ?? null;
-        
-        if (wiener == null) {
-            throw new JsonException("Deserialization of settings of WhiteNoise failed");
-        }
-        
-        Copy(wiener);
-    }
 
     private static (double hf, bool hr, double sf, bool sr, double vf, bool vr) FromPreset(WhiteNoisePresets preset) {
 
@@ -234,7 +208,7 @@ public sealed class WhiteNoise : ImageGenerator {
                 (int)context["seed"].GetParsedValue()))
     );
 
-    public override SettingsBuilder<T> GetSettings<T>() {
+    public static SettingsBuilder<T> GetSettings<T>() where T : IImageGenerator {
         if (typeof(T) != typeof(WhiteNoise)) {
             throw new SettingsBuilderException("Invalid type inputted.");
         }
@@ -245,6 +219,8 @@ public sealed class WhiteNoise : ImageGenerator {
     public override string ToString() {
         return JsonSerializer.Serialize(this);
     }
+
+    public object Clone() => MemberwiseClone();
 }
 
 /// <summary>

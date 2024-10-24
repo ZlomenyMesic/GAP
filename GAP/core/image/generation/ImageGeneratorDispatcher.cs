@@ -10,7 +10,7 @@ namespace GAP.core.image.generation;
 
 /// <summary>
 /// Image Generator Dispatcher <br/>
-/// registers new <see cref="ImageGenerator"/> classes using the <see cref="ClassRegistry{T}"/> into the
+/// registers new <see cref="IImageGenerator"/> classes using the <see cref="ClassRegistry{T}"/> into the
 /// <see cref="ImageGeneratorRegistry"/> class registry
 /// </summary>
 public class ImageGeneratorDispatcher {
@@ -33,7 +33,7 @@ public class ImageGeneratorDispatcher {
     }
     
     /// <summary>
-    /// registers new <see cref="ImageGenerator"/>-implementing class
+    /// registers new <see cref="IImageGenerator"/>-implementing class
     /// </summary>
     /// <param name="id">id of the generator class</param>
     /// <param name="type"><c>typeof(&lt;YourClassName&gt;)</c></param>

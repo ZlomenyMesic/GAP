@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="core\audio\" />
+    <Folder Include="core\audio\generators\" />
     <Folder Include="machineLearning\deepdream\output\layers\" />
   </ItemGroup>
 

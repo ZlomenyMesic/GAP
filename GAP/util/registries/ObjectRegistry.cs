@@ -42,4 +42,17 @@ public abstract class ObjectRegistry<T> {
 
         throw new RegistryItemNotFoundException($"Could not find registry object '{id}'");
     }
+    
+    /// <summary>
+    /// returns all registered types
+    /// </summary>
+    public static (string id, T type)?[] GetAll() {
+        List<(string id, T type)?> all = new();
+        
+        foreach (var r in REGISTRY) {
+            all.Add((r.Key, r.Value));
+        }
+        
+        return all.ToArray();
+    }
 }

@@ -54,4 +54,17 @@ public abstract class ClassRegistry<T> {
         
         return instance;
     }
+
+    /// <summary>
+    /// returns all registered types
+    /// </summary>
+    public static (string id, Type type)?[] GetAll() {
+        List<(string id, Type type)?> all = new();
+        
+        foreach (var r in REGISTRY) {
+            all.Add((r.Key, r.Value)!);
+        }
+        
+        return all.ToArray();
+    }
 }

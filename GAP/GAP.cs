@@ -6,8 +6,8 @@
 //
 
 using GAP.core.modLoader;
-using GAP.machineLearning.deepdream;
 using Kolors;
+using GAP.machineLearning.deepdream;
 
 namespace GAP;
 
@@ -20,7 +20,13 @@ internal class GAP : Mod {
     private static readonly string[] EXCLUDED_BINARIES = [
         "Kolors", 
         "Microsoft.Win32.SystemEvents",
-        "System.Drawing.Common"
+        "System.Drawing.Common",
+        "NAudio.Asio",
+        "NAudio.Core",
+        "NAudio",
+        "NAudio.Midi",
+        "NAudio.Wasapi",
+        "NAudio.WinMM"
     ];
 
     //
@@ -35,6 +41,9 @@ internal class GAP : Mod {
     //
     
     static int Main() {
+        
+        // --- MAIN FUNCTIONALITY ---
+        // DO NOT REMOVE !!!
         
         // System.Drawing.Common is only for Windows
         // this is necessary for not crashing somewhere else and
@@ -51,16 +60,13 @@ internal class GAP : Mod {
         Debug.debugLevel = DEBUG_LEVEL;
         
         // Mod loading
-        // Totally harmless, and totally doesn't load itself as a mod
-        //int modCount = ModLoader.LoadMods(".");
-
         ModLoader.LoadMods(".", EXCLUDED_BINARIES);
         ModLoader.WriteRegisteredMods();
-
-
-
-
-
+        
+        // --- END OF MAIN FUNCTIONALITY ---
+        // you can put your code here:
+        
+        
         DeepDream.Iterations = 5;
         DeepDream.Octaves = 8;
         DeepDream.LayerActivationFunction = DeepDream.LayerActivationFunctions.LastPriority;

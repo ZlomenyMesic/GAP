@@ -14,7 +14,7 @@ namespace GAP.core.image.transformation.transformers;
 /// Grid Image Transformation <br/>
 /// transforms the picture by separating its pixels and placing transparent color between them 
 /// </summary>
-public class Grid : ImageTransformer {
+public class Grid : IImageTransformer, ICloneable {
     public uint scaleFactor { get; set; }
     
     /// <summary>
@@ -39,7 +39,7 @@ public class Grid : ImageTransformer {
     /// </summary>
     /// <param name="image">input image</param>
     /// <returns>transformed image as <see cref="Bitmap"/></returns>
-    public override Bitmap TransformImage(Bitmap image) {
+    public Bitmap TransformImage(Bitmap image) {
 
         if (scaleFactor == 1) return image;
 
@@ -55,45 +55,14 @@ public class Grid : ImageTransformer {
             
         return result;
     }
-
-    /// <summary>
-    /// copies all fields into itself from another instance
-    /// </summary>
-    /// <param name="grid">other instance</param>
-    private void Copy(Grid grid) {
-        scaleFactor = grid.scaleFactor;
-    }
-
-    /// <summary>
-    /// loads settings from a json string into an instance that called this method
-    /// </summary>
-    /// <param name="settings">json string</param>
-    /// <exception cref="JsonException">
-    /// if inputted json is invalid or if value returned by the
-    /// <see cref="JsonSerializer.Deserialize{TValue}(System.IO.Stream,System.Text.Json.JsonSerializerOptions?)"/>
-    /// returns null
-    /// </exception>
-    /// <exception cref="ArgumentException">if <see cref="settings"/> is null</exception>
-    /// <exception cref="NotSupportedException">if no deserializer is available</exception>
-    public override void LoadFromJson(string settings) {
-        Grid? grid = JsonSerializer.Deserialize<Grid>(settings) ?? null;
-        
-        if (grid == null) {
-            throw new JsonException("Deserialization of settings of Grid failed");
-        }
-        
-        Copy(grid);
-    }
-    
     
     private static readonly SettingsBuilder<Grid> SETTINGS = SettingsBuilder<Grid>.Build("grid", 
         SettingsNode<Grid>.New("default")
             .Argument("scale_factor", Arguments.UInteger(0, 100))
             .OnParse(context => new Grid((uint)context["scale_factor"].GetParsedValue()))
     );
-    
 
-    public override SettingsBuilder<T> GetSettings<T>() {
+    public SettingsBuilder<T> GetSettings<T>() {
         if (typeof(T) != typeof(Grid)) {
             throw new SettingsBuilderException("Invalid type inputted.");
         }
@@ -102,4 +71,8 @@ public class Grid : ImageTransformer {
     }
 
     public override string ToString() => JsonSerializer.Serialize(this);
+    
+    public object Clone() {
+        return MemberwiseClone();
+    }
 }
