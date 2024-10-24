@@ -237,7 +237,7 @@ def loop_layers():
         CUR_LAYER_ACTIVATION = layer_settings[layer]
 
         if VERBOSE:
-            print(f"{CYAN}LAYER {i + 1}{WHITE} - Name: {GREEN}{CUR_LAYER}{WHITE}; Activation: {CUR_LAYER_ACTIVATION}")
+            print(f"{CYAN}Layer {i + 1}{WHITE} - Name: {GREEN}{CUR_LAYER}{WHITE}; Activation: {CUR_LAYER_ACTIVATION}")
 
         extract_layer(layer)
 

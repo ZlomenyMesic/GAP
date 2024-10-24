@@ -141,6 +141,9 @@ internal static class DeepDream {
     internal static string[] LayerSequence = ["mixed0"];
 
 
+    internal static string FinishCheckPath { get; set; } = @"..\..\..\machineLearning\deepdream\output\DONE";
+
+
     /// <summary>
     /// different possible layer activation functions
     /// any custom function must take the current iteration and total number of layers as arguments
@@ -176,8 +179,34 @@ internal static class DeepDream {
 
     private static readonly string ParamsPath = @"..\..\..\machineLearning\deepdream\params.txt";
     private static readonly string DDPythonScriptPath = @"deepdream\DeepDream.py";
-    private static readonly string FinishCheckPath   = @"..\..\..\machineLearning\deepdream\output\DONE";
 
+
+    internal static void LoadParametersFile() {
+        try {
+            //using StreamReader sr = new(ParamsPath);
+            //string[] parameters = sr.ReadToEnd().Split('\n');
+
+            //Verbose = bool.Parse(parameters[0]);
+            //ImageName = parameters[1];
+            //ImageOrigin = parameters[2];
+            //ImageOriginFormat = int.Parse(parameters[3]);
+            //OutputPath = parameters[4];
+            //FinishCheckPath = parameters[5];
+            //DistortionRate = int.Parse(parameters[6]);
+            //Octaves = int.Parse(parameters[7]);
+            //OctaveScale = int.Parse(parameters[8]);
+            //Iterations = int.Parse(parameters[9]);
+            //MaxLoss = int.Parse(parameters[10]);
+            //LayerSequence = parameters[11].Split(' ');
+
+            throw new Exception();
+
+        } catch (Exception) {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"Error: parameters could not be loaded!\n");
+            Console.ForegroundColor = ConsoleColor.Gray;
+        }
+    }
 
     /// <summary>
     /// saves the current parameters to params.txt to make them accessible from
