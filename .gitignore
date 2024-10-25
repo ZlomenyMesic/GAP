@@ -33,6 +33,9 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
+# params.txt
+GAP/machineLearning/deepdream/params.txt
+
 # JetBrains Rider
 .idea/
 
