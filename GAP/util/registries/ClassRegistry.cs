@@ -29,7 +29,7 @@ public abstract class ClassRegistry<T> {
     /// if failed to add the type due to a type with the same id already registered
     /// </exception>
     protected static Type BaseRegister(string id, Type registeredType) {
-        if (registeredType.BaseType != typeof(T)) {
+        if (registeredType.IsAssignableFrom(typeof(T))) {
             throw new RegistryInvalidTypeException(registeredType, typeof(T));
         }
         
@@ -42,17 +42,18 @@ public abstract class ClassRegistry<T> {
     /// returns a new instance of a type stored behind id
     /// </summary>
     /// <exception cref="RegistryItemNotFoundException">if desired object is not found</exception>
-    protected static T? BaseGetInstance(string id, params object[] args) {
-        T? instance = default;
+    protected static Type BaseGet(string id) {
         
-        if (REGISTRY.TryGetValue(id, out Type? value)) {
-            if (value != null) instance = (T)Activator.CreateInstance(value, args)!;
-        }
-        else {
-            throw new RegistryItemNotFoundException($"Could not find registry object \'{id}\'.");
-        }
+        if (!REGISTRY.TryGetValue(id, out Type? value))
+            throw new KeyNotFoundException($"Could not find registry object \'{id}\'.");
         
-        return instance;
+        if (value != null) {
+            return value;
+        }
+
+        throw new NullReferenceException(
+            $"Cannot create an instance of {typeof(T).Name}. Requested type is null.");
+
     }
 
     /// <summary>
