@@ -41,6 +41,7 @@ internal class GAP : Mod {
     //
     
     static int Main() {
+        /*
         
         // --- MAIN FUNCTIONALITY ---
         // DO NOT REMOVE !!!
@@ -66,10 +67,12 @@ internal class GAP : Mod {
         // --- END OF MAIN FUNCTIONALITY ---
         // you can put your code here:
         
+        */
         
         DeepDream.Iterations = 5;
         DeepDream.Octaves = 8;
         DeepDream.LayerActivationFunction = DeepDream.LayerActivationFunctions.LastPriority;
+        DeepDream.LoadParametersFile();
         DeepDream.RunGeneratorFilteredRandom(3);
 
         //DeepDream.RunGeneratorCustom("conv2d_26", "activation_26", "activation_19");

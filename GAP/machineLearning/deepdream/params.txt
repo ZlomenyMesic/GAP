@@ -9,5 +9,5 @@ input.jpg
 1.3
 5
 2147483647
-activation_92 mixed3 mixed2
+conv2d_73 mixed5 activation_30
 5 5 15
