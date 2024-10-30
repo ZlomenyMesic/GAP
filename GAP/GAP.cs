@@ -8,6 +8,7 @@
 using GAP.core.modLoader;
 using Kolors;
 using GAP.machineLearning.deepdream;
+using GAP.machineLearning.ladybug;
 
 namespace GAP;
 
@@ -41,7 +42,7 @@ internal class GAP : Mod {
     //
     
     static int Main() {
-        /*
+        
         
         // --- MAIN FUNCTIONALITY ---
         // DO NOT REMOVE !!!
@@ -63,19 +64,18 @@ internal class GAP : Mod {
         // Mod loading
         ModLoader.LoadMods(".", EXCLUDED_BINARIES);
         ModLoader.WriteRegisteredMods();
-        
+
         // --- END OF MAIN FUNCTIONALITY ---
         // you can put your code here:
-        
-        */
-        
-        DeepDream.Iterations = 5;
-        DeepDream.Octaves = 8;
-        DeepDream.LayerActivationFunction = DeepDream.LayerActivationFunctions.LastPriority;
-        DeepDream.LoadParametersFile();
+
+        DeepDream.ImageOrigin = @"C:\Users\michn\Desktop\convolutions\outputs\dog1.png";
+        DeepDream.OctaveScale = 1.2f;
         DeepDream.RunGeneratorFilteredRandom(3);
 
-        //DeepDream.RunGeneratorCustom("conv2d_26", "activation_26", "activation_19");
+        //Ladybug.RenameData();
+        //Ladybug.CreateDataSubsets();
+        //Ladybug.TrainModel();
+        //Ladybug.RunGenerator();
 
         return 0;
     }

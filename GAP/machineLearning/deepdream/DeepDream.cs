@@ -181,33 +181,6 @@ internal static class DeepDream {
     private static readonly string DDPythonScriptPath = @"deepdream\DeepDream.py";
 
 
-    internal static void LoadParametersFile() {
-        try {
-            //using StreamReader sr = new(ParamsPath);
-            //string[] parameters = sr.ReadToEnd().Split('\n');
-
-            //Verbose = bool.Parse(parameters[0]);
-            //ImageName = parameters[1];
-            //ImageOrigin = parameters[2];
-            //ImageOriginFormat = int.Parse(parameters[3]);
-            //OutputPath = parameters[4];
-            //FinishCheckPath = parameters[5];
-            //DistortionRate = int.Parse(parameters[6]);
-            //Octaves = int.Parse(parameters[7]);
-            //OctaveScale = int.Parse(parameters[8]);
-            //Iterations = int.Parse(parameters[9]);
-            //MaxLoss = int.Parse(parameters[10]);
-            //LayerSequence = parameters[11].Split(' ');
-
-            throw new Exception();
-
-        } catch (Exception) {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Error: parameters could not be loaded!\n");
-            Console.ForegroundColor = ConsoleColor.Gray;
-        }
-    }
-
     /// <summary>
     /// saves the current parameters to params.txt to make them accessible from
     /// the python script. changing the order also has to be done in DeepDream.py
@@ -221,6 +194,7 @@ internal static class DeepDream {
         using StreamWriter sw = new(ParamsPath);
         sw.Write($"{Verbose}\n{ImageName}\n{ImageOrigin}\n{ImageOriginFormat}\n{OutputPath}\n{FinishCheckPath}\n{DistortionRate}\n{Octaves}\n{OctaveScale}\n{Iterations}\n{MaxLoss}\n{layers}\n{activations}");
     }
+
 
     /// <summary>
     /// creates an array of successive layer activations base on LayerActivationFunction
