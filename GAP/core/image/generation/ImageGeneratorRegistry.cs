@@ -33,7 +33,7 @@ internal abstract class ImageGeneratorRegistry : ClassRegistry<IImageGenerator> 
     /// registered reference to class is null</exception>
     /// <exception cref="KeyNotFoundException">no class with id of <see cref="id"/> was not found</exception>
     public static Type GetType(string id) {
-        Debug.info(REGISTRY.Count.ToString());
+        Debug.Info(REGISTRY.Count.ToString());
 
         if (!REGISTRY.TryGetValue(id, out Type? value))
             throw new KeyNotFoundException($"Could not find registry object \'{id}\'.");

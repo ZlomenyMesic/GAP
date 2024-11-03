@@ -38,6 +38,8 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable {
         this.height = height;
         this.seed = seed;
     }
+    
+    public WhiteNoise() {}
 
     /// <summary>
     /// constructor using presets
@@ -138,7 +140,7 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable {
     
     private static readonly SettingsBuilder<WhiteNoise> SETTINGS = SettingsBuilder<WhiteNoise>.Build("white_noise", 
         SettingsNode<WhiteNoise>.New("advanced")
-            .Argument("seed", Arguments.Integer())
+            .Group(IImageGenerator.UniversalSeedInput())
             .Argument("width", Arguments.Integer(0))
             .Argument("height", Arguments.Integer(0))
             .Group(SettingsGroup
@@ -172,15 +174,9 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable {
                     .Argument("saturation_factor", Arguments.Double(0, 1))
                     .Argument("allow_random_value", Arguments.Bool())
                     .Argument("value_factor", Arguments.Double(0, 1))
+                    .EnableAutoParse()
                 )
-                .OnParse((cin, cout) => {
-                    cout["allow_random_hue"].SetParsedValue(cin["allow_random_hue"].GetParsedValue());
-                    cout["allow_random_saturation"].SetParsedValue(cin["allow_random_saturation"].GetParsedValue());
-                    cout["allow_random_value"].SetParsedValue(cin["allow_random_value"].GetParsedValue());
-                    cout["hue_factor"].SetParsedValue(cin["hue_factor"].GetParsedValue());
-                    cout["saturation_factor"].SetParsedValue(cin["saturation_factor"].GetParsedValue());
-                    cout["value_factor"].SetParsedValue(cin["value_factor"].GetParsedValue());
-                })
+                .EnableAutoParse()
             )
             .OnParse(context => {
                 WhiteNoise whiteNoise = new WhiteNoise(
@@ -199,7 +195,7 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable {
         ,
         
         SettingsNode<WhiteNoise>.New("basic")
-            .Argument("seed", Arguments.Integer())
+            .Group(IImageGenerator.UniversalSeedInput())
             .Argument("width", Arguments.Integer())
             .Argument("height", Arguments.Integer())
             .OnParse(context => new WhiteNoise(

@@ -12,13 +12,22 @@ namespace GAP.util.settings;
 /// groups options of different inputs of settings  
 /// </summary>
 public sealed class SettingsGroup : ICloneable {
-    public string name { get; private set; }
-    public Context? outputContext { get; private init; } = null;
+    private string name { get; }
+    public string Name => name;
+    public Context? groupContext { get; private init; } = null;
     private List<SettingsGroupOption>? options { get; set; } = null;
     public SettingsGroupOption[] Options => 
         options?.ToArray() ?? throw new SettingsBuilderException("No options have been set.");
 
-    private Action<Context, Context>? onParse = null;
+    private Action<Context, Context>? parseContext = null;
+    private bool autoParseContext = false;
+    
+    private static readonly Action<Context, Context> AUTO_PARSE = (cin, cout) => {
+        for (int i = 0; i < cin.Length; i++) {
+            var v = cin.GetAtIndex(i);
+            cout[v.name].SetParsedValue(v.value.GetParsedValue());
+        }
+    };
     
     public SettingsGroupOption this[string name] {
         get {
@@ -27,7 +36,7 @@ public sealed class SettingsGroup : ICloneable {
             }
             
             foreach (var o in options) {
-                if (o.name == name) return o;
+                if (o.Name == name) return o;
             }
             
             throw new SettingsBuilderException($"Option with name '{name}' doesn't exist in group '{this.name}'.");
@@ -45,10 +54,10 @@ public sealed class SettingsGroup : ICloneable {
             throw new SettingsBuilderException($"Output context is not initialized for group '{name}'.");
         
         SettingsGroup sg = new SettingsGroup(name) {
-            outputContext = new Context()
+            groupContext = new Context()
         };
         
-        sg.outputContext.Add(outputContext);
+        sg.groupContext.Add(outputContext);
         
         return sg;
     }
@@ -59,7 +68,7 @@ public sealed class SettingsGroup : ICloneable {
         }
         
         SettingsGroup sg = new SettingsGroup(name) {
-            outputContext = outputContext
+            groupContext = outputContext
         };
         
         return sg;
@@ -73,10 +82,10 @@ public sealed class SettingsGroup : ICloneable {
     public SettingsGroup(string name, params (string name, ArgumentType argumentType)[] outputContext) {
         this.name = name;
 
-        this.outputContext ??= new Context();
+        this.groupContext ??= new Context();
         
         foreach ((string name, ArgumentType argumentType) c in outputContext) {
-            this.outputContext.Add(c.name, c.argumentType);
+            this.groupContext.Add(c.name, c.argumentType);
         }
     }
     
@@ -92,8 +101,8 @@ public sealed class SettingsGroup : ICloneable {
     public SettingsGroup Option(SettingsGroupOption option) {
         options ??= [];
 
-        foreach (SettingsGroupOption o in options.Where(o => o.name == option.name)) {
-            throw new SettingsBuilderException($"A settings option with the same ({o.name}) name already exists.");
+        foreach (SettingsGroupOption o in options.Where(o => o.Name == option.Name)) {
+            throw new SettingsBuilderException($"A settings option with the same ({o.Name}) name already exists.");
         }
         
         options.Add(option);
@@ -107,10 +116,17 @@ public sealed class SettingsGroup : ICloneable {
     /// </summary>
     /// <param name="parse">parameter 1: group context, parameter 2: node context</param>
     public SettingsGroup OnParse(Action<Context, Context> parse) {
-        onParse = parse;
+        parseContext = parse;
         return this;
     }
-    
+
+    /// <summary>
+    /// enables auto parsing of context, matches context values with same name
+    /// </summary>
+    public SettingsGroup EnableAutoParse() {
+        autoParseContext = true;
+        return this;
+    }
 
     /// <summary>
     /// parses the arguments to a context
@@ -123,18 +139,23 @@ public sealed class SettingsGroup : ICloneable {
         if (options == null)
             throw new SettingsBuilderException($"No options have been set for group '{name}'.");
 
-        if (onParse is null)
-            throw new SettingsBuilderException($"No parsing method has been set for group '{name}'.");
-        
-        if (this.outputContext is null)
+        if (groupContext is null)
             throw new SettingsBuilderException($"Output context is not initialized for group '{name}'.");
+        
+        if (autoParseContext) {
+            parseContext = AUTO_PARSE;
+        }
+        
+        if (parseContext is null)
+            throw new SettingsBuilderException($"No parsing method has been set for group '{name}'.");
+
 
         foreach (var o in options) {
-            if (o.name == optionName) {
-                o.Execute(outputContext);
-                onParse(this.outputContext, outputContext);
-                return;
-            }
+            if (o.Name != optionName) continue;
+            
+            o.Execute(outputContext);
+            parseContext(groupContext, outputContext);
+            return;
         }
         
         throw new SettingsBuilderException($"Option '{optionName}' does not exist in group '{name}'.");
@@ -143,7 +164,7 @@ public sealed class SettingsGroup : ICloneable {
     /// <summary>
     /// whether all properties have been properly initialized
     /// </summary>
-    public bool IsFullyInitialized() => outputContext is { Length: > 0 } && options is { Count: > 0 };
+    public bool IsFullyInitialized() => groupContext is { Length: > 0 } && options is { Count: > 0 };
     
     /// <summary>
     /// sets the value of an argument of an option
@@ -154,7 +175,7 @@ public sealed class SettingsGroup : ICloneable {
         }
         
         foreach (var o in options) {
-            if (o.name == optionName) {
+            if (o.Name == optionName) {
                 o.SetValue(argumentName, value);
                 return;
             }
@@ -165,8 +186,9 @@ public sealed class SettingsGroup : ICloneable {
     
     public object Clone() {
         SettingsGroup sg = new SettingsGroup(name) {
-            onParse = onParse,
-            outputContext = (Context?)outputContext?.Clone()
+            parseContext = parseContext,
+            groupContext = (Context?)groupContext?.Clone(),
+            autoParseContext = autoParseContext
         };
 
         if (options == null) throw new SettingsBuilderException($"Options of group '{name}' cannot be uninitialized.");
@@ -180,11 +202,11 @@ public sealed class SettingsGroup : ICloneable {
     public override string ToString() {
         string output = $"{{\"name\": \"{name}\", \"outputContext\": [";
 
-        if (outputContext != null) {
-            for (int i = 0; i < outputContext.Length; i++) {
-                var argument = outputContext.GetAtIndex(i); 
+        if (groupContext != null) {
+            for (int i = 0; i < groupContext.Length; i++) {
+                var argument = groupContext.GetAtIndex(i); 
                 output += $"{{\"name\": \"{argument.name}\", \"value\": {argument.value}}}" + 
-                          (i == outputContext.Length - 1 ? "" : ", ");
+                          (i == groupContext.Length - 1 ? "" : ", ");
             }
         }
 

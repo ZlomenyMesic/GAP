@@ -15,7 +15,8 @@ namespace GAP.util.settings;
 /// <typeparam name="TResult">result class</typeparam>
 public class SettingsNode<TResult> : ICloneable {
     
-    public string name { get; }
+    private string name { get; }
+    public string Name => name;
     public Context context { get; private set; } = new();
     public List<SettingsGroup>? groups { get; private set; } = null;
     private Func<Context, TResult>? executionDelegate = null;
@@ -65,13 +66,13 @@ public class SettingsNode<TResult> : ICloneable {
         if (!group.IsFullyInitialized())
             throw new SettingsBuilderException($"Group '{group}' in '{name}' is not fully initialized.");
         
-        if (groups.Any(g => g.name == group.name)) {
-            throw new SettingsBuilderException($"Group '{group.name}' in '{name}' already exists.");
+        if (groups.Any(g => g.Name == group.Name)) {
+            throw new SettingsBuilderException($"Group '{group.Name}' in '{name}' already exists.");
         }
         
         groups.Add(group);
-        context.Add(group.outputContext ?? 
-                    throw new SettingsBuilderException($"Output context of group '{group.name}' in '{name}' is null."));
+        context.Add(group.groupContext ?? 
+                    throw new SettingsBuilderException($"Output context of group '{group.Name}' in '{name}' is null."));
 
         return this;
     }
@@ -116,7 +117,7 @@ public class SettingsNode<TResult> : ICloneable {
         
         foreach (SettingsGroup group in groups) {
             foreach ((string groupName, string optionName) c in config) {
-                if (group.name != c.groupName) continue;
+                if (group.Name != c.groupName) continue;
                 
                 group.Execute(c.optionName, context);
             }
@@ -140,7 +141,7 @@ public class SettingsNode<TResult> : ICloneable {
         }
         
         foreach (var g in groups) {
-            if (g.name == groupName) {
+            if (g.Name == groupName) {
                 g[optionName].SetValue(argumentName, value);
                 return;
             }

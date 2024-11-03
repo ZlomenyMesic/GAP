@@ -27,7 +27,7 @@ public class SettingsBuilder<TResult> {
             }
 
             foreach (var n in nodes) {
-                if (n.name == name) {
+                if (n.Name == name) {
                     return n;
                 }
             }
@@ -92,7 +92,7 @@ public class SettingsBuilder<TResult> {
             throw new SettingsBuilderException("No settings nodes have been configured.");
         
         foreach (var n in nodes) {
-            if (n.name == nodeName) {
+            if (n.Name == nodeName) {
                 return n.Execute(selectedOptions);
             }
         }
@@ -104,7 +104,7 @@ public class SettingsBuilder<TResult> {
     /// creates a new empty <see cref="SettingsBuilder{TResult}"/>, <b>ONLY for FALLBACK values!</b>
     /// </summary>
     public static SettingsBuilder<T> Empty<T>(string name) {
-        Debug.warn($"Empty '{name}' settings were created.");
+        Debug.Warn($"Empty '{name}' settings were created.");
         
         var empty = new SettingsBuilder<T>(name) {
             isEmpty = true
@@ -120,8 +120,10 @@ public class SettingsBuilder<TResult> {
         
         if (nodes == null) return clone;
         
+        clone.nodes = new List<SettingsNode<TResult>>();
+        
         foreach (SettingsNode<TResult> n in nodes) {
-            clone.Build((SettingsNode<TResult>)n.Clone());
+            clone.nodes.Add((SettingsNode<TResult>)n.Clone());
         }
 
         return clone;
