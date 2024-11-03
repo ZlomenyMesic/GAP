@@ -46,6 +46,7 @@ internal class GAP : Mod {
     
     static int Main() {
         
+        
         // --- MAIN FUNCTIONALITY ---
         // DO NOT REMOVE !!!
         
@@ -70,7 +71,7 @@ internal class GAP : Mod {
         // Mod loading
         ModLoader.LoadMods(".", EXCLUDED_BINARIES);
         ModLoader.WriteRegisteredMods();
-        
+
         // --- END OF MAIN FUNCTIONALITY ---
         // you can put your code here:
 
@@ -95,7 +96,7 @@ internal class GAP : Mod {
         // DeepDream.LoadParametersFile();
         // DeepDream.RunGeneratorFilteredRandom(3);
 
-        // DeepDream.RunGeneratorCustom("conv2d_26", "activation_26", "activation_19");
+        //DeepDream.RunGeneratorCustom("conv2d_26", "activation_26", "activation_19");
 
         return 0;
     }

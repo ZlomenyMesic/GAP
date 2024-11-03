@@ -1,13 +1,13 @@
 True
 input.jpg
-..\..\..\machineLearning\deepdream\input.jpg
+C:\Users\michn\Desktop\convolutions\outputs\dog1.png
 0
 ..\..\..\machineLearning\deepdream\output\dream.png
 ..\..\..\machineLearning\deepdream\output\DONE
 20
 8
-1.3
+1.2
 5
 2147483647
-conv2d_73 mixed5 activation_30
+activation_33 activation_40 mixed5
 5 5 15

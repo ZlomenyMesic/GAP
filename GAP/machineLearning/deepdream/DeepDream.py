@@ -104,9 +104,6 @@ def calculate_consecutive_shapes(original):
         shapes.append(shape)
     return shapes[::-1]
 
-def mean_sq_act(activation):
-    return 
-
 
 # doesn't really calculate loss, but rather layer activation
 def calculate_loss(input_image):
