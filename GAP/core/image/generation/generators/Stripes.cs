@@ -84,8 +84,8 @@ public class Stripes : IImageGenerator {
             Console.Write($"[{rect.a.x}; {rect.a.y}] [{rect.b.x}, {rect.b.y}]");
             ConsoleColors.PrintlnColoredB("   ", c.ToArgb());
 
-            for (int x = rect.a.x * (pixelsPerUnit + gapThickness); x < rect.b.x * (pixelsPerUnit + gapThickness) + pixelsPerUnit - 1; x++) {
-                for (int y = rect.a.y * (pixelsPerUnit + gapThickness); y < rect.b.y * (pixelsPerUnit + gapThickness) + pixelsPerUnit - 1; y++) {
+            for (int x = rect.a.x * (pixelsPerUnit + gapThickness); x < rect.b.x * (pixelsPerUnit + gapThickness) + pixelsPerUnit; x++) {
+                for (int y = rect.a.y * (pixelsPerUnit + gapThickness); y < rect.b.y * (pixelsPerUnit + gapThickness) + pixelsPerUnit; y++) {
                     output.SetPixel(x, y, c);
                 }
             }
