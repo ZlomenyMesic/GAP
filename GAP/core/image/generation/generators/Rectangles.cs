@@ -1,8 +1,3 @@
-//
-// GAP - Generative Art Producer
-//   by ZlomenyMesic & KryKom
-//
-
 using System.Drawing;
 using GAP.util.exceptions;
 using GAP.util.settings;
@@ -10,7 +5,7 @@ using Kolors;
 
 namespace GAP.core.image.generation.generators;
 
-public class Stripes : IImageGenerator {
+public class Rectangles : IImageGenerator {
 
     private int width { get; set; } = 128;
     private int height { get; set; } = 128;
@@ -30,7 +25,7 @@ public class Stripes : IImageGenerator {
     public int PixelsPerUnit => pixelsPerUnit;
     public int GapThickness => gapThickness;
     
-    public Stripes(int gridWidth, int gridHeight, int pixelsPerUnit, int gapThickness, int seed) {
+    public Rectangles(int gridWidth, int gridHeight, int pixelsPerUnit, int gapThickness, int seed) {
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
         this.pixelsPerUnit = pixelsPerUnit;
@@ -41,7 +36,7 @@ public class Stripes : IImageGenerator {
         height = gridHeight * pixelsPerUnit + (gridHeight - 1) * gapThickness;
     }
     
-    public Stripes() { }
+    public Rectangles() { }
     
     public Bitmap GenerateImage() {
         
@@ -62,8 +57,6 @@ public class Stripes : IImageGenerator {
         
         // choose a background color from the palette
         int background = palette.Colors[minI] + (0xff << 24);
-        ConsoleColors.PrintlnColoredB("   ", background);
-        palette.PrintPalette();
         
         Bitmap output = new Bitmap(width, height);
 
@@ -81,8 +74,6 @@ public class Stripes : IImageGenerator {
         while (!grid.IsFull()) {
             var rect = grid.GetRandomRectangle();
             Color c = Color.FromArgb(palette.Colors[rnd.Next(0, palette.Colors.Length - 1)] + (0xff << 24));
-            Console.Write($"[{rect.a.x}; {rect.a.y}] [{rect.b.x}, {rect.b.y}]");
-            ConsoleColors.PrintlnColoredB("   ", c.ToArgb());
 
             for (int x = rect.a.x * (pixelsPerUnit + gapThickness); x < rect.b.x * (pixelsPerUnit + gapThickness) + pixelsPerUnit; x++) {
                 for (int y = rect.a.y * (pixelsPerUnit + gapThickness); y < rect.b.y * (pixelsPerUnit + gapThickness) + pixelsPerUnit; y++) {
@@ -94,28 +85,28 @@ public class Stripes : IImageGenerator {
         return output;
     }
 
-    private static readonly SettingsBuilder<Stripes> SETTINGS = SettingsBuilder<Stripes>.Build("rectangles",
-        SettingsNode<Stripes>.New("stripes")
+    private static readonly SettingsBuilder<Rectangles> SETTINGS = SettingsBuilder<Rectangles>.Build("rectangles",
+        SettingsNode<Rectangles>.New("rectangles")
             .Group(IImageGenerator.UniversalSeedInput())
-            .Argument("grid_width", Arguments.Integer(2))
-            .Argument("grid_height", Arguments.Integer(2))
+            .Argument("grid_width", Arguments.Integer(1))
+            .Argument("grid_height", Arguments.Integer(1))
             .Argument("pixels_per_unit", Arguments.Integer(1))
             .Argument("gap_thickness", Arguments.Integer(1))
-            .OnParse(cin => new Stripes(
+            .OnParse(cin => new Rectangles(
                 (int)cin["grid_width"].GetParsedValue(), 
                 (int)cin["grid_height"].GetParsedValue(), 
                 (int)cin["pixels_per_unit"].GetParsedValue(), 
-                (int)cin["gap_thickness"].GetParsedValue(),
+                (int)cin["gap_thickness"].GetParsedValue(), 
                 (int)cin["seed"].GetParsedValue())
             )
     );
     
     public static SettingsBuilder<T> GetSettings<T>() where T : IImageGenerator {
-        if (typeof(T) != typeof(Stripes)) {
+        if (typeof(T) != typeof(Rectangles)) {
             throw new SettingsBuilderException("Invalid type inputted.");
         }
         
-        return SETTINGS.Clone() as SettingsBuilder<T> ?? SettingsBuilder<T>.Empty<T>("stripes");
+        return SETTINGS.Clone() as SettingsBuilder<T> ?? SettingsBuilder<T>.Empty<T>("rectangles");
     }
 
     /// <summary>
@@ -128,6 +119,8 @@ public class Stripes : IImageGenerator {
         private readonly int height;
         private readonly int seed;
 
+        private const int END_CHANCE = 8;
+
         public Grid(int width, int height, int seed) {
             this.width = width;
             this.height = height;
@@ -136,17 +129,20 @@ public class Stripes : IImageGenerator {
         }
         
         public ((int x, int y) a, (int x, int y) b) GetRandomRectangle() {
-            ((int x, int y) a, (int x, int y) b) positions = ((0, 0), (0, 0));
-            positions.a = GetRandomFirst();
-            positions.b = GetRandomSecond(positions.a.x, positions.a.y);
+            ((int x, int y) a, (int x, int y) b) p = ((0, 0), (0, 0));
+            p.a = GetRandomFirst();
+            p.b = GetRandomSecond(p.a.x, p.a.y);
 
-            for (int x = positions.a.x; x <= positions.b.x; x++) {
-                for (int y = positions.a.y; y <= positions.b.y; y++) {
+            (p.a.x, p.b.x) = p.a.x <= p.b.x ? (p.a.x, p.b.x) : (p.b.x, p.a.x);
+            (p.a.y, p.b.y) = p.a.y <= p.b.y ? (p.a.y, p.b.y) : (p.b.y, p.a.y);
+            
+            for (int x = p.a.x; x <= p.b.x; x++) {
+                for (int y = p.a.y; y <= p.b.y; y++) {
                     grid[x, y] = true;
                 }
             }
             
-            return positions;
+            return p;
         }
 
         public bool IsFull() {
@@ -172,36 +168,143 @@ public class Stripes : IImageGenerator {
         }
 
         private (int x, int y) GetRandomSecond(int startX, int startY) {
+            Random rnd = new Random(seed + 3);
+
+            return rnd.Next(1, 4) switch {
+                1 => GetSecond1(startX, startY),
+                2 => GetSecond2(startX, startY),
+                3 => GetSecond3(startX, startY),
+                4 => GetSecond4(startX, startY),
+                _ => GetSecond1(startX, startY)
+            };
+        }
+
+        private (int x, int y) GetSecond1(int startX, int startY) {
             int maxX = startX;
             Random rnd = new Random(seed + 2);
-            
+
             while (true) {
-                if (grid[maxX, startY]) {
+                if (grid[maxX, startY] == true) {
                     maxX--;
                     break;
                 }
-                
-                if (maxX == width - 1 || rnd.Next(0, 5) == 0) break;
+
+                if (maxX == width - 1 || rnd.Next(0, END_CHANCE) == 0) {
+                    break;
+                }
                 
                 maxX++;
             }
 
-            
             for (int y = startY; y < height; y++) {
-                for (int x = startX; x < maxX; x++) {
-                    if (grid[x, y]) {
+                for (int x = startX; x <= maxX; x++) {
+                    if (grid[x, y] == true) {
                         return (x, y - 1);
                     }
+                }
 
-                    if (rnd.Next(0, 5) == 0) {
-                        return (x, y);
-                    }
+                if (rnd.Next(0, END_CHANCE) == 0) {
+                    return (maxX, y);
                 }
             }
             
             return (maxX, height - 1);
-        } 
+        }
         
+        private (int x, int y) GetSecond2(int startX, int startY) {
+            int maxX = startX;
+            Random rnd = new Random(seed + 2);
+
+            while (true) {
+                if (grid[maxX, startY] == true) {
+                    maxX++;
+                    break;
+                }
+
+                if (maxX == 0 || rnd.Next(0, END_CHANCE) == 0) {
+                    break;
+                }
+                
+                maxX--;
+            }
+
+            for (int y = startY; y < height; y++) {
+                for (int x = startX; x >= maxX; x--) {
+                    if (grid[x, y] == true) {
+                        return (x, y - 1);
+                    }
+                }
+
+                if (rnd.Next(0, END_CHANCE) == 0) {
+                    return (maxX, y);
+                }
+            }
+            
+            return (maxX, height - 1);
+        }
         
+        private (int x, int y) GetSecond3(int startX, int startY) {
+            int maxX = startX;
+            Random rnd = new Random(seed + 2);
+
+            while (true) {
+                if (grid[maxX, startY] == true) {
+                    maxX--;
+                    break;
+                }
+
+                if (maxX == width - 1 || rnd.Next(0, END_CHANCE) == 0) {
+                    break;
+                }
+                
+                maxX++;
+            }
+
+            for (int y = startY; y >= 0; y--) {
+                for (int x = startX; x <= maxX; x++) {
+                    if (grid[x, y] == true) {
+                        return (x, y + 1);
+                    }
+                }
+
+                if (rnd.Next(0, END_CHANCE) == 0) {
+                    return (maxX, y);
+                }
+            }
+            
+            return (maxX, 0);
+        }
+        
+        private (int x, int y) GetSecond4(int startX, int startY) {
+            int maxX = startX;
+            Random rnd = new Random(seed + 2);
+
+            while (true) {
+                if (grid[maxX, startY] == true) {
+                    maxX++;
+                    break;
+                }
+
+                if (maxX == 0 || rnd.Next(0, END_CHANCE) == 0) {
+                    break;
+                }
+                
+                maxX--;
+            }
+
+            for (int y = startY; y >= height; y--) {
+                for (int x = startX; x >= maxX; x--) {
+                    if (grid[x, y] == true) {
+                        return (x, y + 1);
+                    }
+                }
+
+                if (rnd.Next(0, END_CHANCE) == 0) {
+                    return (maxX, y);
+                }
+            }
+            
+            return (maxX, 0);
+        }
     }
 }
