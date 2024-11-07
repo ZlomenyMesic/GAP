@@ -184,7 +184,7 @@ public class Rectangles : IImageGenerator {
             Random rnd = new Random(seed + 2);
 
             while (true) {
-                if (grid[maxX, startY] == true) {
+                if (grid[maxX, startY]) {
                     maxX--;
                     break;
                 }
@@ -198,7 +198,7 @@ public class Rectangles : IImageGenerator {
 
             for (int y = startY; y < height; y++) {
                 for (int x = startX; x <= maxX; x++) {
-                    if (grid[x, y] == true) {
+                    if (grid[x, y]) {
                         return (x, y - 1);
                     }
                 }
@@ -216,7 +216,7 @@ public class Rectangles : IImageGenerator {
             Random rnd = new Random(seed + 2);
 
             while (true) {
-                if (grid[maxX, startY] == true) {
+                if (grid[maxX, startY]) {
                     maxX++;
                     break;
                 }
@@ -230,7 +230,7 @@ public class Rectangles : IImageGenerator {
 
             for (int y = startY; y < height; y++) {
                 for (int x = startX; x >= maxX; x--) {
-                    if (grid[x, y] == true) {
+                    if (grid[x, y]) {
                         return (x, y - 1);
                     }
                 }
@@ -248,7 +248,7 @@ public class Rectangles : IImageGenerator {
             Random rnd = new Random(seed + 2);
 
             while (true) {
-                if (grid[maxX, startY] == true) {
+                if (grid[maxX, startY]) {
                     maxX--;
                     break;
                 }
@@ -262,7 +262,7 @@ public class Rectangles : IImageGenerator {
 
             for (int y = startY; y >= 0; y--) {
                 for (int x = startX; x <= maxX; x++) {
-                    if (grid[x, y] == true) {
+                    if (grid[x, y]) {
                         return (x, y + 1);
                     }
                 }
@@ -280,7 +280,7 @@ public class Rectangles : IImageGenerator {
             Random rnd = new Random(seed + 2);
 
             while (true) {
-                if (grid[maxX, startY] == true) {
+                if (grid[maxX, startY]) {
                     maxX++;
                     break;
                 }
@@ -294,7 +294,7 @@ public class Rectangles : IImageGenerator {
 
             for (int y = startY; y >= height; y--) {
                 for (int x = startX; x >= maxX; x--) {
-                    if (grid[x, y] == true) {
+                    if (grid[x, y]) {
                         return (x, y + 1);
                     }
                 }
