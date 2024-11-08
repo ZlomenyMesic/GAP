@@ -25,9 +25,8 @@ public interface IImageGenerator {
     /// <summary>
     /// returns copy of settings available for the generator
     /// </summary>
-    /// <typeparam name="T">must be same as the generator class</typeparam>
-    public static SettingsBuilder<T> GetSettings<T>() where T : IImageGenerator {
-        throw new NotImplementedException();
+    public static object GetSettings() {
+        return SettingsBuilder<IImageGenerator>.Empty("blank");
     }
 
     private static readonly SettingsGroup UNIVERSAL_SEED_SETTINGS = SettingsGroup

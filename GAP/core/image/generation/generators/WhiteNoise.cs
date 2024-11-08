@@ -217,12 +217,8 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable {
             )
     );
 
-    public static SettingsBuilder<T> GetSettings<T>() where T : IImageGenerator {
-        if (typeof(T) != typeof(WhiteNoise)) {
-            throw new SettingsBuilderException("Invalid type inputted.");
-        }
-        
-        return SETTINGS.Clone() as SettingsBuilder<T> ?? SettingsBuilder<T>.Empty<T>("white_noise");
+    public static object GetSettings() {
+        return SETTINGS.Clone();
     }
 
     public override string ToString() {

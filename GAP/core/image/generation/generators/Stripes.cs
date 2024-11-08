@@ -110,12 +110,8 @@ public class Stripes : IImageGenerator {
             )
     );
     
-    public static SettingsBuilder<T> GetSettings<T>() where T : IImageGenerator {
-        if (typeof(T) != typeof(Stripes)) {
-            throw new SettingsBuilderException("Invalid type inputted.");
-        }
-        
-        return SETTINGS.Clone() as SettingsBuilder<T> ?? SettingsBuilder<T>.Empty<T>("stripes");
+    public static object GetSettings() {
+        return SETTINGS.Clone();
     }
 
     /// <summary>

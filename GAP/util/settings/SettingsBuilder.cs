@@ -103,13 +103,13 @@ public class SettingsBuilder<TResult> {
     /// <summary>
     /// creates a new empty <see cref="SettingsBuilder{TResult}"/>, <b>ONLY for FALLBACK values!</b>
     /// </summary>
-    public static SettingsBuilder<T> Empty<T>(string name) {
+    public static SettingsBuilder<TResult> Empty(string name) {
         Debug.Warn($"Empty '{name}' settings were created.");
         
-        var empty = new SettingsBuilder<T>(name) {
+        var empty = new SettingsBuilder<TResult>(name) {
             isEmpty = true
         };
-        empty.Build(SettingsNode<T>.Empty<T>());
+        empty.Build(SettingsNode<TResult>.Empty<TResult>());
         
         return empty;
     }

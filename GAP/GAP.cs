@@ -5,12 +5,17 @@
 //      founded 11.9.2024
 //
 
+using System.Drawing;
+using System.Drawing.Imaging;
+using GAP.core.image.generation;
 using GAP.core.image.generation.generators;
 using GAP.core.modLoader;
 using Kolors;
 using GAP.machineLearning.deepdream;
+using GAP.util;
 using GAP.util.settings;
 using NAudio.Midi;
+using ColorPalette = Kolors.ColorPalette;
 
 namespace GAP;
 
@@ -80,15 +85,6 @@ internal class GAP : Mod {
         mec.AddTrack([new PatchChangeEvent(0, 2, 1), new NoteOnEvent(0, 2, 48, 32, 980), new NoteEvent(980, 2, MidiCommandCode.NoteOff, 48, 0), new MetaEvent(MetaEventType.EndTrack, 0, 1000)]);
         
         MidiFile.Export("./idk.midi", mec);
-
-        var b = WhiteNoise.GetSettings<WhiteNoise>();
-        b["basic"].SetValue("width", 1024);
-        b["basic"].SetValue("height", 768);
-        b["basic"].SetGroupOptionValue("seed", "word", "seed", "adamati");
-
-        WhiteNoise w = b.Execute("basic", ("seed", "word"));
-        
-        Console.WriteLine(w.ToString());
         
         // DeepDream.Iterations = 5;
         // DeepDream.Octaves = 8;

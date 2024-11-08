@@ -67,7 +67,7 @@ public class Grid : IImageTransformer, ICloneable {
             throw new SettingsBuilderException("Invalid type inputted.");
         }
         
-        return SETTINGS.Clone() as SettingsBuilder<T> ?? SettingsBuilder<T>.Empty<T>("white_noise");
+        return SETTINGS.Clone() as SettingsBuilder<T> ?? SettingsBuilder<T>.Empty("white_noise");
     }
 
     public override string ToString() => JsonSerializer.Serialize(this);
