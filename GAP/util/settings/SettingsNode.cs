@@ -13,7 +13,7 @@ namespace GAP.util.settings;
 /// single settings node object
 /// </summary>
 /// <typeparam name="TResult">result class</typeparam>
-public class SettingsNode<TResult> : ICloneable {
+public class SettingsNode<TResult> : ISettingsNode<TResult, TResult> {
     
     private string name { get; }
     public string Name => name;
@@ -43,14 +43,14 @@ public class SettingsNode<TResult> : ICloneable {
         
         this.name = name;
     }
-    
-    
+
+
     /// <summary>
     /// adds an argument to the settings node
     /// </summary>
     /// <param name="argumentName">name of the argument</param>
     /// <param name="argumentType">type of the argument</param>
-    public SettingsNode<TResult> Argument(string argumentName, ArgumentType argumentType) {
+    public ISettingsNode<TResult, TResult> Argument(string argumentName, ArgumentType argumentType) {
         context.Add(argumentName, argumentType);
         return this;
     }
@@ -60,7 +60,7 @@ public class SettingsNode<TResult> : ICloneable {
     /// creates a new group of settings
     /// </summary>
     /// <param name="group">added group option</param>
-    public SettingsNode<TResult> Group(SettingsGroup group) {
+    public ISettingsNode<TResult, TResult> Group(SettingsGroup group) {
         groups ??= [];
 
         if (!group.IsFullyInitialized())
@@ -82,23 +82,9 @@ public class SettingsNode<TResult> : ICloneable {
     /// sets the <see cref="executionDelegate"/> that creates a
     /// <see cref="TResult"/> instance from <see cref="context"/>
     /// </summary>
-    public SettingsNode<TResult> OnParse(Func<Context, TResult> execute) {
+    public ISettingsNode<TResult, TResult> OnParse(Func<Context, TResult> execute) {
         executionDelegate = execute;
         return this;
-    }
-
-
-    /// <summary>
-    /// creates a new empty <see cref="SettingsNode{TResult}"/>, <b>ONLY for FALLBACK values!</b> 
-    /// </summary>
-    internal static SettingsNode<T> Empty<T>() {
-        SettingsNode<T> empty = SettingsNode<T>.New("empty");
-        empty.isEmpty = true;
-        empty.Argument("empty", Arguments.
-            PlainText("This node is empty. " +
-                      "For more information watch this video: https://youtu.be/dQw4w9WgXcQ?si=7aQZOGrCBTLmLRih"));
-        
-        return empty;
     }
     
 
@@ -148,8 +134,7 @@ public class SettingsNode<TResult> : ICloneable {
         }
     }
     
-
-    public object Clone() {
+    public ISettingsNode<TResult, TResult> Clone() {
         SettingsNode<TResult> clone = new SettingsNode<TResult>(name) {
             context = (Context)context.Clone(),
             executionDelegate = executionDelegate

@@ -85,7 +85,7 @@ public class Rectangles : IImageGenerator {
         return output;
     }
 
-    private static readonly SettingsBuilder<Rectangles> SETTINGS = SettingsBuilder<Rectangles>.Build("rectangles",
+    private static readonly ISettingsBuilder<Rectangles, Rectangles> SETTINGS = SettingsBuilder<Rectangles>.Build("rectangles",
         SettingsNode<Rectangles>.New("rectangles")
             .Group(IImageGenerator.UniversalSeedInput())
             .Argument("grid_width", Arguments.Integer(1))
@@ -101,7 +101,7 @@ public class Rectangles : IImageGenerator {
             )
     );
     
-    public static object GetSettings() {
+    public static ISettingsBuilder<Rectangles, Rectangles> GetSettings() {
         return SETTINGS.Clone();
     }
 

@@ -108,18 +108,14 @@ public class Pixelize : IImageTransformer, ICloneable {
         Copy(pixelize);
     }
     
-    private static readonly SettingsBuilder<Pixelize> SETTINGS = SettingsBuilder<Pixelize>.Build("pixelize", 
+    private static readonly ISettingsBuilder<Pixelize, Pixelize> SETTINGS = SettingsBuilder<Pixelize>.Build("pixelize", 
         SettingsNode<Pixelize>.New("default")
             .Argument("pixel_type", Arguments.SingleSelect(typeof(PixelType)))
             .OnParse(context => new Pixelize((PixelType)context["pixel_type"].GetParsedValue()))
     );
 
-    public SettingsBuilder<T> GetSettings<T>() {
-        if (typeof(T) != typeof(Pixelize)) {
-            throw new SettingsBuilderException("Invalid type inputted.");
-        }
-        
-        return SETTINGS.Clone() as SettingsBuilder<T> ?? SettingsBuilder<T>.Empty("white_noise");
+    public static ISettingsBuilder<Pixelize, Pixelize> GetSettings() {
+        return SETTINGS.Clone();
     }
 
     public override string ToString() => JsonSerializer.Serialize(this);

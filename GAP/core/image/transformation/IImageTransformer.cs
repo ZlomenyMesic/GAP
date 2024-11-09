@@ -23,7 +23,7 @@ public interface IImageTransformer {
     /// <summary>
     /// returns copy of settings available for the transformer
     /// </summary>
-    public static SettingsBuilder<T> GetSettings<T>() where T : IImageTransformer {
-        throw new NotImplementedException();
+    public static ISettingsBuilder<IImageTransformer, IImageTransformer> GetSettings() {
+        return ISettingsBuilder<IImageTransformer, IImageTransformer>.Empty("image_transformer");
     }
 }

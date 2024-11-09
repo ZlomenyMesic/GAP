@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using GAP.core.image.generation;
 using GAP.core.image.generation.generators;
+using GAP.core.image.transformation.transformers;
 using GAP.core.modLoader;
 using Kolors;
 using GAP.machineLearning.deepdream;
@@ -85,6 +86,11 @@ internal class GAP : Mod {
         mec.AddTrack([new PatchChangeEvent(0, 2, 1), new NoteOnEvent(0, 2, 48, 32, 980), new NoteEvent(980, 2, MidiCommandCode.NoteOff, 48, 0), new MetaEvent(MetaEventType.EndTrack, 0, 1000)]);
         
         MidiFile.Export("./idk.midi", mec);
+
+        ColorReduce cr = new ColorReduce(0);
+        Bitmap bmp = (Bitmap)Image.FromFile(@"C:\Users\krystof\Desktop\fotky\Fotky-En\Fotky\PANO_20230625_134046.jpg");
+        bmp = cr.TransformImage(bmp);
+        bmp.Save("./reduce.png", ImageFormat.Png);
         
         // DeepDream.Iterations = 5;
         // DeepDream.Octaves = 8;

@@ -94,7 +94,7 @@ public class Stripes : IImageGenerator {
         return output;
     }
 
-    private static readonly SettingsBuilder<Stripes> SETTINGS = SettingsBuilder<Stripes>.Build("rectangles",
+    private static readonly ISettingsBuilder<Stripes, Stripes> SETTINGS = SettingsBuilder<Stripes>.Build("rectangles",
         SettingsNode<Stripes>.New("stripes")
             .Group(IImageGenerator.UniversalSeedInput())
             .Argument("grid_width", Arguments.Integer(2))
@@ -110,7 +110,7 @@ public class Stripes : IImageGenerator {
             )
     );
     
-    public static object GetSettings() {
+    public static ISettingsBuilder<Stripes, Stripes> GetSettings() {
         return SETTINGS.Clone();
     }
 

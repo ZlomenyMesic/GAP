@@ -131,7 +131,7 @@ public class Paths : IImageGenerator {
         };
     }
 
-    private static readonly SettingsBuilder<Paths> SETTINGS = SettingsBuilder<Paths>.Build("paths",
+    private static readonly ISettingsBuilder<Paths, Paths> SETTINGS = SettingsBuilder<Paths>.Build("paths",
         SettingsNode<Paths>.New("basic")
             .Group(IImageGenerator.UniversalSeedInput())
             .Argument("grid_width", Arguments.Integer(2))
@@ -161,7 +161,7 @@ public class Paths : IImageGenerator {
             )
     );
 
-    public static object GetSettings() {
+    public static ISettingsBuilder<Paths, Paths> GetSettings() {
         return SETTINGS.Clone();
     }
 }

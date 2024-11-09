@@ -150,7 +150,7 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable {
         return s;
     }
     
-    private static readonly SettingsBuilder<WhiteNoise> SETTINGS = SettingsBuilder<WhiteNoise>.Build("white_noise", 
+    private static readonly ISettingsBuilder<WhiteNoise, WhiteNoise> SETTINGS = SettingsBuilder<WhiteNoise>.Build("white_noise", 
         SettingsNode<WhiteNoise>.New("advanced")
             .Group(IImageGenerator.UniversalSeedInput())
             .Argument("width", Arguments.Integer(128))
@@ -217,8 +217,8 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable {
             )
     );
 
-    public static object GetSettings() {
-        return SETTINGS.Clone();
+    public static SettingsBuilder<WhiteNoise> GetSettings() {
+        return (SettingsBuilder<WhiteNoise>)SETTINGS.Clone();
     }
 
     public override string ToString() {
