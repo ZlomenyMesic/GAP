@@ -7,6 +7,7 @@ using System.Drawing;
 using GAP.util;
 using GAP.util.math;
 using GAP.util.settings;
+using Kolors;
 
 namespace GAP.core.image.generation;
 
@@ -57,5 +58,27 @@ public interface IImageGenerator {
     /// </summary>
     public static SettingsGroup UniversalSeedInput() {
         return (SettingsGroup)UNIVERSAL_SEED_SETTINGS.Clone();
-    } 
+    }
+
+    /// <summary>
+    /// returns the darkest color of the palette
+    /// </summary>
+    public static sealed Color GetDarkest(ColorPalette palette) {
+        double minV = int.MaxValue;
+        int minI = 0;
+        
+        for (int i = 0; i < palette.Colors.Length; i++) {
+            (_, _, double v) = ColorFormat.ColorToHsv(Color.FromArgb(palette.Colors[i]));
+
+            if (!(v < minV)) continue;
+            
+            minV = v;
+            minI = i;
+        }
+        
+        // choose a background color from the palette
+        int background = palette.Colors[minI] + (0xff << 24);
+        
+        return Color.FromArgb(background);
+    }
 }

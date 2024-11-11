@@ -1,5 +1,9 @@
+//
+// GAP - Generative Art Producer
+//   by ZlomenyMesic & KryKom
+//
+
 using System.Drawing;
-using GAP.util.exceptions;
 using GAP.util.settings;
 using Kolors;
 

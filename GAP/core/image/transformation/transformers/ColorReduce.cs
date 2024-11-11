@@ -1,6 +1,10 @@
+//
+// GAP - Generative Art Producer
+//   by ZlomenyMesic & KryKom
+//
+
 using System.Drawing;
 using GAP.util.settings;
-using Kolors;
 
 namespace GAP.core.image.transformation.transformers;
 
@@ -16,6 +20,8 @@ public class ColorReduce : IImageTransformer {
     public ColorReduce(int reduceLevel) {
         this.reduceLevel = Math.Max(Math.Min(reduceLevel, 128), 0);
     }
+
+    public ColorReduce() {}
     
     public Bitmap TransformImage(Bitmap image) {
         for (int x = 0; x < image.Width; x++) {

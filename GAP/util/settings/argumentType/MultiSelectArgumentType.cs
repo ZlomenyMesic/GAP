@@ -4,7 +4,7 @@
 //
 
 using GAP.util.exceptions;
-using Kolors;
+using Kolors.console;
 
 namespace GAP.util.settings.argumentType;
 

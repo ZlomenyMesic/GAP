@@ -5,7 +5,6 @@
 
 using System.Drawing;
 using System.Text.Json;
-using GAP.util.exceptions;
 using GAP.util.settings;
 using Kolors;
 

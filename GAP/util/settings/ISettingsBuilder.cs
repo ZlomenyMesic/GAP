@@ -1,4 +1,9 @@
-using Kolors;
+//
+// GAP - Generative Art Producer
+//   by ZlomenyMesic & KryKom
+//
+
+using Kolors.console;
 
 namespace GAP.util.settings;
 

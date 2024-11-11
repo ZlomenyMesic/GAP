@@ -4,9 +4,9 @@
 //
 
 using System.Drawing;
-using GAP.util.exceptions;
 using GAP.util.settings;
 using Kolors;
+using Kolors.console;
 
 namespace GAP.core.image.generation.generators;
 
@@ -81,8 +81,6 @@ public class Stripes : IImageGenerator {
         while (!grid.IsFull()) {
             var rect = grid.GetRandomRectangle();
             Color c = Color.FromArgb(palette.Colors[rnd.Next(0, palette.Colors.Length - 1)] + (0xff << 24));
-            Console.Write($"[{rect.a.x}; {rect.a.y}] [{rect.b.x}, {rect.b.y}]");
-            ConsoleColors.PrintlnColoredB("   ", c.ToArgb());
 
             for (int x = rect.a.x * (pixelsPerUnit + gapThickness); x < rect.b.x * (pixelsPerUnit + gapThickness) + pixelsPerUnit; x++) {
                 for (int y = rect.a.y * (pixelsPerUnit + gapThickness); y < rect.b.y * (pixelsPerUnit + gapThickness) + pixelsPerUnit; y++) {

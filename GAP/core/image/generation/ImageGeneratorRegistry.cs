@@ -7,7 +7,7 @@ using System.Reflection;
 using GAP.util.exceptions;
 using GAP.util.registries;
 using GAP.util.settings;
-using Kolors;
+using Kolors.console;
 
 namespace GAP.core.image.generation;
 
