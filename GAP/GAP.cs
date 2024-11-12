@@ -8,6 +8,9 @@
 using System.Drawing.Imaging;
 using GAP.core.image.generation.generators;
 using GAP.core.modLoader;
+using GAP.machineLearning.deepdream;
+using GAP.machineLearning.ladybug;
+using GAP.machineLearning.ladybug.scripts;
 using GAP.util;
 using Kolors.console;
 using NAudio.Midi;
@@ -102,36 +105,28 @@ internal class GAP : Mod {
         // --- END OF MAIN FUNCTIONALITY ---
         // you can put your code here:
 
-<<<<<<< HEAD
-        //DeepDream.ImageOrigin = @"C:\Users\michn\Desktop\convolutions\outputs\dog1.png";
-        //DeepDream.OctaveScale = 1.2f;
-        //DeepDream.RunGeneratorFilteredRandom(3);
-=======
         MidiEventCollection mec = new MidiEventCollection(1, 960);
         mec.AddTrack([new TempoEvent(600000, 0), new MetaEvent(MetaEventType.EndTrack, 0, 0)]);
         mec.AddTrack([new PatchChangeEvent(0, 2, 1), new NoteOnEvent(0, 2, 48, 32, 980), new NoteEvent(980, 2, MidiCommandCode.NoteOff, 48, 0), new MetaEvent(MetaEventType.EndTrack, 0, 1000)]);
         
         MidiFile.Export("./idk.midi", mec);
->>>>>>> 602c30e405d5f8cfeeab7cfcf3e8a0ebf35af426
 
         ConsoleProgressBar bar = new ConsoleProgressBar(1000, 4000, 40, ConsoleProgressBar.BarStyle.MODERN);
 
         Event += bar.OnProgressUpdate;
-        
+        /*
         for (int i = 1000; i < 4000; i++) {
             Spectrogram s = new Spectrogram(400, 400, i);
             var bmp = s.GenerateImage();
             bmp.Save($@".\gallery\spectrogram-400x400\{SeedFormat.WordFromSeed(i)}.png", ImageFormat.Png);
             Event.Invoke(null, EventArgs.Empty);
         }
-        
-        // DeepDream.Iterations = 5;
-        // DeepDream.Octaves = 8;
-        // DeepDream.LayerActivationFunction = DeepDream.LayerActivationFunctions.LastPriority;
-        // DeepDream.LoadParametersFile();
-        // DeepDream.RunGeneratorFilteredRandom(3);
+        */
 
-        //DeepDream.RunGeneratorCustom("conv2d_26", "activation_26", "activation_19");
+        //DeepDream.RunGeneratorFilteredRandom(3);
+        Ladybug.TrainModel();
+        //Ladybug.RunGenerator();
+        //Scripts.PrintModelSummary();
 
         return 0;
     }

@@ -16,17 +16,9 @@ import tensorflow.keras.applications.inception_v3 as inception_v3
 import matplotlib.pyplot as plt
 import numpy as np
 
-WHITE = "\033[0;37;40m"
-GRAY = "\033[1;30;40m"
-RED = "\033[1;31;40m"
-GREEN = "\033[1;32;40m"
-YELLOW = "\033[1;33;40m"
-BLUE = "\033[1;34;40m"
-MAGENTA = "\033[1;35;40m"
-CYAN = "\033[0;36;40m"
-
-BULLET = "\u25cf"
-CIRCLE = "\u25cb"
+import sys, os
+sys.path.append(os.path.relpath(r"..\..\..\machinelearning\utils"))
+from ConsoleColors import *
 
 # number of parameters passed in params.txt
 PARAMS_LEN = 13
@@ -258,8 +250,7 @@ if VERBOSE:
     print(f"Running DeepDream:")
     print(f"   {GREEN}{CIRCLE}{WHITE} Input source: {IMG_ORIGIN}")
     print(f"   {GREEN}{CIRCLE}{WHITE} Output path: {OUTPUT_PATH}")
-    print(f"   {GREEN}{CIRCLE}{WHITE} Layers to iterate: {RED}{len(LAYERS)}{WHITE}")
-    print("")
+    print(f"   {GREEN}{CIRCLE}{WHITE} Layers to iterate: {RED}{len(LAYERS)}{WHITE}\n")
 
 create_layer_dict()
 

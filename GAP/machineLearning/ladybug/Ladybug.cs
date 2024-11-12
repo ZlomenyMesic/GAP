@@ -8,21 +8,11 @@
 namespace GAP.machineLearning.ladybug;
 
 internal static class Ladybug {
-    private static readonly string RenameDataScriptPath = @"ladybug\RenameData.py";
-    private static readonly string DataSubsetsScriptPath = @"ladybug\DataSubsets.py";
-    private static readonly string TrainModelScriptPath = @"ladybug\TrainModel.py";
-    private static readonly string ApplicationScriptPath = @"ladybug\Application.py";
-
-    internal static void RenameData() {
-        PythonWrapper.RunPythonScript(RenameDataScriptPath);
-    }
-
-    internal static void CreateDataSubsets() {
-        PythonWrapper.RunPythonScript(DataSubsetsScriptPath);
-    }
+    private static readonly string TrainingScriptPath = @"ladybug\ModelTraining.py";
+    private static readonly string ApplicationScriptPath = @"ladybug\ModelApplication.py";
 
     internal static void TrainModel() {
-        PythonWrapper.RunPythonScript(TrainModelScriptPath);
+        PythonWrapper.RunPythonScript(TrainingScriptPath);
     }
 
     internal static void RunGenerator() {

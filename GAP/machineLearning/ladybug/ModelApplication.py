@@ -14,6 +14,15 @@ import tensorflow as tf
 import tensorflow.keras as keras
 import numpy as np
 
+import sys, os
+sys.path.append(os.path.relpath(r"..\..\..\machinelearning\utils"))
+from ConsoleColors import *
+
+OUTPUT_PATH = r"..\..\..\machinelearning\ladybug\output\output.png"
+
+ITERATIONS = 100
+DISTORTION_RATE = 15
+
 def random_noise():
     noise = np.random.random((1, 180, 180, 3))
     return tf.convert_to_tensor(noise)
@@ -30,7 +39,7 @@ def save_image(img):
     img += 0.5
     img *= 255.0
     img = np.clip(img, 0, 255).astype("uint8")
-    keras.utils.save_img("output.png", img)
+    keras.utils.save_img(OUTPUT_PATH, img)
 
 def calculate_loss(image):
     activation = model(image)
@@ -58,10 +67,10 @@ def gradient_ascent_step(image, distortion_rate, i):
     return loss, image
 
 # loop repeats NUM_OCTAVE times with ITERATIONS steps
-def gradient_ascent_loop(image, iterations, distortion_rate):
-    for i in range(iterations):
+def gradient_ascent_loop(image):
+    for i in range(ITERATIONS):
         print(f"iteration {i}")
-        loss, image = gradient_ascent_step(image, distortion_rate, i)
+        loss, image = gradient_ascent_step(image, DISTORTION_RATE, i)
         print()
     return image
 
@@ -69,7 +78,7 @@ model = keras.models.load_model("cnn_model.keras")
 print("model loaded")
 
 noise = random_noise()
-output = gradient_ascent_loop(noise, 400, 10)
+output = gradient_ascent_loop(noise)
 print("image generated")
 
 save_image(output.numpy())
