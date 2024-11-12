@@ -5,7 +5,6 @@
 
 using System.Drawing;
 using System.Text.Json;
-using GAP.util.exceptions;
 using GAP.util.settings;
 using Kolors;
 
@@ -19,6 +18,11 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable {
     private int width { get; set; }
     private int height { get; set; }
     private int seed { get; set; }
+    
+    public int Width => width;
+    public int Height => height;
+    public int Seed => seed;
+    
 
     private double hueFactor { get; set; } = 1d;
     private bool allowRandomHue { get; set; }
@@ -26,6 +30,13 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable {
     private bool allowRandomSaturation { get; set; }
     private double valueFactor { get; set; } = 1d;
     private bool allowRandomBrightness { get; set; }
+
+    public double HueFactor => hueFactor;
+    public bool AllowRandomHue => allowRandomHue;
+    public double SaturationFactor => saturationFactor;
+    public bool AllowRandomSaturation => allowRandomSaturation;
+    public double ValueFactor => valueFactor;
+    public bool AllowRandomBrightness => allowRandomBrightness;
     
     /// <summary>
     /// default constructor
@@ -38,6 +49,8 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable {
         this.height = height;
         this.seed = seed;
     }
+    
+    public WhiteNoise() {}
 
     /// <summary>
     /// constructor using presets
@@ -136,11 +149,11 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable {
         return s;
     }
     
-    private static readonly SettingsBuilder<WhiteNoise> SETTINGS = SettingsBuilder<WhiteNoise>.Build("white_noise", 
+    private static readonly ISettingsBuilder<WhiteNoise, WhiteNoise> SETTINGS = SettingsBuilder<WhiteNoise>.Build("white_noise", 
         SettingsNode<WhiteNoise>.New("advanced")
-            .Argument("seed", Arguments.Integer())
-            .Argument("width", Arguments.Integer(0))
-            .Argument("height", Arguments.Integer(0))
+            .Group(IImageGenerator.UniversalSeedInput())
+            .Argument("width", Arguments.Integer(128))
+            .Argument("height", Arguments.Integer(128))
             .Group(SettingsGroup
                 .New("advanced", Context.New(
                     ("allow_random_hue", Arguments.Bool()),
@@ -172,15 +185,9 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable {
                     .Argument("saturation_factor", Arguments.Double(0, 1))
                     .Argument("allow_random_value", Arguments.Bool())
                     .Argument("value_factor", Arguments.Double(0, 1))
+                    .EnableAutoParse()
                 )
-                .OnParse((cin, cout) => {
-                    cout["allow_random_hue"].SetParsedValue(cin["allow_random_hue"].GetParsedValue());
-                    cout["allow_random_saturation"].SetParsedValue(cin["allow_random_saturation"].GetParsedValue());
-                    cout["allow_random_value"].SetParsedValue(cin["allow_random_value"].GetParsedValue());
-                    cout["hue_factor"].SetParsedValue(cin["hue_factor"].GetParsedValue());
-                    cout["saturation_factor"].SetParsedValue(cin["saturation_factor"].GetParsedValue());
-                    cout["value_factor"].SetParsedValue(cin["value_factor"].GetParsedValue());
-                })
+                .EnableAutoParse()
             )
             .OnParse(context => {
                 WhiteNoise whiteNoise = new WhiteNoise(
@@ -199,21 +206,18 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable {
         ,
         
         SettingsNode<WhiteNoise>.New("basic")
-            .Argument("seed", Arguments.Integer())
-            .Argument("width", Arguments.Integer())
-            .Argument("height", Arguments.Integer())
+            .Group(IImageGenerator.UniversalSeedInput())
+            .Argument("width", Arguments.Integer(128))
+            .Argument("height", Arguments.Integer(128))
             .OnParse(context => new WhiteNoise(
                 (int)context["width"].GetParsedValue(),
                 (int)context["height"].GetParsedValue(),
-                (int)context["seed"].GetParsedValue()))
+                (int)context["seed"].GetParsedValue())
+            )
     );
 
-    public static SettingsBuilder<T> GetSettings<T>() where T : IImageGenerator {
-        if (typeof(T) != typeof(WhiteNoise)) {
-            throw new SettingsBuilderException("Invalid type inputted.");
-        }
-        
-        return SETTINGS.Clone() as SettingsBuilder<T> ?? SettingsBuilder<T>.Empty<T>("white_noise");
+    public static SettingsBuilder<WhiteNoise> GetSettings() {
+        return (SettingsBuilder<WhiteNoise>)SETTINGS.Clone();
     }
 
     public override string ToString() {

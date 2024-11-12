@@ -4,7 +4,6 @@
 //
 
 using GAP.util.exceptions;
-using Kolors;
 
 namespace GAP.util.settings;
 
@@ -13,21 +12,21 @@ namespace GAP.util.settings;
 /// builds settings for generator (or other) classes 
 /// </summary>
 /// <typeparam name="TResult">settings result class</typeparam>
-public class SettingsBuilder<TResult> {
+public class SettingsBuilder<TResult> : ISettingsBuilder<TResult, TResult> {
 
     public string name { get; }
-    public List<SettingsNode<TResult>>? nodes { get; private set; } = null;
+    public List<ISettingsNode<TResult, TResult>>? nodes { get; private set; } = null;
     private bool isEmpty = false;
 
 
-    public SettingsNode<TResult> this[string name] {
+    public ISettingsNode<TResult, TResult> this[string name] {
         get {
             if (nodes is null) {
                 throw new SettingsBuilderException($"No nodes have been set in builder '{name}'");
             }
 
             foreach (var n in nodes) {
-                if (n.name == name) {
+                if (n.Name == name) {
                     return n;
                 }
             }
@@ -55,7 +54,7 @@ public class SettingsBuilder<TResult> {
     /// adds new settings nodes to the builder
     /// </summary>
     /// <param name="nodes">node creation actions</param>
-    public void Build(params SettingsNode<TResult>[] nodes) {
+    public void Build(params ISettingsNode<TResult, TResult>[] nodes) {
         
         this.nodes ??= nodes.ToList();
 
@@ -66,7 +65,7 @@ public class SettingsBuilder<TResult> {
     /// <summary>
     /// creates a new <see cref="SettingsBuilder{TResult}"/> with nodes and returns it
     /// </summary>
-    public static SettingsBuilder<TResult> Build(string name, params SettingsNode<TResult>[] nodes) {
+    public static ISettingsBuilder<TResult, TResult> Build(string name, params ISettingsNode<TResult, TResult>[] nodes) {
         SettingsBuilder<TResult> builder = new SettingsBuilder<TResult>(name) {
             nodes = nodes.ToList()
         };
@@ -92,7 +91,7 @@ public class SettingsBuilder<TResult> {
             throw new SettingsBuilderException("No settings nodes have been configured.");
         
         foreach (var n in nodes) {
-            if (n.name == nodeName) {
+            if (n.Name == nodeName) {
                 return n.Execute(selectedOptions);
             }
         }
@@ -100,28 +99,16 @@ public class SettingsBuilder<TResult> {
         throw new SettingsBuilderException("No matching settings node found.");
     }
 
-    /// <summary>
-    /// creates a new empty <see cref="SettingsBuilder{TResult}"/>, <b>ONLY for FALLBACK values!</b>
-    /// </summary>
-    public static SettingsBuilder<T> Empty<T>(string name) {
-        Debug.warn($"Empty '{name}' settings were created.");
-        
-        var empty = new SettingsBuilder<T>(name) {
-            isEmpty = true
-        };
-        empty.Build(SettingsNode<T>.Empty<T>());
-        
-        return empty;
-    }
-    
 
-    public SettingsBuilder<TResult> Clone() {
+    public ISettingsBuilder<TResult, TResult> Clone() {
         SettingsBuilder<TResult> clone = new SettingsBuilder<TResult>(name);
         
         if (nodes == null) return clone;
         
-        foreach (SettingsNode<TResult> n in nodes) {
-            clone.Build((SettingsNode<TResult>)n.Clone());
+        clone.nodes = new List<ISettingsNode<TResult, TResult>>();
+        
+        foreach (ISettingsNode<TResult, TResult> n in nodes) {
+            clone.nodes.Add(n.Clone());
         }
 
         return clone;

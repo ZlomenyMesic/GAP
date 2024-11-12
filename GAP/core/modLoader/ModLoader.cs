@@ -4,7 +4,7 @@
 //
 
 using System.Reflection;
-using Kolors;
+using Kolors.console;
 
 namespace GAP.core.modLoader;
 
@@ -43,11 +43,11 @@ internal static class ModLoader {
             if (result) {
                 modCount++;
                 
-                ConsoleColors.printColored("   \u25cf ", Debug.infoColor);
+                ConsoleColors.PrintColored("   \u25cf ", Debug.InfoColor);
                 Console.WriteLine(file.Replace(path + "\\", ""));
             }
             else {
-                ConsoleColors.printColored("   \u25cb ", Debug.errorColor);
+                ConsoleColors.PrintColored("   \u25cb ", Debug.ErrorColor);
                 Console.WriteLine(file.Replace(path + "\\", ""));
             }
         }
@@ -84,14 +84,14 @@ internal static class ModLoader {
                 var mod = (Mod?)Activator.CreateInstance(type);
                 
                 if (mod == null) {
-                    Debug.warn($"Mod loader failed to load type {type.FullName} from assembly {modAssembly.FullName}");
+                    Debug.Warn($"Mod loader failed to load type {type.FullName} from assembly {modAssembly.FullName}");
                     continue;
                 }
                 
                 string modId = mod.Register();
 
                 if (MOD_IDS.Contains(modId)) {
-                    Debug.warn($"A mod with the same id ('{modId}') has already been registered!");
+                    Debug.Warn($"A mod with the same id ('{modId}') has already been registered!");
                     continue;
                 }
                 
@@ -121,8 +121,7 @@ internal static class ModLoader {
         Console.WriteLine($"\x1B[1mRegistered Mods ({MOD_IDS.Count}):\x1B[0m");
         
         for (int i = 0; i < MOD_IDS.Count; i++) {
-            ConsoleColors.printColored($"   \u25cf {MOD_IDS[i]}", Debug.warnColor);
-            Console.WriteLine($": {MOD_DESCRIPTIONS[i]}");
+            Console.WriteLine($"   \x1B[1m{MOD_IDS[i]}\x1b[0m: {MOD_DESCRIPTIONS[i]}");
         }
         
         Console.WriteLine();

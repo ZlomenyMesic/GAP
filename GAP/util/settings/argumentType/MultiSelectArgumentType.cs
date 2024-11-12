@@ -4,7 +4,7 @@
 //
 
 using GAP.util.exceptions;
-using Kolors;
+using Kolors.console;
 
 namespace GAP.util.settings.argumentType;
 
@@ -96,7 +96,7 @@ public class MultiSelectArgumentType : ArgumentType {
             return;
         }
         
-        Debug.warn("Trying to set a value that does not exist.");
+        Debug.Warn("Trying to set a value that does not exist.");
     }
 
     /// <summary>
@@ -120,7 +120,7 @@ public class MultiSelectArgumentType : ArgumentType {
             return;
         }
         
-        Debug.warn("Trying to select a value that does not exist.");
+        Debug.Warn("Trying to select a value that does not exist.");
     }
 
     /// <summary>
@@ -144,7 +144,7 @@ public class MultiSelectArgumentType : ArgumentType {
             return;
         }
         
-        Debug.warn("Trying to deselect a value that does not exist.");
+        Debug.Warn("Trying to deselect a value that does not exist.");
     }
 
     /// <summary>
@@ -168,7 +168,7 @@ public class MultiSelectArgumentType : ArgumentType {
             return;
         }
         
-        Debug.warn("Trying to toggle a value that does not exist.");
+        Debug.Warn("Trying to toggle a value that does not exist.");
     }
 
     /// <summary>

@@ -8,14 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="Kolors">
-      <HintPath>util\Kolors.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="kolors" Version="1.0.7.1" />
     <PackageReference Include="NAudio" Version="2.2.1" />
-    <PackageReference Include="System.Drawing.Common" Version="8.0.8" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.10" />
   </ItemGroup>
 
   <ItemGroup>

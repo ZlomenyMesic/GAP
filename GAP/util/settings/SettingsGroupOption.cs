@@ -12,9 +12,18 @@ namespace GAP.util.settings;
 /// single option of input method of settings
 /// </summary>
 public sealed class SettingsGroupOption : ICloneable {
-    public string name { get; }
+    private string name { get; }
+    public string Name => name;
     public Context context { get; init; } = new();
     public Action<Context, Context>? parseContext { get; private set; } = null;
+    private bool autoParseContext { get; set; } = false;
+    
+    private static readonly Action<Context, Context> AUTO_PARSE = (cin, cout) => {
+        for (int i = 0; i < cin.Length; i++) {
+            var v = cin.GetAtIndex(i);
+            cout[v.name].SetParsedValue(v.value.GetParsedValue());
+        }
+    };
 
     
     /// <summary>
@@ -41,7 +50,16 @@ public sealed class SettingsGroupOption : ICloneable {
     /// </summary>
     /// <param name="parse">parameter 1: option context, parameter 2: shared group context</param>
     public SettingsGroupOption OnParse(Action<Context, Context> parse) {
+        autoParseContext = false;
         parseContext = parse;
+        return this;
+    }
+
+    /// <summary>
+    /// enables auto parsing of context, matches context values with same name
+    /// </summary>
+    public SettingsGroupOption EnableAutoParse() {
+        autoParseContext = true;
         return this;
     }
 
@@ -52,6 +70,10 @@ public sealed class SettingsGroupOption : ICloneable {
     /// no parsing delegate has been provided through the <see cref="OnParse"/> method
     /// </exception>
     public void Execute(in Context context) {
+
+        if (autoParseContext) {
+            parseContext = AUTO_PARSE;
+        }
         
         if (parseContext == null) {
             throw new SettingsBuilderException(
@@ -78,7 +100,8 @@ public sealed class SettingsGroupOption : ICloneable {
     public object Clone() {
         SettingsGroupOption sgo = new SettingsGroupOption(name) {
             parseContext = parseContext,
-            context = (Context)context.Clone()
+            context = (Context)context.Clone(),
+            autoParseContext = autoParseContext
         };
         
         return sgo;

@@ -5,10 +5,12 @@
 //      founded 11.9.2024
 //
 
+using System.Drawing.Imaging;
+using GAP.core.image.generation.generators;
 using GAP.core.modLoader;
-using Kolors;
-using GAP.machineLearning.deepdream;
-using GAP.machineLearning.ladybug;
+using GAP.util;
+using Kolors.console;
+using NAudio.Midi;
 
 namespace GAP;
 
@@ -18,6 +20,7 @@ internal class GAP : Mod {
     public const string PROJECT_ID = "gap";
     private const string DESCRIPTION = "official vanilla GAP generators";
     private const Debug.DebugLevel DEBUG_LEVEL = Debug.DebugLevel.ALL;
+    private static string MOD_DIRECTORY = ".";
     private static readonly string[] EXCLUDED_BINARIES = [
         "Kolors", 
         "Microsoft.Win32.SystemEvents",
@@ -27,8 +30,26 @@ internal class GAP : Mod {
         "NAudio",
         "NAudio.Midi",
         "NAudio.Wasapi",
-        "NAudio.WinMM"
+        "NAudio.WinMM",
+        "Microsoft.CodeAnalysis.dll"
     ];
+    
+    private const string GAP_ASCII_ART = 
+        " g_____   a___  p______            g_____                           _   _              a___       _    p____" +
+        "__                                    \ng|  __ \\ a/ _ \\ p| ___ \\          g|  __ \\                      " +
+        "   | | (_)            a/ _ \\     | |   p| ___ \\                                   \ng| |  \\// a/_\\ \\p| " +
+        "|_/ /  d______  g| |  \\/ ___ _ __   ___ _ __ __ _| |_ ___   _____  a/ /_\\ \\_ __| |_  p| |_/ / __ ___   __" +
+        " _ _ __ __ _ _ __ ___  \ng| | __ a|  _  |p|  __/  d|______| g| | __ / _ \\ '_ \\ / _ \\ '__/ _` | __| \\ \\ " +
+        "/ / _ \\ a|  _  | '__| __| p|  __/ '__/ _ \\ / _` | '__/ _` | '_ ` _ \\ \ng| |_\\ \\a| | | |p| |            " +
+        "  g| |_\\ \\  __/ | | |  __/ | | (_| | |_| |\\ V /  __/ a| | | | |  | |_  p| |  | | | (_) | (_| | | | (_| | " +
+        "| | | | |\n g\\____/a\\_| |_/p\\_|               g\\____/\\___|_| |_|\\___|_|  \\__,_|\\__|_| \\_/ \\___| a" +
+        "\\_| |_/_|   \\__| p\\_|  |_|  \\___/ \\__, |_|  \\__,_|_| |_| |_|\n                                                                                                                   __/ |                    \n                                                                                                                  |___/                     ";
+
+    private const int G_GREEN = 0x8AC926;
+    private const int A_BLUE = 0x1982C4;
+    private const int P_PURPLE = 0x6A4C93;
+    private const int D_RED = 0xFF595E;
+    private const int D_YELLOW = 0xFFCA3A;
 
     //
     // NOTE:
@@ -40,6 +61,8 @@ internal class GAP : Mod {
     // TODOS:
     //
     //
+
+    public static event EventHandler Event;
     
     static int Main() {
         
@@ -57,25 +80,58 @@ internal class GAP : Mod {
         // Console settings
         Console.Title = "GAP: cli";
         Console.OutputEncoding = System.Text.Encoding.Unicode;
+        Console.WriteLine();
+        Console.WindowWidth = 140;
+        ConsoleColors.PrintlnComplexColored(GAP_ASCII_ART, [("g", G_GREEN), ("a", A_BLUE), ("p", P_PURPLE), ("d", 0x919397)]);
         
         // Debug levels (maybe change this to no info later?)
-        Debug.debugLevel = DEBUG_LEVEL;
+        Debug.Level = DEBUG_LEVEL;
+
+        Debug.InfoColor = 0x85c46c;
+        Debug.WarnColor = 0xd9b72b;
+        Debug.ErrorColor = 0xff5647;
+        
+        OperatingSystem os = Environment.OSVersion;
+        Debug.Info($"Platform: {os}");
         
         // Mod loading
-        ModLoader.LoadMods(".", EXCLUDED_BINARIES);
+        Debug.Info($"Starting mod loading from directory '{Path.GetFullPath(MOD_DIRECTORY)}'\n");
+        ModLoader.LoadMods(MOD_DIRECTORY, EXCLUDED_BINARIES);
         ModLoader.WriteRegisteredMods();
 
         // --- END OF MAIN FUNCTIONALITY ---
         // you can put your code here:
 
+<<<<<<< HEAD
         //DeepDream.ImageOrigin = @"C:\Users\michn\Desktop\convolutions\outputs\dog1.png";
         //DeepDream.OctaveScale = 1.2f;
         //DeepDream.RunGeneratorFilteredRandom(3);
+=======
+        MidiEventCollection mec = new MidiEventCollection(1, 960);
+        mec.AddTrack([new TempoEvent(600000, 0), new MetaEvent(MetaEventType.EndTrack, 0, 0)]);
+        mec.AddTrack([new PatchChangeEvent(0, 2, 1), new NoteOnEvent(0, 2, 48, 32, 980), new NoteEvent(980, 2, MidiCommandCode.NoteOff, 48, 0), new MetaEvent(MetaEventType.EndTrack, 0, 1000)]);
+        
+        MidiFile.Export("./idk.midi", mec);
+>>>>>>> 602c30e405d5f8cfeeab7cfcf3e8a0ebf35af426
 
-        //Ladybug.RenameData();
-        //Ladybug.CreateDataSubsets();
-        //Ladybug.TrainModel();
-        //Ladybug.RunGenerator();
+        ConsoleProgressBar bar = new ConsoleProgressBar(1000, 4000, 40, ConsoleProgressBar.BarStyle.MODERN);
+
+        Event += bar.OnProgressUpdate;
+        
+        for (int i = 1000; i < 4000; i++) {
+            Spectrogram s = new Spectrogram(400, 400, i);
+            var bmp = s.GenerateImage();
+            bmp.Save($@".\gallery\spectrogram-400x400\{SeedFormat.WordFromSeed(i)}.png", ImageFormat.Png);
+            Event.Invoke(null, EventArgs.Empty);
+        }
+        
+        // DeepDream.Iterations = 5;
+        // DeepDream.Octaves = 8;
+        // DeepDream.LayerActivationFunction = DeepDream.LayerActivationFunctions.LastPriority;
+        // DeepDream.LoadParametersFile();
+        // DeepDream.RunGeneratorFilteredRandom(3);
+
+        //DeepDream.RunGeneratorCustom("conv2d_26", "activation_26", "activation_19");
 
         return 0;
     }

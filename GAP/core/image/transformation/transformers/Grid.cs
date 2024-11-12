@@ -5,7 +5,6 @@
 
 using System.Drawing;
 using System.Text.Json;
-using GAP.util.exceptions;
 using GAP.util.settings;
 
 namespace GAP.core.image.transformation.transformers;
@@ -56,18 +55,14 @@ public class Grid : IImageTransformer, ICloneable {
         return result;
     }
     
-    private static readonly SettingsBuilder<Grid> SETTINGS = SettingsBuilder<Grid>.Build("grid", 
+    private static readonly ISettingsBuilder<Grid, Grid> SETTINGS = SettingsBuilder<Grid>.Build("grid", 
         SettingsNode<Grid>.New("default")
             .Argument("scale_factor", Arguments.UInteger(0, 100))
             .OnParse(context => new Grid((uint)context["scale_factor"].GetParsedValue()))
     );
 
-    public SettingsBuilder<T> GetSettings<T>() {
-        if (typeof(T) != typeof(Grid)) {
-            throw new SettingsBuilderException("Invalid type inputted.");
-        }
-        
-        return SETTINGS.Clone() as SettingsBuilder<T> ?? SettingsBuilder<T>.Empty<T>("white_noise");
+    public static SettingsBuilder<Grid> GetSettings() {
+        return (SettingsBuilder<Grid>)SETTINGS.Clone();
     }
 
     public override string ToString() => JsonSerializer.Serialize(this);
