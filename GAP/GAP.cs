@@ -68,9 +68,9 @@ internal class GAP : Mod {
         // --- END OF MAIN FUNCTIONALITY ---
         // you can put your code here:
 
-        DeepDream.ImageOrigin = @"C:\Users\michn\Desktop\convolutions\outputs\dog1.png";
-        DeepDream.OctaveScale = 1.2f;
-        DeepDream.RunGeneratorFilteredRandom(3);
+        //DeepDream.ImageOrigin = @"C:\Users\michn\Desktop\convolutions\outputs\dog1.png";
+        //DeepDream.OctaveScale = 1.2f;
+        //DeepDream.RunGeneratorFilteredRandom(3);
 
         //Ladybug.RenameData();
         //Ladybug.CreateDataSubsets();
