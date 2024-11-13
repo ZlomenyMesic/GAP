@@ -9,7 +9,7 @@ using Kolors;
 
 namespace GAP.core.image.generation.generators;
 
-public class Rectangles : IImageGenerator {
+public class Rectangles : IImageGenerator, IBatchableGenerator {
 
     private int width { get; set; } = 128;
     private int height { get; set; } = 128;
@@ -306,5 +306,11 @@ public class Rectangles : IImageGenerator {
             
             return (maxX, 0);
         }
+    }
+
+    public IImageGenerator GetNextGenerator(int i) {
+        Rectangles copy = (Rectangles)MemberwiseClone();
+        copy.seed = i;
+        return copy;
     }
 }

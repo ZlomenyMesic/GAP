@@ -6,7 +6,7 @@ using static System.Double;
 
 namespace GAP.core.image.generation.generators;
 
-public class Paths : IImageGenerator {
+public class Paths : IImageGenerator, IBatchableGenerator {
     
     private int seed { get; set; }
     private int width { get; set; }
@@ -163,5 +163,11 @@ public class Paths : IImageGenerator {
 
     public static ISettingsBuilder<Paths, Paths> GetSettings() {
         return SETTINGS.Clone();
+    }
+
+    public IImageGenerator GetNextGenerator(int i) {
+        Paths copy = (Paths)MemberwiseClone();
+        copy.seed = i;
+        return copy;
     }
 }

@@ -10,7 +10,7 @@ using Kolors.console;
 
 namespace GAP.core.image.generation.generators;
 
-public class Stripes : IImageGenerator {
+public class Stripes : IImageGenerator, IBatchableGenerator {
 
     private int width { get; set; } = 128;
     private int height { get; set; } = 128;
@@ -110,6 +110,12 @@ public class Stripes : IImageGenerator {
     
     public static ISettingsBuilder<Stripes, Stripes> GetSettings() {
         return SETTINGS.Clone();
+    }
+
+    public IImageGenerator GetNextGenerator(int i) {
+        Stripes copy = (Stripes)MemberwiseClone();
+        copy.seed = i;
+        return copy;
     }
 
     /// <summary>

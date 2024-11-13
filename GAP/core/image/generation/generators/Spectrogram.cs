@@ -9,7 +9,7 @@ using Kolors;
 
 namespace GAP.core.image.generation.generators;
 
-public class Spectrogram : IImageGenerator {
+public class Spectrogram : IImageGenerator, IBatchableGenerator {
     private int width { get; set; }
     private int height { get; set; }
     private int seed { get; set; }
@@ -113,5 +113,11 @@ public class Spectrogram : IImageGenerator {
 
     public static SettingsBuilder<Spectrogram> GetSettings() {
         return (SettingsBuilder<Spectrogram>)SETTINGS.Clone();
+    }
+
+    public IImageGenerator GetNextGenerator(int i) {
+        Spectrogram copy = (Spectrogram)MemberwiseClone();
+        copy.seed = i;
+        return copy;
     }
 }

@@ -43,8 +43,16 @@ internal class GAP : Mod {
         "/ / _ \\ a|  _  | '__| __| p|  __/ '__/ _ \\ / _` | '__/ _` | '_ ` _ \\ \ng| |_\\ \\a| | | |p| |            " +
         "  g| |_\\ \\  __/ | | |  __/ | | (_| | |_| |\\ V /  __/ a| | | | |  | |_  p| |  | | | (_) | (_| | | | (_| | " +
         "| | | | |\n g\\____/a\\_| |_/p\\_|               g\\____/\\___|_| |_|\\___|_|  \\__,_|\\__|_| \\_/ \\___| a" +
-        "\\_| |_/_|   \\__| p\\_|  |_|  \\___/ \\__, |_|  \\__,_|_| |_| |_|\n                                                                                                                   __/ |                    \n                                                                                                                  |___/                     ";
+        "\\_| |_/_|   \\__| p\\_|  |_|  \\___/ \\__, |_|  \\__,_|_| |_| |_|\n                                        " +
+        "                                                                           __/ |                    \n      " +
+        "                                                                                                            " +
+        "|___/                     ";
 
+    private const string GAP_ASCII_ART_2 =
+        "  g*________    a*_____ p*__________ \n g*/  _____/   a*/  _  \\p*\\______   \\\ng*/   \\  ___  a*/  /_\\  \\p*|     " +
+        "___/\ng*\\    \\_\\  \\a*/    |    \\    p*|    \n g*\\______  /a*\\____|__  /p*____|    \n        g*\\/         a*" +
+        "\\/ d*generative art producer\n\n";
+    
     private const int G_GREEN = 0x8AC926;
     private const int A_BLUE = 0x1982C4;
     private const int P_PURPLE = 0x6A4C93;
@@ -82,7 +90,7 @@ internal class GAP : Mod {
         Console.OutputEncoding = System.Text.Encoding.Unicode;
         Console.WriteLine();
         Console.WindowWidth = 140;
-        ConsoleColors.PrintlnComplexColored(GAP_ASCII_ART, [("g", G_GREEN), ("a", A_BLUE), ("p", P_PURPLE), ("d", 0x919397)]);
+        ConsoleColors.PrintlnComplexColored(GAP_ASCII_ART_2, ("g*", G_GREEN), ("a*", A_BLUE), ("p*", P_PURPLE), ("d*", 0x919397));
         
         // Debug levels (maybe change this to no info later?)
         Debug.Level = DEBUG_LEVEL;
@@ -112,7 +120,7 @@ internal class GAP : Mod {
 
         Event += bar.OnProgressUpdate;
         
-        for (int i = 1000; i < 4000; i++) {
+        for (int i = 0; i < 4000; i++) {
             Spectrogram s = new Spectrogram(400, 400, i);
             var bmp = s.GenerateImage();
             bmp.Save($@".\gallery\spectrogram-400x400\{SeedFormat.WordFromSeed(i)}.png", ImageFormat.Png);

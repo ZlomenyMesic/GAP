@@ -14,7 +14,7 @@ namespace GAP.core.image.generation.generators;
 /// White Noise Image Generation <br/>
 /// generates purely random set of pixels with color properties set manually or with the <see cref="WhiteNoisePresets"/>
 /// </summary>
-public sealed class WhiteNoise : IImageGenerator, ICloneable {
+public sealed class WhiteNoise : IImageGenerator, ICloneable, IBatchableGenerator {
     private int width { get; set; }
     private int height { get; set; }
     private int seed { get; set; }
@@ -218,6 +218,12 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable {
 
     public static SettingsBuilder<WhiteNoise> GetSettings() {
         return (SettingsBuilder<WhiteNoise>)SETTINGS.Clone();
+    }
+
+    public IImageGenerator GetNextGenerator(int i) {
+        WhiteNoise copy = (WhiteNoise)MemberwiseClone();
+        copy.seed = i;
+        return copy;
     }
 
     public override string ToString() {
