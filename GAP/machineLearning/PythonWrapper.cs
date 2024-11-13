@@ -10,17 +10,25 @@ using System.Diagnostics;
 namespace GAP.machineLearning;
 
 internal static class PythonWrapper {
-    private static readonly string SCRIPT_DIR = $@"..\..\..\machineLearning\";
+    internal static string SCRIPT_DIR = $@"..\..\..\machineLearning\";
 
-    // script must be located in directory machineLearning
+    // when Python is installed via Microsoft Store, the command "python" doesn't
+    // exist, so "py" has to be run instead
+    internal static string PYTHON_CMD = "python";
+
     /// <summary>
     /// executes a python script.
     /// the script MUST be located in machineLearning directory!
     /// </summary>
     /// <param name="name">script/file name</param>
     /// <param name="args">optional arguments</param>
-    internal static void RunPythonScript(string name, string args = "")
-        => ExecuteCMD($"python {SCRIPT_DIR}{name} {args}");
+    internal static void RunPythonScript(string name, string args = "") {
+        try {
+            ExecuteCMD($"{PYTHON_CMD} {SCRIPT_DIR}{name} {args}");
+        } catch {
+            Console.WriteLine($"Could not run script: {name}");
+        }
+    }
 
     /// <summary>
     /// executes a command using cmd.exe.

@@ -8,6 +8,9 @@
 using System.Drawing.Imaging;
 using GAP.core.image.generation.generators;
 using GAP.core.modLoader;
+using GAP.machineLearning.deepdream;
+using GAP.machineLearning.ladybug;
+using GAP.machineLearning.ladybug.scripts;
 using GAP.util;
 using Kolors.console;
 using NAudio.Midi;

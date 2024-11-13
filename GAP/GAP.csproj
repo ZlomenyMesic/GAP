@@ -16,6 +16,8 @@
   <ItemGroup>
     <Folder Include="core\audio\generators\" />
     <Folder Include="machineLearning\deepdream\output\layers\" />
+    <Folder Include="machineLearning\ladybug\output\" />
+    <Folder Include="machineLearning\utils\" />
   </ItemGroup>
 
   <PropertyGroup>
