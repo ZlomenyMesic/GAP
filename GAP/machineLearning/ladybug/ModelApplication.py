@@ -18,6 +18,8 @@ import sys, os
 sys.path.append(os.path.relpath(r"..\..\..\machinelearning\utils"))
 from ConsoleColors import *
 
+MODEL_PATH = r"..\..\..\machinelearning\ladybug"
+MODEL_NAME = "cnn_model.keras"
 OUTPUT_PATH = r"..\..\..\machinelearning\ladybug\output\output.png"
 
 ITERATIONS = 100
@@ -43,18 +45,17 @@ def save_image(img):
 
 def calculate_loss(image):
     activation = model(image)
-    print(f"activation - {activation}")
 
     loss = tf.zeros(shape=())
     loss += tf.reduce_mean(activation)
-    return loss
+    return loss, activation
 
 def gradient_ascent_step(image, distortion_rate, i):
     # GradientTape record all tensor operations made with the image.
     # it is a very useful tool for automatic differentiation
     with tf.GradientTape() as tape:
         tape.watch(image)
-        loss = calculate_loss(image)
+        loss, activation = calculate_loss(image)
 
     # retroactively calculate the loss gradient with respect to the different parts of the image
     gradients = tape.gradient(loss, image)
@@ -64,22 +65,28 @@ def gradient_ascent_step(image, distortion_rate, i):
 
     # update the image using the calculated gradients
     image += distortion_rate * -gradients
-    return loss, image
+    return loss, activation, image
 
 # loop repeats NUM_OCTAVE times with ITERATIONS steps
 def gradient_ascent_loop(image):
     for i in range(ITERATIONS):
-        print(f"iteration {i}")
-        loss, image = gradient_ascent_step(image, DISTORTION_RATE, i)
-        print()
+        loss, activation, image = gradient_ascent_step(image, DISTORTION_RATE, i)
+        print(f"{CYAN}Iteration {i + 1}/{ITERATIONS}{WHITE} - Loss: {loss:.5f}, Activation: {activation[0][0]:.5f}", end = "\r")
     return image
 
-model = keras.models.load_model("cnn_model.keras")
-print("model loaded")
+print(f"Running Ladybug:")
+print(f"   {GREEN}{CIRCLE}{WHITE} Output path: {OUTPUT_PATH}")
+print(f"   {GREEN}{CIRCLE}{WHITE} Total iterations: {RED}{ITERATIONS}{WHITE}")
+print(f"   {GREEN}{CIRCLE}{WHITE} Distortion rate:  {RED}{DISTORTION_RATE}{WHITE}\n")
+
+model = keras.models.load_model(fr"{MODEL_PATH}\{MODEL_NAME}")
+print(f"Model {MAGENTA}{MODEL_NAME}{WHITE} loaded successfully.\n");
 
 noise = random_noise()
 output = gradient_ascent_loop(noise)
-print("image generated")
 
 save_image(output.numpy())
-print("image saved")
+print(f"\n\nOutput saved to: {YELLOW}{OUTPUT_PATH}{WHITE}\n")
+
+f = open("DONE", "w")
+f.close()

@@ -13,9 +13,16 @@ internal static class Ladybug {
 
     internal static void TrainModel() {
         PythonWrapper.RunPythonScript(TrainingScriptPath);
+        WaitForOutput();
     }
 
     internal static void RunGenerator() {
         PythonWrapper.RunPythonScript(ApplicationScriptPath);
+        WaitForOutput();
+    }
+    private static void WaitForOutput() {
+        while (!File.Exists("DONE"))
+            Thread.Sleep(500);
+        File.Delete("DONE");
     }
 }

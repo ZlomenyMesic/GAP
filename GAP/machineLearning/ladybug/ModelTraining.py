@@ -20,11 +20,12 @@ sys.path.append(os.path.relpath(r"..\..\..\machinelearning\utils"))
 from ConsoleColors import *
 
 DATASET_DIR = pathlib.Path(r"C:\Users\michn\Desktop\catsndawgs\train_modif")
+MODEL_PATH = r"..\..\..\machinelearning\ladybug"
 MODEL_NAME = "cnn_model.keras"
 
 IMG_SIZE = 180
 BATCH_SIZE = 32
-EPOCHS = 2
+EPOCHS = 3
 
 # expects the subsets already exist
 # if they don't, create them using DataSubsets.py
@@ -87,7 +88,7 @@ model.compile(loss = "binary_crossentropy", optimizer = "rmsprop", metrics = ["a
 # auto-save for the model
 callbacks = [
     keras.callbacks.ModelCheckpoint(
-        filepath = MODEL_NAME,
+        filepath = fr"{MODEL_PATH}\{MODEL_NAME}",
 
         # only save the best version of the model (don't overwrite an older but better one)
         # how good a model is is measured using the validation loss
@@ -98,9 +99,8 @@ callbacks = [
 # training data is saved to history in case someone wants to view it
 history = train_model()
 
-print("\nTraining finished:")
-
 test_loss, test_acc = model.evaluate(test_dataset)
+print("\nTraining finished:")
 print(f"   {GREEN}{CIRCLE}{WHITE} Testing loss: {CYAN}{test_loss:.3f}{WHITE}")
 print(f"   {GREEN}{CIRCLE}{WHITE} Testing accuracy: {CYAN}{test_acc:.3f}{WHITE}\n")
 
@@ -108,3 +108,6 @@ print(f"   {GREEN}{CIRCLE}{WHITE} Testing accuracy: {CYAN}{test_acc:.3f}{WHITE}\
 #test_model = keras.models.load_model(MODEL_NAME)
 #test_loss, test_acc = test_model.evaluate(test_dataset)
 #print(f"test loss: {test_loss:.3f}\ntest accuracy: {test_acc:.3f}")
+
+f = open(r"DONE", "w")
+f.close()

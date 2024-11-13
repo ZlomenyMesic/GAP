@@ -118,9 +118,9 @@ internal class GAP : Mod {
         mec.AddTrack([new PatchChangeEvent(0, 2, 1), new NoteOnEvent(0, 2, 48, 32, 980), new NoteEvent(980, 2, MidiCommandCode.NoteOff, 48, 0), new MetaEvent(MetaEventType.EndTrack, 0, 1000)]);
         
         MidiFile.Export("./idk.midi", mec);
-
+        /*
         ConsoleProgressBar bar = new ConsoleProgressBar(1000, 4000, 40, ConsoleProgressBar.BarStyle.MODERN);
-
+        
         Event += bar.OnProgressUpdate;
         
         for (int i = 0; i < 4000; i++) {
@@ -129,14 +129,12 @@ internal class GAP : Mod {
             bmp.Save($@".\gallery\spectrogram-400x400\{SeedFormat.WordFromSeed(i)}.png", ImageFormat.Png);
             Event.Invoke(null, EventArgs.Empty);
         }
-        
-        // DeepDream.Iterations = 5;
-        // DeepDream.Octaves = 8;
-        // DeepDream.LayerActivationFunction = DeepDream.LayerActivationFunctions.LastPriority;
-        // DeepDream.LoadParametersFile();
-        // DeepDream.RunGeneratorFilteredRandom(3);
+        */
 
-        //DeepDream.RunGeneratorCustom("conv2d_26", "activation_26", "activation_19");
+        //DeepDream.RunGenerator();
+        //Ladybug.TrainModel();
+        Ladybug.RunGenerator();
+        Console.WriteLine("Hello, World!");
 
         return 0;
     }
