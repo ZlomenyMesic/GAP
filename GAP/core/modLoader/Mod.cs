@@ -9,7 +9,7 @@ namespace GAP.core.modLoader;
 /// Mod Interface <br/>
 /// an interface all mod libraries must implement
 /// </summary>
-public interface Mod {
+public interface IMod {
 
     /// <summary>
     /// method called at mod gathering

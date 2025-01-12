@@ -13,7 +13,7 @@ namespace GAP.util.registries;
 /// <typeparam name="T">type of stored object</typeparam>
 public abstract class ObjectRegistry<T> {
     
-    protected static IDictionary<string, T> REGISTRY { get; } = new Dictionary<string, T>();
+    protected static readonly IDictionary<string, T> REGISTRY = new Dictionary<string, T>();
     
     /// <summary>
     /// registers new object

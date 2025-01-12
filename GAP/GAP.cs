@@ -12,12 +12,13 @@ using GAP.machineLearning.deepdream;
 using GAP.machineLearning.ladybug;
 using GAP.machineLearning.ladybug.scripts;
 using GAP.util;
-using Kolors.console;
+using NeoKolors.Console;
 using NAudio.Midi;
 
 namespace GAP;
 
-internal class GAP : Mod {
+// ReSharper disable once InconsistentNaming
+internal class GAP : IMod {
 
     // constants
     public const string PROJECT_ID = "gap";

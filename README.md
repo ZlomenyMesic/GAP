@@ -1,1 +1,1 @@
-# GAP
+# Generative Art Program

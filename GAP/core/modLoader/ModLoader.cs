@@ -4,7 +4,7 @@
 //
 
 using System.Reflection;
-using Kolors.console;
+using NeoKolors.Console;
 
 namespace GAP.core.modLoader;
 
@@ -14,8 +14,8 @@ namespace GAP.core.modLoader;
 /// </summary>
 internal static class ModLoader {
     
-    private static List<string> MOD_IDS { get; } = [];
-    private static List<string> MOD_DESCRIPTIONS { get; } = [];
+    private static readonly List<string> MOD_IDS = [];
+    private static readonly List<string> MOD_DESCRIPTIONS = [];
 
     /// <summary>
     /// loads all available mods from a specified directory
@@ -79,9 +79,9 @@ internal static class ModLoader {
     /// <returns>whether the mod was successfully loaded</returns>
     private static bool RegisterMod(Assembly modAssembly) {
         foreach (var type in modAssembly.GetTypes()) {
-            if (typeof(Mod).IsAssignableFrom(type) && !type.IsInterface) {
+            if (typeof(IMod).IsAssignableFrom(type) && !type.IsInterface) {
                 
-                var mod = (Mod?)Activator.CreateInstance(type);
+                var mod = (IMod?)Activator.CreateInstance(type);
                 
                 if (mod == null) {
                     Debug.Warn($"Mod loader failed to load type {type.FullName} from assembly {modAssembly.FullName}");

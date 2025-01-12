@@ -6,8 +6,10 @@
 using System.Drawing;
 using GAP.util;
 using GAP.util.math;
-using GAP.util.settings;
-using Kolors;
+using NeoKolors;
+using NeoKolors.Common;
+using NeoKolors.Settings;
+using Color = System.Drawing.Color;
 
 namespace GAP.core.image.generation;
 
@@ -26,38 +28,36 @@ public interface IImageGenerator {
     /// <summary>
     /// returns copy of settings available for the generator
     /// </summary>
-    public static ISettingsBuilder<IImageGenerator, IImageGenerator> GetSettings() {
-        return ISettingsBuilder<IImageGenerator, IImageGenerator>.Empty("blank");
-    }
+    public static ISettingsBuilder<IImageGenerator> GetSettings() => throw new NotImplementedException();
 
     private static readonly SettingsGroup UNIVERSAL_SEED_SETTINGS = SettingsGroup
         .New("seed", Context.New(("seed", Arguments.Integer())))
         .Option(SettingsGroupOption
             .New("number")
             .Argument("seed", Arguments.Integer())
-            .EnableAutoParse()
+            .EnableAutoMerge()
         )
         .Option(SettingsGroupOption
             .New("word")
             .Argument("seed", Arguments.String())
-            .OnParse((cin, cout) => {
-                cout["seed"].SetParsedValue(SeedFormat.SeedFromWord((string)cin["seed"].GetParsedValue()));
+            .Merges((cin, cout) => {
+                cout["seed"] <<= SeedFormat.SeedFromWord((string)cin["seed"].Get());
             })
         )
         .Option(SettingsGroupOption
             .New("string")
             .Argument("seed", Arguments.String())
-            .OnParse((cin, cout) => {
-                cout["seed"].SetParsedValue(Hash.GetHashCode((string)cin["seed"].GetParsedValue()));
+            .Merges((cin, cout) => {
+                cout["seed"] <<= Hash.GetHashCode((string)cin["seed"].Get());
             })
         )
-        .EnableAutoParse();
+        .EnableAutoMerge();
         
     /// <summary>
     /// returns a clone of the universal seed input group
     /// </summary>
     public static SettingsGroup UniversalSeedInput() {
-        return (SettingsGroup)UNIVERSAL_SEED_SETTINGS.Clone();
+        return UNIVERSAL_SEED_SETTINGS;
     }
 
     /// <summary>

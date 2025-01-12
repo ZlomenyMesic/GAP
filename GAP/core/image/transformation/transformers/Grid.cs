@@ -5,7 +5,7 @@
 
 using System.Drawing;
 using System.Text.Json;
-using GAP.util.settings;
+using NeoKolors.Settings;
 
 namespace GAP.core.image.transformation.transformers;
 
@@ -14,7 +14,7 @@ namespace GAP.core.image.transformation.transformers;
 /// transforms the picture by separating its pixels and placing transparent color between them 
 /// </summary>
 public class Grid : IImageTransformer, ICloneable {
-    public uint scaleFactor { get; set; }
+    public uint ScaleFactor { get; set; }
     
     /// <summary>
     /// constructor
@@ -25,7 +25,7 @@ public class Grid : IImageTransformer, ICloneable {
 
         if (scaleFactor == 0) throw new ArgumentException("Scale factor for Grid transform must be greater than zero");
 
-        this.scaleFactor = scaleFactor;
+        this.ScaleFactor = scaleFactor;
     }
     
     /// <summary>
@@ -40,25 +40,25 @@ public class Grid : IImageTransformer, ICloneable {
     /// <returns>transformed image as <see cref="Bitmap"/></returns>
     public Bitmap TransformImage(Bitmap image) {
 
-        if (scaleFactor == 1) return image;
+        if (ScaleFactor == 1) return image;
 
-        int width = (int)(image.Width * scaleFactor);
-        int height = (int)(image.Height * scaleFactor);
+        int width = (int)(image.Width * ScaleFactor);
+        int height = (int)(image.Height * ScaleFactor);
         Bitmap result = new Bitmap(width, height);
 
         for (int x = 0; x < image.Width; x++) {
             for (int y = 0; y < image.Height; y++) {
-                result.SetPixel((int)(x * scaleFactor), (int)(y * scaleFactor), image.GetPixel(x, y));
+                result.SetPixel((int)(x * ScaleFactor), (int)(y * ScaleFactor), image.GetPixel(x, y));
             }
         }
             
         return result;
     }
     
-    private static readonly ISettingsBuilder<Grid, Grid> SETTINGS = SettingsBuilder<Grid>.Build("grid", 
+    private static readonly ISettingsBuilder<Grid> SETTINGS = SettingsBuilder<Grid>.Build("grid", 
         SettingsNode<Grid>.New("default")
             .Argument("scale_factor", Arguments.UInteger(0, 100))
-            .OnParse(context => new Grid((uint)context["scale_factor"].GetParsedValue()))
+            .Constructs(context => new Grid((uint)context["scale_factor"].Get()))
     );
 
     public static SettingsBuilder<Grid> GetSettings() {

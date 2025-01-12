@@ -14,7 +14,7 @@ namespace GAP.core.image.generation;
 /// <see cref="ImageGeneratorRegistry"/> class registry
 /// </summary>
 public class ImageGeneratorDispatcher {
-    private string projectId { get; set; }
+    private string ProjectId { get; set; }
     private static readonly List<string> REGISTERED_IDS = new();
     
     /// <summary>
@@ -29,7 +29,7 @@ public class ImageGeneratorDispatcher {
         }
         
         REGISTERED_IDS.Add(projectId);
-        this.projectId = projectId;
+        ProjectId = projectId;
     }
     
     /// <summary>
@@ -38,6 +38,6 @@ public class ImageGeneratorDispatcher {
     /// <param name="id">id of the generator class</param>
     /// <param name="type"><c>typeof(&lt;YourClassName&gt;)</c></param>
     public void Register(string id, Type type) {
-        ImageGeneratorRegistry.Register($"{projectId}:{id}", type);
+        ImageGeneratorRegistry.Register($"{ProjectId}:{id}", type);
     }
 }

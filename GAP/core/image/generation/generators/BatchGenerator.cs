@@ -8,21 +8,17 @@ public class BatchGenerator : IImageGenerator {
     
     // TODO finish batch generator
     
-    private IBatchableGenerator generator { get; set; }
-    private int iterations { get; set; }
-    private int startSeed { get; set; }
-    private NameType nameType { get; set; }
+    public IBatchableGenerator Generator { get; private set; }
+    public int Iterations { get; private set; }
+    public int StartSeed { get; private set; }
+    public NameType NameType { get; private set; }
     
-    public IBatchableGenerator Generator => generator;
-    public int Iterations => iterations;
-    public int StartSeed => startSeed;
-    public NameType NameType => nameType;
 
     public BatchGenerator(IBatchableGenerator generator, int iterations, int startSeed, NameType nameType) {
-        this.generator = generator;
-        this.iterations = iterations;
-        this.startSeed = startSeed;
-        this.nameType = nameType;
+        Generator = generator;
+        Iterations = iterations;
+        StartSeed = startSeed;
+        NameType = nameType;
     }
     
     /// <summary>
@@ -30,12 +26,12 @@ public class BatchGenerator : IImageGenerator {
     /// </summary>
     public Bitmap GenerateImage() {
         
-        for (int i = startSeed; i < iterations + startSeed; i++) {
-            Bitmap bmp = generator.GenerateImage();
+        for (int i = StartSeed; i < Iterations + StartSeed; i++) {
+            Bitmap bmp = Generator.GenerateImage();
             bmp.Save($"./gallery/{SeedFormat.WordFromSeed(i)}.png", ImageFormat.Png); 
         }
         
-        return generator.GenerateImage();
+        return Generator.GenerateImage();
     }
 
     public static object GetSettings() {

@@ -5,19 +5,19 @@
 
 using System.Drawing;
 using System.Text.Json;
-using GAP.util.settings;
+using NeoKolors.Settings;
 
 namespace GAP.core.image.transformation.transformers;
 
 public class Rescale : IImageTransformer, ICloneable {
 
-    private int scale { get; set; }
+    private int Scale { get; set; }
     
     public Bitmap TransformImage(Bitmap image) {
         throw new NotImplementedException();
     }
 
-    public SettingsBuilder<T> GetSettings<T>() {
+    public SettingsBuilder<Rescale> GetSettings() {
         throw new NotImplementedException();
     }
 

@@ -4,10 +4,9 @@
 //
 
 using System.Reflection;
-using GAP.util.exceptions;
 using GAP.util.registries;
-using GAP.util.settings;
-using Kolors.console;
+using NeoKolors.Console;
+using NeoKolors.Settings;
 
 namespace GAP.core.image.generation;
 
@@ -55,30 +54,12 @@ internal abstract class ImageGeneratorRegistry : ClassRegistry<IImageGenerator> 
     /// </summary>
     /// <param name="id">id of the generator</param>
     /// <returns>the settings builder of the generator</returns>
-    /// <exception cref="SettingsBuilderException">could not get the settings</exception>
     /// <exception cref="NullReferenceException">
     /// registered reference to class is null</exception>
     /// <exception cref="KeyNotFoundException">no class with id of <see cref="id"/> was not found</exception>
-    public static object GetSettings(string id) {
+    public static ISettingsBuilder<object> GetSettings(string id) {
         MethodInfo? mf = GetType(id).GetMethod("GetSettings");
-        
-        object? result;
-        
-        if (mf != null) {
-            result = mf.Invoke(null, null);
-        }
-        else {
-            throw new SettingsBuilderException($"Cannot get settings of {GetType(id).FullName}. Method does not exist.");
-        }
-
-        if (result == null) {
-            throw new SettingsBuilderException($"Cannot get settings of {GetType(id).FullName}.");
-        }
-        
-        if (typeof(SettingsBuilder<>).Name == result.GetType().Name) {
-            return result;
-        }
-        
-        throw new SettingsBuilderException($"Cannot get settings of {GetType(id).FullName}.");
+        object? result = mf!.Invoke(null, null);
+        return (ISettingsBuilder<object>)result!;
     }
 }

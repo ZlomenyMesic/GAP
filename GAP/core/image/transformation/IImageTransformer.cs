@@ -4,7 +4,7 @@
 //
 
 using System.Drawing;
-using GAP.util.settings;
+using NeoKolors.Settings;
 
 namespace GAP.core.image.transformation;
 
@@ -23,7 +23,5 @@ public interface IImageTransformer {
     /// <summary>
     /// returns copy of settings available for the transformer
     /// </summary>
-    public static ISettingsBuilder<IImageTransformer, IImageTransformer> GetSettings() {
-        return ISettingsBuilder<IImageTransformer, IImageTransformer>.Empty("image_transformer");
-    }
+    public static ISettingsBuilder<IImageTransformer> GetSettings() => throw new NotImplementedException();
 }

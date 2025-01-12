@@ -4,40 +4,33 @@
 //
 
 using System.Drawing;
-using GAP.util.settings;
-using Kolors;
+using NeoKolors.Common;
+using NeoKolors.Settings;
+using Color = System.Drawing.Color;
 
 namespace GAP.core.image.generation.generators;
 
-public class Rectangles : IImageGenerator, IBatchableGenerator {
+public class Rectangles : IBatchableGenerator {
 
-    private int width { get; set; } = 128;
-    private int height { get; set; } = 128;
-    private int seed { get; set; } = 0;
+    public int Width { get; private set; } = 128;
+    public int Height { get; private set; } = 128;
+    public int Seed { get; private set; }
     
-    public int Width => width;
-    public int Height => height;
-    public int Seed => seed;
-
-    private int gridWidth { get; set; } = 8;
-    private int gridHeight { get; set; } = 8;
-    private int pixelsPerUnit { get; set; } = 8;
-    private int gapThickness { get; set; } = 4;
+    public int GridWidth { get; private set; } = 8;
+    public int GridHeight { get; private set; } = 8;
+    public int PixelsPerUnit { get; private set; } = 8;
+    public int GapThickness { get; private set; } = 4;
     
-    public int GridWidth => gridWidth;
-    public int GridHeight => gridHeight;
-    public int PixelsPerUnit => pixelsPerUnit;
-    public int GapThickness => gapThickness;
     
     public Rectangles(int gridWidth, int gridHeight, int pixelsPerUnit, int gapThickness, int seed) {
-        this.gridWidth = gridWidth;
-        this.gridHeight = gridHeight;
-        this.pixelsPerUnit = pixelsPerUnit;
-        this.gapThickness = gapThickness;
-        this.seed = seed;
+        GridWidth = gridWidth;
+        GridHeight = gridHeight;
+        PixelsPerUnit = pixelsPerUnit;
+        GapThickness = gapThickness;
+        Seed = seed;
         
-        width = gridWidth * pixelsPerUnit + (gridWidth - 1) * gapThickness;
-        height = gridHeight * pixelsPerUnit + (gridHeight - 1) * gapThickness;
+        Width = gridWidth * pixelsPerUnit + (gridWidth - 1) * gapThickness;
+        Height = gridHeight * pixelsPerUnit + (gridHeight - 1) * gapThickness;
     }
     
     public Rectangles() { }
@@ -45,7 +38,7 @@ public class Rectangles : IImageGenerator, IBatchableGenerator {
     public Bitmap GenerateImage() {
         
         // create a palette
-        ColorPalette palette = ColorPalette.GeneratePalette(seed, 6);
+        ColorPalette palette = ColorPalette.GeneratePalette(Seed, 6);
 
         double minV = int.MaxValue;
         int minI = 0;
@@ -62,25 +55,25 @@ public class Rectangles : IImageGenerator, IBatchableGenerator {
         // choose a background color from the palette
         int background = palette.Colors[minI] + (0xff << 24);
         
-        Bitmap output = new Bitmap(width, height);
+        Bitmap output = new Bitmap(Width, Height);
 
         // fill it with the 
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        for (int x = 0; x < Width; x++) {
+            for (int y = 0; y < Height; y++) {
                 output.SetPixel(x, y, Color.FromArgb(background));
             }
         }
 
-        Random rnd = new Random(seed);
+        Random rnd = new Random(Seed);
         
-        Grid grid = new Grid(gridWidth, gridHeight, seed);
+        Grid grid = new Grid(GridWidth, GridHeight, Seed);
 
         while (!grid.IsFull()) {
             var rect = grid.GetRandomRectangle();
             Color c = Color.FromArgb(palette.Colors[rnd.Next(0, palette.Colors.Length)] + (0xff << 24));
 
-            for (int x = rect.a.x * (pixelsPerUnit + gapThickness); x < rect.b.x * (pixelsPerUnit + gapThickness) + pixelsPerUnit; x++) {
-                for (int y = rect.a.y * (pixelsPerUnit + gapThickness); y < rect.b.y * (pixelsPerUnit + gapThickness) + pixelsPerUnit; y++) {
+            for (int x = rect.a.x * (PixelsPerUnit + GapThickness); x < rect.b.x * (PixelsPerUnit + GapThickness) + PixelsPerUnit; x++) {
+                for (int y = rect.a.y * (PixelsPerUnit + GapThickness); y < rect.b.y * (PixelsPerUnit + GapThickness) + PixelsPerUnit; y++) {
                     output.SetPixel(x, y, c);
                 }
             }
@@ -89,24 +82,24 @@ public class Rectangles : IImageGenerator, IBatchableGenerator {
         return output;
     }
 
-    private static readonly ISettingsBuilder<Rectangles, Rectangles> SETTINGS = SettingsBuilder<Rectangles>.Build("rectangles",
+    private static readonly SettingsBuilder<Rectangles> SETTINGS = SettingsBuilder<Rectangles>.Build("rectangles",
         SettingsNode<Rectangles>.New("rectangles")
             .Group(IImageGenerator.UniversalSeedInput())
             .Argument("grid_width", Arguments.Integer(1))
             .Argument("grid_height", Arguments.Integer(1))
             .Argument("pixels_per_unit", Arguments.Integer(1))
             .Argument("gap_thickness", Arguments.Integer(1))
-            .OnParse(cin => new Rectangles(
-                (int)cin["grid_width"].GetParsedValue(), 
-                (int)cin["grid_height"].GetParsedValue(), 
-                (int)cin["pixels_per_unit"].GetParsedValue(), 
-                (int)cin["gap_thickness"].GetParsedValue(), 
-                (int)cin["seed"].GetParsedValue())
+            .Constructs(cin => new Rectangles(
+                (int)cin["grid_width"].Get(), 
+                (int)cin["grid_height"].Get(), 
+                (int)cin["pixels_per_unit"].Get(), 
+                (int)cin["gap_thickness"].Get(), 
+                (int)cin["seed"].Get())
             )
     );
     
-    public static ISettingsBuilder<Rectangles, Rectangles> GetSettings() {
-        return SETTINGS.Clone();
+    public static ISettingsBuilder<Rectangles> GetSettings() {
+        return (ISettingsBuilder<Rectangles>)SETTINGS.Clone();
     }
 
     /// <summary>
@@ -310,7 +303,7 @@ public class Rectangles : IImageGenerator, IBatchableGenerator {
 
     public IImageGenerator GetNextGenerator(int i) {
         Rectangles copy = (Rectangles)MemberwiseClone();
-        copy.seed = i;
+        copy.Seed = i;
         return copy;
     }
 }

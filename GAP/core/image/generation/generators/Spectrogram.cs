@@ -4,25 +4,21 @@
 //
 
 using System.Drawing;
-using GAP.util.settings;
-using Kolors;
+using NeoKolors;
+using NeoKolors.Common;
+using NeoKolors.Settings;
+using Color = System.Drawing.Color;
 
 namespace GAP.core.image.generation.generators;
 
-public class Spectrogram : IImageGenerator, IBatchableGenerator {
-    private int width { get; set; }
-    private int height { get; set; }
-    private int seed { get; set; }
+public class Spectrogram : IBatchableGenerator {
+    public int Width { get; private set; }
+    public int Height { get; private set; }
+    public int Seed { get; private set; }
     
-    public int Width => width;
-    public int Height => height;
-    public int Seed => seed;
-
-    private int lineLifetime { get; set; }
-    private int step { get; set; }
+    public int LineLifetime { get; private set; }
+    public int Step { get; private set; }
     
-    public int LineLifetime => lineLifetime;
-    public int Step => step;
 
     /// <summary>
     /// 2d spectrogram line image generator
@@ -33,45 +29,45 @@ public class Spectrogram : IImageGenerator, IBatchableGenerator {
     /// <param name="lineLifetime">how long will the line be</param>
     /// <param name="step">idk what that is</param>
     public Spectrogram(int width, int height, int seed, int lineLifetime = 15000, int step = 200) {
-        this.width = width;
-        this.height = height;
-        this.seed = seed;
-        this.lineLifetime = lineLifetime;
-        this.step = step;
+        Width = width;
+        Height = height;
+        Seed = seed;
+        LineLifetime = lineLifetime;
+        Step = step;
     }
     
     public Bitmap GenerateImage() {
-        Bitmap bmp = new Bitmap(width, height);
-        Random rnd = new Random(seed);
+        Bitmap bmp = new Bitmap(Width, Height);
+        Random rnd = new Random(Seed);
 
         float xFrequency = rnd.NextSingle();
         float yFrequency = rnd.NextSingle();
-        int xOffset = width / 2;
-        int yOffset = height / 2; 
-        float factor = width > height ? (float)width * 1/3 : (float)height * 1/3;
+        int xOffset = Width / 2;
+        int yOffset = Height / 2; 
+        float factor = Width > Height ? (float)Width * 1/3 : (float)Height * 1/3;
         float startOffset = rnd.NextSingle();
         Func<float, float> xFunc = GetFunc();
         Func<float, float> yFunc = GetFunc();
         
-        var A = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
-        var B = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
-        var C = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
-        var D = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
+        var a = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
+        var b = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
+        var c = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
+        var d = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
         
         Color background = Color.FromArgb(255, 16, 16 ,16);
         Graphics g = Graphics.FromImage(bmp);
         g.Clear(background);
         
-        for (float j = startOffset; j < lineLifetime / (float)step + startOffset; j += 1 / (float)step) {
+        for (float j = startOffset; j < LineLifetime / (float)Step + startOffset; j += 1 / (float)Step) {
             bmp.SetPixel((int)(xOffset + xFunc(xFrequency * j) * factor), 
-                (int)(yOffset + yFunc(yFrequency * j) * factor), ColorPalette.GenerateColorAtX(A, B, C, D, j));
+                (int)(yOffset + yFunc(yFrequency * j) * factor), ColorPalette.GenerateColorAtX(a, b, c, d, j));
         }
         
         return bmp;
     }
 
     private Func<float, float> GetFunc() {
-        Random rnd = new Random(seed);
+        Random rnd = new Random(Seed);
         
         return rnd.Next(1, 7) switch {
             1 => Sin,
@@ -95,19 +91,19 @@ public class Spectrogram : IImageGenerator, IBatchableGenerator {
     private static float Sawtooth(float x) => 2 * (x / (2f * MathF.PI) - MathF.Abs(x / (2f * MathF.PI) + 1f / 2f));
     
     
-    private static readonly ISettingsBuilder<Spectrogram, Spectrogram> SETTINGS = SettingsBuilder<Spectrogram>.Build("spectrogram", 
+    private static readonly ISettingsBuilder<Spectrogram> SETTINGS = SettingsBuilder<Spectrogram>.Build("spectrogram", 
         SettingsNode<Spectrogram>.New("spectrogram")
             .Group(IImageGenerator.UniversalSeedInput())
             .Argument("width", Arguments.Integer(32))
             .Argument("height", Arguments.Integer(32))
             .Argument("line_lifetime", Arguments.Integer(0))
             .Argument("step", Arguments.Double(0))
-            .OnParse(cin => new Spectrogram(
-                (int)cin["width"].GetParsedValue(), 
-                (int)cin["height"].GetParsedValue(), 
-                (int)cin["seed"].GetParsedValue(), 
-                (int)cin["line_lifetime"].GetParsedValue(), 
-                (int)(1 / (float)cin["step"].GetParsedValue()))
+            .Constructs(cin => new Spectrogram(
+                (int)cin["width"].Get(), 
+                (int)cin["height"].Get(), 
+                (int)cin["seed"].Get(), 
+                (int)cin["line_lifetime"].Get(), 
+                (int)(1 / (float)cin["step"].Get()))
             )
     );
 
@@ -117,7 +113,7 @@ public class Spectrogram : IImageGenerator, IBatchableGenerator {
 
     public IImageGenerator GetNextGenerator(int i) {
         Spectrogram copy = (Spectrogram)MemberwiseClone();
-        copy.seed = i;
+        copy.Seed = i;
         return copy;
     }
 }

@@ -5,7 +5,7 @@
 
 using System.Drawing;
 using System.Text.Json;
-using GAP.util.settings;
+using NeoKolors.Settings;
 
 namespace GAP.core.image.transformation.transformers;
 
@@ -14,7 +14,7 @@ namespace GAP.core.image.transformation.transformers;
 /// creates a poor pixel effect over the image
 /// </summary>
 public class Pixelize : IImageTransformer, ICloneable {
-    public PixelType pixelType { get; set; }
+    public PixelType PixelType { get; set; }
     
     /// <summary>
     /// empty constructor
@@ -26,7 +26,7 @@ public class Pixelize : IImageTransformer, ICloneable {
     /// </summary>
     /// <param name="pixelType">type of pixel color arrangement</param>
     public Pixelize(PixelType pixelType) {
-        this.pixelType = pixelType;
+        this.PixelType = pixelType;
     }
     
     /// <summary>
@@ -35,7 +35,7 @@ public class Pixelize : IImageTransformer, ICloneable {
     /// <param name="image">input image</param>
     /// <returns>transformed image as <see cref="Bitmap"/></returns>
     public Bitmap TransformImage(Bitmap image) {
-        if (pixelType == PixelType.STRIPES) {
+        if (PixelType == PixelType.STRIPES) {
             return PixelizeStripes(image);
         }
         else {
@@ -83,7 +83,7 @@ public class Pixelize : IImageTransformer, ICloneable {
     /// </summary>
     /// <param name="pixelize">other instance</param>
     private void Copy(Pixelize pixelize) {
-        pixelType = pixelize.pixelType;
+        PixelType = pixelize.PixelType;
     }
 
     /// <summary>
@@ -107,14 +107,14 @@ public class Pixelize : IImageTransformer, ICloneable {
         Copy(pixelize);
     }
     
-    private static readonly ISettingsBuilder<Pixelize, Pixelize> SETTINGS = SettingsBuilder<Pixelize>.Build("pixelize", 
+    private static readonly ISettingsBuilder<Pixelize> SETTINGS = SettingsBuilder<Pixelize>.Build("pixelize", 
         SettingsNode<Pixelize>.New("default")
-            .Argument("pixel_type", Arguments.SingleSelect(typeof(PixelType)))
-            .OnParse(context => new Pixelize((PixelType)context["pixel_type"].GetParsedValue()))
+            .Argument("pixel_type", Arguments.SingleSelect(PixelType.SQUARES))
+            .Constructs(context => new Pixelize((PixelType)context["pixel_type"].Get()))
     );
 
-    public static ISettingsBuilder<Pixelize, Pixelize> GetSettings() {
-        return SETTINGS.Clone();
+    public static ISettingsBuilder<Pixelize> GetSettings() {
+        return (ISettingsBuilder<Pixelize>)SETTINGS.Clone();
     }
 
     public override string ToString() => JsonSerializer.Serialize(this);

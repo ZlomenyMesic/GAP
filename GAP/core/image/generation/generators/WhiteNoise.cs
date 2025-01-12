@@ -5,8 +5,9 @@
 
 using System.Drawing;
 using System.Text.Json;
-using GAP.util.settings;
-using Kolors;
+using NeoKolors;
+using NeoKolors.Common;
+using NeoKolors.Settings;
 
 namespace GAP.core.image.generation.generators;
 
@@ -14,29 +15,18 @@ namespace GAP.core.image.generation.generators;
 /// White Noise Image Generation <br/>
 /// generates purely random set of pixels with color properties set manually or with the <see cref="WhiteNoisePresets"/>
 /// </summary>
-public sealed class WhiteNoise : IImageGenerator, ICloneable, IBatchableGenerator {
-    private int width { get; set; }
-    private int height { get; set; }
-    private int seed { get; set; }
-    
-    public int Width => width;
-    public int Height => height;
-    public int Seed => seed;
+public sealed class WhiteNoise : ICloneable, IBatchableGenerator {
+    public int Width { get; private set; }
+    public int Height { get; private set; }
+    public int Seed { get; private set; }
     
 
-    private double hueFactor { get; set; } = 1d;
-    private bool allowRandomHue { get; set; }
-    private double saturationFactor { get; set; } = 1d;
-    private bool allowRandomSaturation { get; set; }
-    private double valueFactor { get; set; } = 1d;
-    private bool allowRandomBrightness { get; set; }
-
-    public double HueFactor => hueFactor;
-    public bool AllowRandomHue => allowRandomHue;
-    public double SaturationFactor => saturationFactor;
-    public bool AllowRandomSaturation => allowRandomSaturation;
-    public double ValueFactor => valueFactor;
-    public bool AllowRandomBrightness => allowRandomBrightness;
+    public double HueFactor { get; private set; } = 1d;
+    public bool AllowRandomHue { get; private set; }
+    public double SaturationFactor { get; private set; } = 1d;
+    public bool AllowRandomSaturation { get; private set; }
+    public double ValueFactor { get; private set; } = 1d;
+    public bool AllowRandomValue { get; private set; }
     
     /// <summary>
     /// default constructor
@@ -45,9 +35,9 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable, IBatchableGenerato
     /// <param name="height">height of the generated image</param>
     /// <param name="seed">seed used by the <see cref="Random"/></param>
     public WhiteNoise(int width, int height, int seed) {
-        this.width = width;
-        this.height = height;
-        this.seed = seed;
+        Width = width;
+        Height = height;
+        Seed = seed;
     }
     
     public WhiteNoise() {}
@@ -60,10 +50,12 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable, IBatchableGenerato
     /// <param name="seed">seed used by the <see cref="Random"/></param>
     /// <param name="presets">preset used to set color generation parameters</param>
     public WhiteNoise(int width, int height, int seed, WhiteNoisePresets presets) {
-        this.width = width;
-        this.height = height;
-        this.seed = seed;
-        
+        Width = width;
+        Height = height;
+        Seed = seed;
+        (HueFactor, AllowRandomHue,
+            SaturationFactor, AllowRandomSaturation,
+            ValueFactor, AllowRandomValue) = FromPreset(presets); 
     }
 
     /// <summary>
@@ -79,22 +71,22 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable, IBatchableGenerato
     /// <param name="allowRandomSaturation">
     /// whether random values are used to generate the saturation part of a color
     /// </param>
-    /// <param name="allowRandomBrightness">
+    /// <param name="allowRandomValue">
     /// whether random values are used to generate the value part of a color
     /// </param>
     public WhiteNoise(int width, int height, int seed, double hueFactor, double saturationFactor,
         double valueFactor, bool allowRandomHue = true, 
-        bool allowRandomSaturation = true, bool allowRandomBrightness = true) {
+        bool allowRandomSaturation = true, bool allowRandomValue = true) {
         
-        this.width = width;
-        this.height = height;
-        this.seed = seed;
-        this.hueFactor = hueFactor;
-        this.saturationFactor = saturationFactor;
-        this.valueFactor = valueFactor;
-        this.allowRandomHue = allowRandomHue;
-        this.allowRandomSaturation = allowRandomSaturation;
-        this.allowRandomBrightness = allowRandomBrightness;
+        Width = width;
+        Height = height;
+        Seed = seed;
+        HueFactor = hueFactor;
+        SaturationFactor = saturationFactor;
+        ValueFactor = valueFactor;
+        AllowRandomHue = allowRandomHue;
+        AllowRandomSaturation = allowRandomSaturation;
+        AllowRandomValue = allowRandomValue;
     }
 
     /// <summary>
@@ -102,15 +94,15 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable, IBatchableGenerato
     /// </summary>
     /// <returns><see cref="Bitmap"/> object with the final image</returns>
     public Bitmap GenerateImage() {
-        Random random = new Random(seed);
-        Bitmap image = new Bitmap(width, height);
+        Random random = new Random(Seed);
+        Bitmap image = new Bitmap(Width, Height);
         
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                image.SetPixel(x, y, ColorFormat.ColorFromHsv(
-                    allowRandomHue ? hueFactor * random.NextDouble() * 360: hueFactor * 360, 
-                    allowRandomSaturation ? saturationFactor * random.NextDouble() : saturationFactor, 
-                    allowRandomBrightness ? valueFactor * random.NextDouble(): valueFactor));
+        for (int x = 0; x < Width; x++) {
+            for (int y = 0; y < Height; y++) {
+                image.SetPixel(x, y, ColorFormat.HsvToColor(
+                    AllowRandomHue ? HueFactor * random.NextDouble() * 360: HueFactor * 360, 
+                    AllowRandomSaturation ? SaturationFactor * random.NextDouble() : SaturationFactor, 
+                    AllowRandomValue ? ValueFactor * random.NextDouble(): ValueFactor));
             }
         }
         
@@ -149,7 +141,7 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable, IBatchableGenerato
         return s;
     }
     
-    private static readonly ISettingsBuilder<WhiteNoise, WhiteNoise> SETTINGS = SettingsBuilder<WhiteNoise>.Build("white_noise", 
+    private static readonly ISettingsBuilder<WhiteNoise> SETTINGS = SettingsBuilder<WhiteNoise>.Build("white_noise", 
         SettingsNode<WhiteNoise>.New("advanced")
             .Group(IImageGenerator.UniversalSeedInput())
             .Argument("width", Arguments.Integer(128))
@@ -164,17 +156,17 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable, IBatchableGenerato
                     ("value_factor", Arguments.Double(0, 1))))
                 .Option(SettingsGroupOption
                     .New("presets")
-                    .Argument("presets", Arguments.SingleSelect<WhiteNoisePresets>())
-                    .OnParse((cin, cout) => {
+                    .Argument("presets", Arguments.SingleSelect(WhiteNoisePresets.RANDOM_HUE_AND_DARKNESS))
+                    .Merges((cin, cout) => {
                         (double hf, bool hr, double sf, bool sr, double vf, bool vr) s =
-                            FromPreset((WhiteNoisePresets)cin["presets"].GetParsedValue());
+                            FromPreset((WhiteNoisePresets)cin["presets"].Get());
 
-                        cout["allow_random_hue"].SetParsedValue(s.hr);
-                        cout["hue_factor"].SetParsedValue(s.hf);
-                        cout["allow_random_saturation"].SetParsedValue(s.sr);
-                        cout["saturation_factor"].SetParsedValue(s.sf);
-                        cout["allow_random_value"].SetParsedValue(s.vr);
-                        cout["value_factor"].SetParsedValue(s.vf);
+                        cout["allow_random_hue"] <<= s.hr;
+                        cout["hue_factor"] <<= s.hf;
+                        cout["allow_random_saturation"] <<= s.sr;
+                        cout["saturation_factor"] <<= s.sf;
+                        cout["allow_random_value"] <<= s.vr;
+                        cout["value_factor"] <<= s.vf;
                     })                    
                 )
                 .Option(SettingsGroupOption
@@ -185,21 +177,21 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable, IBatchableGenerato
                     .Argument("saturation_factor", Arguments.Double(0, 1))
                     .Argument("allow_random_value", Arguments.Bool())
                     .Argument("value_factor", Arguments.Double(0, 1))
-                    .EnableAutoParse()
+                    .EnableAutoMerge()
                 )
-                .EnableAutoParse()
+                .EnableAutoMerge()
             )
-            .OnParse(context => {
+            .Constructs(context => {
                 WhiteNoise whiteNoise = new WhiteNoise(
-                    (int)context["width"].GetParsedValue(),
-                    (int)context["height"].GetParsedValue(),
-                    (int)context["seed"].GetParsedValue(),
-                    (double)context["hue_factor"].GetParsedValue(),
-                    (double)context["saturation_factor"].GetParsedValue(),
-                    (double)context["value_factor"].GetParsedValue(),
-                    (bool)context["allow_random_hue"].GetParsedValue(),
-                    (bool)context["allow_random_saturation"].GetParsedValue(),
-                    (bool)context["allow_random_value"].GetParsedValue());
+                    (int)context["width"].Get(),
+                    (int)context["height"].Get(),
+                    (int)context["seed"].Get(),
+                    (double)context["hue_factor"].Get(),
+                    (double)context["saturation_factor"].Get(),
+                    (double)context["value_factor"].Get(),
+                    (bool)context["allow_random_hue"].Get(),
+                    (bool)context["allow_random_saturation"].Get(),
+                    (bool)context["allow_random_value"].Get());
                     
                 return whiteNoise;
             })
@@ -209,10 +201,10 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable, IBatchableGenerato
             .Group(IImageGenerator.UniversalSeedInput())
             .Argument("width", Arguments.Integer(128))
             .Argument("height", Arguments.Integer(128))
-            .OnParse(context => new WhiteNoise(
-                (int)context["width"].GetParsedValue(),
-                (int)context["height"].GetParsedValue(),
-                (int)context["seed"].GetParsedValue())
+            .Constructs(context => new WhiteNoise(
+                (int)context["width"].Get(),
+                (int)context["height"].Get(),
+                (int)context["seed"].Get())
             )
     );
 
@@ -222,7 +214,7 @@ public sealed class WhiteNoise : IImageGenerator, ICloneable, IBatchableGenerato
 
     public IImageGenerator GetNextGenerator(int i) {
         WhiteNoise copy = (WhiteNoise)MemberwiseClone();
-        copy.seed = i;
+        copy.Seed = i;
         return copy;
     }
 

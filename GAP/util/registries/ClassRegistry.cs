@@ -14,7 +14,7 @@ namespace GAP.util.registries;
 public abstract class ClassRegistry<T> {
     
     // ReSharper disable once StaticMemberInGenericType
-    protected static IDictionary<string, Type?> REGISTRY { get; } = new Dictionary<string, Type?>();
+    protected static readonly IDictionary<string, Type?> REGISTRY = new Dictionary<string, Type?>();
 
     /// <summary>
     /// registers a new class reference 

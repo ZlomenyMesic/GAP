@@ -4,7 +4,7 @@
 //
 
 using System.Drawing;
-using GAP.util.settings;
+using NeoKolors.Settings;
 
 namespace GAP.core.image.transformation.transformers;
 
@@ -14,11 +14,10 @@ public class ColorReduce : IImageTransformer {
     /// value between 0 - 128, how much of the bits of color channel is lost,
     /// 0 -> none, 128 -> all except the most significant
     /// </summary>
-    private int reduceLevel { get; set; }
-    public int ReduceLevel => reduceLevel;
+    public int ReduceLevel { get; private set; }
 
     public ColorReduce(int reduceLevel) {
-        this.reduceLevel = Math.Max(Math.Min(reduceLevel, 128), 0);
+        ReduceLevel = Math.Max(Math.Min(reduceLevel, 128), 0);
     }
 
     public ColorReduce() {}
@@ -28,9 +27,9 @@ public class ColorReduce : IImageTransformer {
             for (int y = 0; y < image.Height; y++) {
                 Color c = image.GetPixel(x, y);
                 (int r, int g, int b) = (c.R, c.G, c.B);
-                r &= ~reduceLevel;
-                g &= ~reduceLevel;
-                b &= ~reduceLevel;
+                r &= ~ReduceLevel;
+                g &= ~ReduceLevel;
+                b &= ~ReduceLevel;
                 
                 image.SetPixel(x, y, Color.FromArgb(r, g, b));
             }
@@ -40,13 +39,13 @@ public class ColorReduce : IImageTransformer {
     }
 
 
-    private static readonly ISettingsBuilder<ColorReduce, ColorReduce> SETTINGS = SettingsBuilder<ColorReduce>.Build("color_reduce", 
+    private static readonly ISettingsBuilder<ColorReduce> SETTINGS = SettingsBuilder<ColorReduce>.Build("color_reduce", 
         SettingsNode<ColorReduce>.New("color_reduce")
             .Argument("reduce_level", Arguments.Integer(0, 128))
-            .OnParse(cin => new ColorReduce((int)cin["reduce_level"].GetParsedValue()))
+            .Constructs(cin => new ColorReduce((int)cin["reduce_level"].Get()))
     );
 
-    public static ISettingsBuilder<ColorReduce, ColorReduce> GetSettings() {
-        return SETTINGS.Clone();
+    public static ISettingsBuilder<ColorReduce> GetSettings() {
+        return (ISettingsBuilder<ColorReduce>)SETTINGS.Clone();
     }
 }

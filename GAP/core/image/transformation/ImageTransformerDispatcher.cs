@@ -14,7 +14,7 @@ namespace GAP.core.image.transformation;
 /// <see cref="ImageTransformerRegistry"/> class registry
 /// </summary>
 public class ImageTransformerDispatcher {
-    private string projectId { get; set; }
+    private string ProjectId { get; set; }
     private static readonly List<string> REGISTERED_IDS = new();
     
     
@@ -29,7 +29,7 @@ public class ImageTransformerDispatcher {
         }
         
         REGISTERED_IDS.Add(projectId);
-        this.projectId = projectId;
+        this.ProjectId = projectId;
     }
     
     /// <summary>
@@ -38,6 +38,6 @@ public class ImageTransformerDispatcher {
     /// <param name="id">id of the transformer class</param>
     /// <param name="type"><c>typeof(&lt;YourClassName&gt;)</c></param>
     public void Register(string id, Type type) {
-        ImageTransformerRegistry.Register($"{projectId}:{id}", type);
+        ImageTransformerRegistry.Register($"{ProjectId}:{id}", type);
     }
 }
