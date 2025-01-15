@@ -7,7 +7,7 @@ using Color = System.Drawing.Color;
 
 namespace GAP.core.image.generation.generators;
 
-public class Paths : IBatchableGenerator {
+public class Paths : IBatchableGenerator<Paths> {
     
     public int Seed { get; private set; }
     public int Width { get; private set; }
@@ -37,6 +37,8 @@ public class Paths : IBatchableGenerator {
         Width = gridWidth * unitSize;
         Height = gridHeight * unitSize;
     }
+    
+    public Paths() {}
     
     public Bitmap GenerateImage() {
         Bitmap bmp = new Bitmap(Width, Height);
@@ -89,6 +91,10 @@ public class Paths : IBatchableGenerator {
         return bmp;
     }
 
+    ISettingsBuilder<IImageGenerator> IImageGenerator.GetSettings() => GetSettings();
+
+    public IImageGenerator GetEmptyInstance() => new Paths(0, 0, 0, 0, 0, 0, 0, 0);
+
     private ((int x, int y) a, (int x, int y) b)[] GeneratePath(int seedOffset) {
         Random rnd = new Random(Seed + 1 + seedOffset);
         int length = PathLifetime + rnd.Next(-PathLifetimeTolerance, PathLifetimeTolerance);
@@ -122,7 +128,7 @@ public class Paths : IBatchableGenerator {
         };
     }
 
-    private static readonly ISettingsBuilder<Paths> SETTINGS = SettingsBuilder<Paths>.Build("paths",
+    private static readonly SettingsBuilder<Paths> SETTINGS = SettingsBuilder<Paths>.Build("paths",
         SettingsNode<Paths>.New("basic")
             .Group(IImageGenerator.UniversalSeedInput())
             .Argument("grid_width", Arguments.Integer(2))
@@ -151,14 +157,18 @@ public class Paths : IBatchableGenerator {
                 (int)cin["path_count"].Get())
             )
     );
-
-    public static ISettingsBuilder<Paths> GetSettings() {
-        return (ISettingsBuilder<Paths>)SETTINGS.Clone();
+    
+    public SettingsBuilder<Paths> GetSettings() {
+        return (SettingsBuilder<Paths>)SETTINGS.Clone();
     }
 
-    public IImageGenerator GetNextGenerator(int i) {
+    public Paths GetNextGenerator(int i) {
         Paths copy = (Paths)MemberwiseClone();
         copy.Seed = i;
         return copy;
+    }
+    
+    IImageGenerator IBatchableGenerator.GetNextGenerator(int i) {
+        return GetNextGenerator(i);
     }
 }

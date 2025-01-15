@@ -11,10 +11,10 @@ namespace GAP.util.registries;
 /// registry for references of a class children
 /// </summary>
 /// <typeparam name="T">type of stored object</typeparam>
-public abstract class ClassRegistry<T> {
+public abstract class TypeRegistry<T> {
     
     // ReSharper disable once StaticMemberInGenericType
-    protected static readonly IDictionary<string, Type?> REGISTRY = new Dictionary<string, Type?>();
+    protected static readonly IDictionary<string, Type> REGISTRY = new Dictionary<string, Type>();
 
     /// <summary>
     /// registers a new class reference 
@@ -23,7 +23,8 @@ public abstract class ClassRegistry<T> {
     /// <param name="registeredType">the reference</param>
     /// <returns>the reference</returns>
     /// <exception cref="RegistryInvalidTypeException">
-    /// when base class of <c>typeof(registeredType)</c> does not match <c>T</c>
+    /// base class of <c>typeof(registeredType)</c> does not match <c>T</c>,
+    /// registered type does not have an empty constructor
     /// </exception>
     /// <exception cref="RegistryCouldNotAddException">
     /// if failed to add the type due to a type with the same id already registered
@@ -43,17 +44,10 @@ public abstract class ClassRegistry<T> {
     /// </summary>
     /// <exception cref="RegistryItemNotFoundException">if desired object is not found</exception>
     protected static Type BaseGet(string id) {
-        
         if (!REGISTRY.TryGetValue(id, out Type? value))
             throw new KeyNotFoundException($"Could not find registry object \'{id}\'.");
-        
-        if (value != null) {
-            return value;
-        }
 
-        throw new NullReferenceException(
-            $"Cannot create an instance of {typeof(T).Name}. Requested type is null.");
-
+        return value;
     }
 
     /// <summary>

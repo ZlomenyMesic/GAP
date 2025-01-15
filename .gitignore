@@ -36,6 +36,12 @@ bld/
 # params.txt
 GAP/machineLearning/deepdream/params.txt
 
+# machine learning output
+GAP/machineLearning/deepdream/output/
+GAP/machineLearning/deepdream/output/*
+GAP/machineLearning/ladybug/output/
+GAP/machineLearning/ladybug/output/*
+
 # JetBrains Rider
 .idea/
 

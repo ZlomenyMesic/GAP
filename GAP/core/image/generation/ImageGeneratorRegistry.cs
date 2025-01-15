@@ -3,27 +3,45 @@
 //   by ZlomenyMesic & KryKom
 //
 
-using System.Reflection;
 using GAP.util.registries;
-using NeoKolors.Console;
+using GAP.util.registries.exceptions;
 using NeoKolors.Settings;
 
 namespace GAP.core.image.generation;
 
 /// <summary>
 /// Image Generator Registry <br/>
-/// holds references to all registered generators using the <see cref="ClassRegistry{T}"/> class registry class
+/// holds references to all registered generators using the <see cref="TypeRegistry{T}"/> class registry class
 /// </summary>
-internal abstract class ImageGeneratorRegistry : ClassRegistry<IImageGenerator> {
+internal abstract class ImageGeneratorRegistry : TypeRegistry<IImageGenerator> {
 
     /// <summary>
     /// registers new <see cref="IImageGenerator"/>-implementing class using the
-    /// <see cref="ClassRegistry{T}.BaseRegister"/> method
+    /// <see cref="TypeRegistry{T}.BaseRegister"/> method
     /// </summary>
     /// <param name="id">id of the class</param>
     /// <param name="type"><c>typeof(&lt;YourClassName&gt;)</c></param>
     internal static void Register(string id, Type type) {
+        var c = type.GetConstructor([]);
+        if (c == null) {
+            throw new RegistryInvalidTypeException(type);
+        }
+        
         BaseRegister(id, type);
+    }
+    
+    /// <summary>
+    /// registers new <see cref="IImageGenerator"/>-implementing class using the
+    /// <see cref="TypeRegistry{T}.BaseRegister"/> method
+    /// </summary>
+    /// <param name="id">id of the class</param>
+    internal static void Register<T>(string id) {
+        var c = typeof(T).GetConstructor([]);
+        if (c == null) {
+            throw new RegistryInvalidTypeException(typeof(T));
+        }
+        
+        BaseRegister(id, typeof(T));
     }
     
     /// <summary>
@@ -35,18 +53,10 @@ internal abstract class ImageGeneratorRegistry : ClassRegistry<IImageGenerator> 
     /// registered reference to class is null</exception>
     /// <exception cref="KeyNotFoundException">no class with id of <see cref="id"/> was not found</exception>
     public static Type GetType(string id) {
-        Debug.Info(REGISTRY.Count.ToString());
-
         if (!REGISTRY.TryGetValue(id, out Type? value))
             throw new KeyNotFoundException($"Could not find registry object \'{id}\'.");
-        
-        if (value != null) {
-            return value;
-        }
 
-        throw new NullReferenceException(
-            "Cannot create an instance of ImageGenerator. Requested type is null.");
-
+        return value;
     }
 
     /// <summary>
@@ -57,9 +67,8 @@ internal abstract class ImageGeneratorRegistry : ClassRegistry<IImageGenerator> 
     /// <exception cref="NullReferenceException">
     /// registered reference to class is null</exception>
     /// <exception cref="KeyNotFoundException">no class with id of <see cref="id"/> was not found</exception>
-    public static ISettingsBuilder<object> GetSettings(string id) {
-        MethodInfo? mf = GetType(id).GetMethod("GetSettings");
-        object? result = mf!.Invoke(null, null);
-        return (ISettingsBuilder<object>)result!;
+    public static ISettingsBuilder<IImageGenerator> GetSettings(string id) {
+        var obj = (IImageGenerator)REGISTRY[id].GetConstructor([])!.Invoke([]);
+        return obj.GetSettings();
     }
 }

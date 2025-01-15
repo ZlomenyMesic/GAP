@@ -13,7 +13,7 @@ namespace GAP.core.image.transformation.transformers;
 /// Grid Image Transformation <br/>
 /// transforms the picture by separating its pixels and placing transparent color between them 
 /// </summary>
-public class Grid : IImageTransformer, ICloneable {
+public class Grid : IImageTransformer<Grid>, ICloneable {
     public uint ScaleFactor { get; set; }
     
     /// <summary>
@@ -54,16 +54,20 @@ public class Grid : IImageTransformer, ICloneable {
             
         return result;
     }
-    
+
+    public ISettingsBuilder<Grid> GetSettings() {
+        return (ISettingsBuilder<Grid>)SETTINGS.Clone();
+    }
+
+    ISettingsBuilder<IImageTransformer> IImageTransformer.GetSettings() {
+        return GetSettings();
+    }
+
     private static readonly ISettingsBuilder<Grid> SETTINGS = SettingsBuilder<Grid>.Build("grid", 
         SettingsNode<Grid>.New("default")
             .Argument("scale_factor", Arguments.UInteger(0, 100))
             .Constructs(context => new Grid((uint)context["scale_factor"].Get()))
     );
-
-    public static SettingsBuilder<Grid> GetSettings() {
-        return (SettingsBuilder<Grid>)SETTINGS.Clone();
-    }
 
     public override string ToString() => JsonSerializer.Serialize(this);
     

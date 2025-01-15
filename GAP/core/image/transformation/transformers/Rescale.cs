@@ -9,7 +9,7 @@ using NeoKolors.Settings;
 
 namespace GAP.core.image.transformation.transformers;
 
-public class Rescale : IImageTransformer, ICloneable {
+public class Rescale : IImageTransformer<Rescale>, ICloneable {
 
     private int Scale { get; set; }
     
@@ -17,9 +17,14 @@ public class Rescale : IImageTransformer, ICloneable {
         throw new NotImplementedException();
     }
 
-    public SettingsBuilder<Rescale> GetSettings() {
+    public ISettingsBuilder<Rescale> GetSettings() {
         throw new NotImplementedException();
     }
+
+    ISettingsBuilder<IImageTransformer> IImageTransformer.GetSettings() {
+        return GetSettings();
+    }
+
 
     public override string ToString() => JsonSerializer.Serialize(this);
     

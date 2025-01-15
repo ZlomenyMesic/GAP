@@ -10,7 +10,7 @@ namespace GAP.core.image.transformation;
 
 /// <summary>
 /// Image Transformer Dispatcher <br/>
-/// registers new <see cref="IImageTransformer"/> classes using the <see cref="ClassRegistry{T}"/> into the
+/// registers new <see cref="IImageTransformer"/> classes using the <see cref="TypeRegistry{T}"/> into the
 /// <see cref="ImageTransformerRegistry"/> class registry
 /// </summary>
 public class ImageTransformerDispatcher {
@@ -29,7 +29,7 @@ public class ImageTransformerDispatcher {
         }
         
         REGISTERED_IDS.Add(projectId);
-        this.ProjectId = projectId;
+        ProjectId = projectId;
     }
     
     /// <summary>

@@ -4,14 +4,13 @@
 //
 
 using System.Drawing;
-using NeoKolors;
 using NeoKolors.Common;
 using NeoKolors.Settings;
 using Color = System.Drawing.Color;
 
 namespace GAP.core.image.generation.generators;
 
-public class Spectrogram : IBatchableGenerator {
+public class Spectrogram : IBatchableGenerator<Spectrogram> {
     public int Width { get; private set; }
     public int Height { get; private set; }
     public int Seed { get; private set; }
@@ -36,6 +35,8 @@ public class Spectrogram : IBatchableGenerator {
         Step = step;
     }
     
+    public Spectrogram() {}
+
     public Bitmap GenerateImage() {
         Bitmap bmp = new Bitmap(Width, Height);
         Random rnd = new Random(Seed);
@@ -65,6 +66,9 @@ public class Spectrogram : IBatchableGenerator {
         
         return bmp;
     }
+
+    ISettingsBuilder<IImageGenerator> IImageGenerator.GetSettings() => GetSettings();
+
 
     private Func<float, float> GetFunc() {
         Random rnd = new Random(Seed);
@@ -107,11 +111,14 @@ public class Spectrogram : IBatchableGenerator {
             )
     );
 
-    public static SettingsBuilder<Spectrogram> GetSettings() {
+    public SettingsBuilder<Spectrogram> GetSettings() {
         return (SettingsBuilder<Spectrogram>)SETTINGS.Clone();
     }
+    
 
-    public IImageGenerator GetNextGenerator(int i) {
+    IImageGenerator IBatchableGenerator.GetNextGenerator(int i) => GetNextGenerator(i);
+
+    public Spectrogram GetNextGenerator(int i) {
         Spectrogram copy = (Spectrogram)MemberwiseClone();
         copy.Seed = i;
         return copy;

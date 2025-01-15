@@ -6,7 +6,9 @@
 //
 
 using System.Drawing.Imaging;
+using GAP.core.image.generation;
 using GAP.core.image.generation.generators;
+using GAP.core.image.transformation;
 using GAP.core.modLoader;
 using GAP.machineLearning.deepdream;
 using GAP.machineLearning.ladybug;
@@ -114,6 +116,8 @@ internal class GAP : IMod {
         // --- END OF MAIN FUNCTIONALITY ---
         // you can put your code here:
 
+        var s = ImageGeneratorRegistry.GetSettings("gap:white_noise");
+        
         MidiEventCollection mec = new MidiEventCollection(1, 960);
         mec.AddTrack([new TempoEvent(600000, 0), new MetaEvent(MetaEventType.EndTrack, 0, 0)]);
         mec.AddTrack([new PatchChangeEvent(0, 2, 1), new NoteOnEvent(0, 2, 48, 32, 980), new NoteEvent(980, 2, MidiCommandCode.NoteOff, 48, 0), new MetaEvent(MetaEventType.EndTrack, 0, 1000)]);

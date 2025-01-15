@@ -15,11 +15,10 @@ namespace GAP.core.image.generation.generators;
 /// White Noise Image Generation <br/>
 /// generates purely random set of pixels with color properties set manually or with the <see cref="WhiteNoisePresets"/>
 /// </summary>
-public sealed class WhiteNoise : ICloneable, IBatchableGenerator {
+public sealed class WhiteNoise : ICloneable, IBatchableGenerator<WhiteNoise> {
     public int Width { get; private set; }
     public int Height { get; private set; }
     public int Seed { get; private set; }
-    
 
     public double HueFactor { get; private set; } = 1d;
     public bool AllowRandomHue { get; private set; }
@@ -27,6 +26,7 @@ public sealed class WhiteNoise : ICloneable, IBatchableGenerator {
     public bool AllowRandomSaturation { get; private set; }
     public double ValueFactor { get; private set; } = 1d;
     public bool AllowRandomValue { get; private set; }
+    
     
     /// <summary>
     /// default constructor
@@ -109,6 +109,10 @@ public sealed class WhiteNoise : ICloneable, IBatchableGenerator {
         return image;
     }
 
+    ISettingsBuilder<IImageGenerator> IImageGenerator.GetSettings() => GetSettings();
+
+    IImageGenerator IBatchableGenerator.GetNextGenerator(int i) => GetNextGenerator(i);
+
 
     private static (double hf, bool hr, double sf, bool sr, double vf, bool vr) FromPreset(WhiteNoisePresets preset) {
 
@@ -141,7 +145,7 @@ public sealed class WhiteNoise : ICloneable, IBatchableGenerator {
         return s;
     }
     
-    private static readonly ISettingsBuilder<WhiteNoise> SETTINGS = SettingsBuilder<WhiteNoise>.Build("white_noise", 
+    private static readonly SettingsBuilder<WhiteNoise> SETTINGS = SettingsBuilder<WhiteNoise>.Build("white_noise", 
         SettingsNode<WhiteNoise>.New("advanced")
             .Group(IImageGenerator.UniversalSeedInput())
             .Argument("width", Arguments.Integer(128))
@@ -208,11 +212,11 @@ public sealed class WhiteNoise : ICloneable, IBatchableGenerator {
             )
     );
 
-    public static SettingsBuilder<WhiteNoise> GetSettings() {
+    public SettingsBuilder<WhiteNoise> GetSettings() {
         return (SettingsBuilder<WhiteNoise>)SETTINGS.Clone();
     }
 
-    public IImageGenerator GetNextGenerator(int i) {
+    public WhiteNoise GetNextGenerator(int i) {
         WhiteNoise copy = (WhiteNoise)MemberwiseClone();
         copy.Seed = i;
         return copy;

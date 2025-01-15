@@ -6,7 +6,6 @@
 using System.Drawing;
 using GAP.util;
 using GAP.util.math;
-using NeoKolors;
 using NeoKolors.Common;
 using NeoKolors.Settings;
 using Color = System.Drawing.Color;
@@ -17,19 +16,21 @@ namespace GAP.core.image.generation;
 /// Image Generator Interface <br/>
 /// all image generator classes must implement this class in order to be properly registered
 /// </summary>
-public interface IImageGenerator {
+public interface IImageGenerator<TSelf> : IImageGenerator where TSelf : class, IImageGenerator<TSelf> {
     
+    /// <summary>
+    /// returns copy of settings available for the generator
+    /// </summary>
+    public new SettingsBuilder<TSelf> GetSettings();
+}
+
+public interface IImageGenerator {
     /// <summary>
     /// main generation method
     /// </summary>
     /// <returns><see cref="Bitmap"/> object with the final image</returns>
     public Bitmap GenerateImage();
-
-    /// <summary>
-    /// returns copy of settings available for the generator
-    /// </summary>
-    public static ISettingsBuilder<IImageGenerator> GetSettings() => throw new NotImplementedException();
-
+    
     private static readonly SettingsGroup UNIVERSAL_SEED_SETTINGS = SettingsGroup
         .New("seed", Context.New(("seed", Arguments.Integer())))
         .Option(SettingsGroupOption
@@ -81,4 +82,6 @@ public interface IImageGenerator {
         
         return Color.FromArgb(background);
     }
+
+    public ISettingsBuilder<IImageGenerator> GetSettings();
 }

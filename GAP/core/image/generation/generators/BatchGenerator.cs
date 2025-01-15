@@ -1,10 +1,11 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using GAP.util;
+using NeoKolors.Settings;
 
 namespace GAP.core.image.generation.generators;
 
-public class BatchGenerator : IImageGenerator {
+public class BatchGenerator : IImageGenerator<BatchGenerator> {
     
     // TODO finish batch generator
     
@@ -34,7 +35,9 @@ public class BatchGenerator : IImageGenerator {
         return Generator.GenerateImage();
     }
 
-    public static object GetSettings() {
+    ISettingsBuilder<IImageGenerator> IImageGenerator.GetSettings() => GetSettings();
+
+    public SettingsBuilder<BatchGenerator> GetSettings() {
         throw new NotImplementedException();
     }
 }

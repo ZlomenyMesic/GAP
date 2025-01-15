@@ -12,7 +12,7 @@ using Color = System.Drawing.Color;
 
 namespace GAP.core.image.generation.generators;
 
-public class Stripes : IBatchableGenerator {
+public class Stripes : IBatchableGenerator<Stripes> {
 
     public int Width { get; private set; } = 128;
     public int Height { get; private set; } = 128;
@@ -85,7 +85,11 @@ public class Stripes : IBatchableGenerator {
         return output;
     }
 
-    private static readonly ISettingsBuilder<Stripes> SETTINGS = SettingsBuilder<Stripes>.Build("rectangles",
+    ISettingsBuilder<IImageGenerator> IImageGenerator.GetSettings() => GetSettings();
+
+    IImageGenerator IBatchableGenerator.GetNextGenerator(int i) => GetNextGenerator(i);
+
+    private static readonly SettingsBuilder<Stripes> SETTINGS = SettingsBuilder<Stripes>.Build("rectangles",
         SettingsNode<Stripes>.New("stripes")
             .Group(IImageGenerator.UniversalSeedInput())
             .Argument("grid_width", Arguments.Integer(2))
@@ -101,11 +105,11 @@ public class Stripes : IBatchableGenerator {
             )
     );
     
-    public static ISettingsBuilder<Stripes> GetSettings() {
-        return (ISettingsBuilder<Stripes>)SETTINGS.Clone();
+    public SettingsBuilder<Stripes> GetSettings() {
+        return (SettingsBuilder<Stripes>)SETTINGS.Clone();
     }
 
-    public IImageGenerator GetNextGenerator(int i) {
+    public Stripes GetNextGenerator(int i) {
         Stripes copy = (Stripes)MemberwiseClone();
         copy.Seed = i;
         return copy;

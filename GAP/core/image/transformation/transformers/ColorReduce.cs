@@ -8,7 +8,7 @@ using NeoKolors.Settings;
 
 namespace GAP.core.image.transformation.transformers;
 
-public class ColorReduce : IImageTransformer {
+public class ColorReduce : IImageTransformer<ColorReduce> {
     
     /// <summary>
     /// value between 0 - 128, how much of the bits of color channel is lost,
@@ -38,6 +38,14 @@ public class ColorReduce : IImageTransformer {
         return image;
     }
 
+    public ISettingsBuilder<ColorReduce> GetSettings() {
+        return (ISettingsBuilder<ColorReduce>)SETTINGS.Clone();
+    }
+
+    ISettingsBuilder<IImageTransformer> IImageTransformer.GetSettings() {
+        return GetSettings();
+    }
+
 
     private static readonly ISettingsBuilder<ColorReduce> SETTINGS = SettingsBuilder<ColorReduce>.Build("color_reduce", 
         SettingsNode<ColorReduce>.New("color_reduce")
@@ -45,7 +53,4 @@ public class ColorReduce : IImageTransformer {
             .Constructs(cin => new ColorReduce((int)cin["reduce_level"].Get()))
     );
 
-    public static ISettingsBuilder<ColorReduce> GetSettings() {
-        return (ISettingsBuilder<ColorReduce>)SETTINGS.Clone();
-    }
 }

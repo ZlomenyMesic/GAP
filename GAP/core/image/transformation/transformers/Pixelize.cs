@@ -13,7 +13,7 @@ namespace GAP.core.image.transformation.transformers;
 /// Pixelize Image Transform <br/>
 /// creates a poor pixel effect over the image
 /// </summary>
-public class Pixelize : IImageTransformer, ICloneable {
+public class Pixelize : IImageTransformer<Pixelize>, ICloneable {
     public PixelType PixelType { get; set; }
     
     /// <summary>
@@ -42,7 +42,15 @@ public class Pixelize : IImageTransformer, ICloneable {
             return PixelizeSquares(image);
         }
     }
-    
+
+    public ISettingsBuilder<Pixelize> GetSettings() {
+        return (ISettingsBuilder<Pixelize>)SETTINGS.Clone();
+    }
+
+    ISettingsBuilder<IImageTransformer> IImageTransformer.GetSettings() {
+        return GetSettings();
+    }
+
     private static Bitmap PixelizeStripes(Bitmap image) {
         Bitmap result = new Bitmap(image.Width * 3, image.Height * 3);
             
@@ -113,9 +121,6 @@ public class Pixelize : IImageTransformer, ICloneable {
             .Constructs(context => new Pixelize((PixelType)context["pixel_type"].Get()))
     );
 
-    public static ISettingsBuilder<Pixelize> GetSettings() {
-        return (ISettingsBuilder<Pixelize>)SETTINGS.Clone();
-    }
 
     public override string ToString() => JsonSerializer.Serialize(this);
     

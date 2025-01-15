@@ -10,7 +10,7 @@ using Color = System.Drawing.Color;
 
 namespace GAP.core.image.generation.generators;
 
-public class Rectangles : IBatchableGenerator {
+public class Rectangles : IBatchableGenerator<Rectangles> {
 
     public int Width { get; private set; } = 128;
     public int Height { get; private set; } = 128;
@@ -82,6 +82,8 @@ public class Rectangles : IBatchableGenerator {
         return output;
     }
 
+    ISettingsBuilder<IImageGenerator> IImageGenerator.GetSettings() => GetSettings();
+
     private static readonly SettingsBuilder<Rectangles> SETTINGS = SettingsBuilder<Rectangles>.Build("rectangles",
         SettingsNode<Rectangles>.New("rectangles")
             .Group(IImageGenerator.UniversalSeedInput())
@@ -98,8 +100,8 @@ public class Rectangles : IBatchableGenerator {
             )
     );
     
-    public static ISettingsBuilder<Rectangles> GetSettings() {
-        return (ISettingsBuilder<Rectangles>)SETTINGS.Clone();
+    public SettingsBuilder<Rectangles> GetSettings() {
+        return (SettingsBuilder<Rectangles>)SETTINGS.Clone();
     }
 
     /// <summary>
@@ -301,9 +303,11 @@ public class Rectangles : IBatchableGenerator {
         }
     }
 
-    public IImageGenerator GetNextGenerator(int i) {
+    public Rectangles GetNextGenerator(int i) {
         Rectangles copy = (Rectangles)MemberwiseClone();
         copy.Seed = i;
         return copy;
     }
+    
+    IImageGenerator IBatchableGenerator.GetNextGenerator(int i) => GetNextGenerator(i);
 }
