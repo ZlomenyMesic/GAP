@@ -17,6 +17,7 @@ public class Spectrogram : IBatchableGenerator<Spectrogram> {
     
     public int LineLifetime { get; private set; }
     public int Step { get; private set; }
+    public Color? Color { get; }
     
 
     /// <summary>
@@ -27,12 +28,13 @@ public class Spectrogram : IBatchableGenerator<Spectrogram> {
     /// <param name="seed">seed</param>
     /// <param name="lineLifetime">how long will the line be</param>
     /// <param name="step">idk what that is</param>
-    public Spectrogram(int width, int height, int seed, int lineLifetime = 15000, int step = 200) {
+    public Spectrogram(int width, int height, int seed, int lineLifetime = 15000, int step = 200, Color? color = null) {
         Width = width;
         Height = height;
         Seed = seed;
         LineLifetime = lineLifetime;
         Step = step;
+        Color = color;
     }
     
     public Spectrogram() {}
@@ -55,13 +57,13 @@ public class Spectrogram : IBatchableGenerator<Spectrogram> {
         var c = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
         var d = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
         
-        Color background = Color.FromArgb(255, 16, 16 ,16);
+        Color background = System.Drawing.Color.FromArgb(255, 16, 16 ,16);
         Graphics g = Graphics.FromImage(bmp);
         g.Clear(background);
         
         for (float j = startOffset; j < LineLifetime / (float)Step + startOffset; j += 1 / (float)Step) {
             bmp.SetPixel((int)(xOffset + xFunc(xFrequency * j) * factor), 
-                (int)(yOffset + yFunc(yFrequency * j) * factor), ColorPalette.GenerateColorAtX(a, b, c, d, j));
+                (int)(yOffset + yFunc(yFrequency * j) * factor), Color ?? ColorPalette.GenerateColorAtX(a, b, c, d, j));
         }
         
         return bmp;
