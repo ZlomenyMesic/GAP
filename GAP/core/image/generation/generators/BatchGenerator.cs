@@ -8,24 +8,30 @@ namespace GAP.core.image.generation.generators;
 public class BatchGenerator : IImageGenerator<BatchGenerator> {
     
     // TODO finish batch generator
-    
-    public IBatchableGenerator Generator { get; private set; }
+
+    public IBatchableGenerator? Generator { get; private set; } = null;
     public int Iterations { get; private set; }
     public int StartSeed { get; private set; }
     public NameType NameType { get; private set; }
     
 
-    public BatchGenerator(IBatchableGenerator generator, int iterations, int startSeed, NameType nameType) {
+    public BatchGenerator(IBatchableGenerator? generator, int iterations, int startSeed, NameType nameType) {
         Generator = generator;
         Iterations = iterations;
         StartSeed = startSeed;
         NameType = nameType;
     }
     
+    public BatchGenerator() { }
+    
     /// <summary>
     /// returns the first generated image and creates a batch of images outputted from a generator
     /// </summary>
     public Bitmap GenerateImage() {
+        
+        if (Generator == null) {
+            throw new NullReferenceException("Generator is null.");
+        }
         
         for (int i = StartSeed; i < Iterations + StartSeed; i++) {
             Bitmap bmp = Generator.GenerateImage();

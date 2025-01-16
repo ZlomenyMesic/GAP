@@ -4,6 +4,9 @@
 //
 
 using System.Reflection;
+using GAP.core.image.generation;
+using GAP.core.image.transformation;
+using GAP.util;
 using NeoKolors.Console;
 
 namespace GAP.core.modLoader;
@@ -52,21 +55,21 @@ internal static class ModLoader {
             }
         }
 
-        bool baseLoaded = false;
-        foreach (var i in MOD_IDS) {
-            if (i == "gap") {
-                baseLoaded = true;
-                break;
-            }
-        }
-
-        if (!baseLoaded) {
-            GAP g = new GAP();
-            
-            MOD_IDS.Add(g.Register());
-            MOD_DESCRIPTIONS.Add(g.GetInfo());
-            g.Initialize();
-        }
+        // bool baseLoaded = false;
+        // foreach (var i in MOD_IDS) {
+        //     if (i == "gap") {
+        //         baseLoaded = true;
+        //         break;
+        //     }
+        // }
+        //
+        // if (!baseLoaded) {
+        //     GAP g = new GAP();
+        //     
+        //     MOD_IDS.Add(g.Register());
+        //     MOD_DESCRIPTIONS.Add(g.GetInfo());
+        //     g.Initialize();
+        // }
         
         Console.WriteLine();
         return modCount;
@@ -80,31 +83,84 @@ internal static class ModLoader {
     private static bool RegisterMod(Assembly modAssembly) {
         foreach (var type in modAssembly.GetTypes()) {
             if (typeof(IMod).IsAssignableFrom(type) && !type.IsInterface) {
-                
                 var mod = (IMod?)Activator.CreateInstance(type);
                 
-                if (mod == null) {
-                    Debug.Warn($"Mod loader failed to load type {type.FullName} from assembly {modAssembly.FullName}");
+                if (InitializeMod(mod, type, modAssembly) == 1) {
                     continue;
                 }
                 
-                string modId = mod.Register();
-
-                if (MOD_IDS.Contains(modId)) {
-                    Debug.Warn($"A mod with the same id ('{modId}') has already been registered!");
-                    continue;
-                }
-                
-                // main mod initialization
-                mod.Initialize();
-                
-                MOD_IDS.Add(modId);
-                MOD_DESCRIPTIONS.Add(mod.GetInfo());
                 return true;
             }
         }
         
         return false;
+    }
+    
+    private static int InitializeMod(IMod? mod, Type type, Assembly modAssembly) {
+        if (mod == null) { 
+            Debug.Warn($"Mod loader failed to load type {type.FullName} from assembly {modAssembly.FullName}");
+            return 1;
+        }
+                
+        string modId = mod.Register();
+
+        if (MOD_IDS.Contains(modId)) {
+            Debug.Warn($"A mod with the same id ('{modId}') has already been registered!");
+            return 1;
+        }
+                
+        var modAttributes = mod.GetType().GetCustomAttributes();
+        bool autoLoad = false;
+
+        foreach (var a in modAttributes) {
+            if (a.GetType() == typeof(AutomaticallyLoadedAttribute)) {
+                autoLoad = ((AutomaticallyLoadedAttribute)a).LoadAutomatically;
+                break;
+            }
+        }
+                
+        // main mod initialization
+        if (!autoLoad) {
+            mod.Initialize();
+        }
+        else {
+            foreach (var t in modAssembly.GetTypes()) {
+                
+                // if t is one of the base interfaces, skip it
+                if ((!t.IsAssignableTo(typeof(IImageGenerator)) || t == typeof(IImageGenerator) || t == typeof(IImageGenerator<>)) &&
+                    (!t.IsAssignableTo(typeof(IImageTransformer)) || t == typeof(IImageTransformer) || t == typeof(IImageTransformer<>)) ||
+                    t == typeof(IBatchableGenerator) ||
+                    t == typeof(IBatchableGenerator<>)) 
+                {
+                    continue;
+                }
+
+                // check if the class is excluded from mod loading
+                var typeAttributes = t.GetCustomAttributes();
+                bool exclude = false;
+                    
+                foreach (var a in typeAttributes) {
+                    if (a.GetType() == typeof(ExcludeFromModLoadingAttribute) && ((ExcludeFromModLoadingAttribute)a).Exclude) {
+                        exclude = true;
+                        break;
+                    }
+                }
+
+                if (exclude) continue;
+                    
+                if (t.IsAssignableTo(typeof(IImageGenerator))) {
+                    ImageGeneratorRegistry.Register($"{mod.Register()}:{NameConverter.CodeNameToId(t.Name)}", t);
+                }
+                        
+                else if (t.IsAssignableTo(typeof(IImageTransformer))) {
+                    ImageTransformerRegistry.Register($"{mod.Register()}:{NameConverter.CodeNameToId(t.Name)}", t);
+                }
+            }
+        }
+                
+        MOD_IDS.Add(modId);
+        MOD_DESCRIPTIONS.Add(mod.GetInfo());
+        return 0;
     }
 
     /// <summary>

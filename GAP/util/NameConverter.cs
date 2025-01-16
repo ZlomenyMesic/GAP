@@ -5,7 +5,7 @@
 
 namespace GAP.util;
 
-public class NameIdConverter {
+public static class NameConverter {
     
     public static string NameToId(string name) {
         string id = "";
@@ -20,6 +20,31 @@ public class NameIdConverter {
             else {
                 id += c;
             }
+        }
+        
+        return id;
+    }
+    
+    public static string CodeNameToId(string name) {
+        string id = "";
+        bool isFirst = true;
+        
+        foreach (var c in name) {
+            if (char.IsUpper(c)) {
+                id += isFirst ? "" : "_";
+                id += char.ToLower(c);
+            }
+            else if (char.IsWhiteSpace(c)) {
+                id += '_';
+            }
+            else if (char.IsDigit(c)) {
+                id += c;
+            }
+            else {
+                id += c;
+            }
+            
+            isFirst = false;
         }
         
         return id;

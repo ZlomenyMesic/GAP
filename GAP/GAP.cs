@@ -5,21 +5,17 @@
 //      founded 11.9.2024
 //
 
-using System.Drawing.Imaging;
 using GAP.core.image.generation;
-using GAP.core.image.generation.generators;
 using GAP.core.image.transformation;
 using GAP.core.modLoader;
-using GAP.machineLearning.deepdream;
 using GAP.machineLearning.ladybug;
-using GAP.machineLearning.ladybug.scripts;
-using GAP.util;
 using NeoKolors.Console;
 using NAudio.Midi;
 
 namespace GAP;
 
 // ReSharper disable once InconsistentNaming
+[AutomaticallyLoaded]
 internal class GAP : IMod {
 
     // constants
@@ -116,29 +112,23 @@ internal class GAP : IMod {
         // --- END OF MAIN FUNCTIONALITY ---
         // you can put your code here:
 
-        var s = ImageGeneratorRegistry.GetSettings("gap:white_noise");
+        foreach (var g in ImageGeneratorRegistry.GetAll()) {
+            Console.WriteLine($"{g.Value.id}: {g.Value.type}");
+        }
+        
+        foreach (var g in ImageTransformerRegistry.GetAll()) {
+            Console.WriteLine($"{g.Value.id}: {g.Value.type}");
+        }
         
         MidiEventCollection mec = new MidiEventCollection(1, 960);
         mec.AddTrack([new TempoEvent(600000, 0), new MetaEvent(MetaEventType.EndTrack, 0, 0)]);
         mec.AddTrack([new PatchChangeEvent(0, 2, 1), new NoteOnEvent(0, 2, 48, 32, 980), new NoteEvent(980, 2, MidiCommandCode.NoteOff, 48, 0), new MetaEvent(MetaEventType.EndTrack, 0, 1000)]);
         
         MidiFile.Export("./idk.midi", mec);
-        /*
-        ConsoleProgressBar bar = new ConsoleProgressBar(1000, 4000, 40, ConsoleProgressBar.BarStyle.MODERN);
-        
-        Event += bar.OnProgressUpdate;
-        
-        for (int i = 0; i < 4000; i++) {
-            Spectrogram s = new Spectrogram(400, 400, i);
-            var bmp = s.GenerateImage();
-            bmp.Save($@".\gallery\spectrogram-400x400\{SeedFormat.WordFromSeed(i)}.png", ImageFormat.Png);
-            Event.Invoke(null, EventArgs.Empty);
-        }
-        */
 
         //DeepDream.RunGenerator();
         //Ladybug.TrainModel();
-        Ladybug.RunGenerator();
+        // Ladybug.RunGenerator();
         Console.WriteLine("Hello, World!");
 
         return 0;
