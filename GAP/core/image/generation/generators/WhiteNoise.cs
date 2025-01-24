@@ -160,7 +160,7 @@ public sealed class WhiteNoise : ICloneable, IBatchableGenerator<WhiteNoise> {
                     ("value_factor", Arguments.Double(0, 1))))
                 .Option(SettingsGroupOption
                     .New("presets")
-                    .Argument("presets", Arguments.SingleSelect(WhiteNoisePresets.RANDOM_HUE_AND_DARKNESS))
+                    .Argument("presets", Arguments.SingleSelectEnum(WhiteNoisePresets.RANDOM_HUE_AND_DARKNESS))
                     .Merges((cin, cout) => {
                         (double hf, bool hr, double sf, bool sr, double vf, bool vr) s =
                             FromPreset((WhiteNoisePresets)cin["presets"].Get());

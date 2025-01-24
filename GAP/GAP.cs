@@ -5,10 +5,14 @@
 //      founded 11.9.2024
 //
 
+using System.Drawing;
 using GAP.core.image.generation;
+using GAP.core.image.generation.generators;
 using GAP.core.image.transformation;
 using GAP.core.modLoader;
+using GAP.machineLearning.deepdream;
 using GAP.machineLearning.ladybug;
+using GAP.util;
 using NeoKolors.Console;
 using NAudio.Midi;
 
@@ -108,26 +112,27 @@ internal class GAP : IMod {
         Debug.Info($"Starting mod loading from directory '{Path.GetFullPath(MOD_DIRECTORY)}'\n");
         ModLoader.LoadMods(MOD_DIRECTORY, EXCLUDED_BINARIES);
         ModLoader.WriteRegisteredMods();
-
+        
         // --- END OF MAIN FUNCTIONALITY ---
         // you can put your code here:
 
-        foreach (var g in ImageGeneratorRegistry.GetAll()) {
-            Console.WriteLine($"{g.Value.id}: {g.Value.type}");
+        foreach (var x in ImageGeneratorRegistry.GetAll()) {
+            Console.WriteLine(x.ToString());
         }
         
-        foreach (var g in ImageTransformerRegistry.GetAll()) {
-            Console.WriteLine($"{g.Value.id}: {g.Value.type}");
-        }
+        // for (int i = 0; i < 100; i++) {
+        //     var s = new CurlyLines(1920, 1080, i, 7);
+        //     s.GenerateImage().Save($@".\gallery\curly_lines-1920x1080\{SeedFormat.WordFromSeed(i)}.png");
+        // }
         
-        MidiEventCollection mec = new MidiEventCollection(1, 960);
-        mec.AddTrack([new TempoEvent(600000, 0), new MetaEvent(MetaEventType.EndTrack, 0, 0)]);
-        mec.AddTrack([new PatchChangeEvent(0, 2, 1), new NoteOnEvent(0, 2, 48, 32, 980), new NoteEvent(980, 2, MidiCommandCode.NoteOff, 48, 0), new MetaEvent(MetaEventType.EndTrack, 0, 1000)]);
-        
-        MidiFile.Export("./idk.midi", mec);
+        // MidiEventCollection mec = new MidiEventCollection(1, 960);
+        // mec.AddTrack([new TempoEvent(600000, 0), new MetaEvent(MetaEventType.EndTrack, 0, 0)]);
+        // mec.AddTrack([new PatchChangeEvent(0, 2, 1), new NoteOnEvent(0, 2, 48, 32, 980), new NoteEvent(980, 2, MidiCommandCode.NoteOff, 48, 0), new MetaEvent(MetaEventType.EndTrack, 0, 1000)]);
+        //
+        // MidiFile.Export("./idk.midi", mec);
 
-        //DeepDream.RunGenerator();
-        //Ladybug.TrainModel();
+        // DeepDream.RunGenerator();
+        // Ladybug.TrainModel();
         // Ladybug.RunGenerator();
         Console.WriteLine("Hello, World!");
 

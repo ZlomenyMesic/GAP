@@ -117,7 +117,7 @@ public class Pixelize : IImageTransformer<Pixelize>, ICloneable {
     
     private static readonly ISettingsBuilder<Pixelize> SETTINGS = SettingsBuilder<Pixelize>.Build("pixelize", 
         SettingsNode<Pixelize>.New("default")
-            .Argument("pixel_type", Arguments.SingleSelect(PixelType.SQUARES))
+            .Argument("pixel_type", Arguments.SingleSelectEnum(PixelType.SQUARES))
             .Constructs(context => new Pixelize((PixelType)context["pixel_type"].Get()))
     );
 
