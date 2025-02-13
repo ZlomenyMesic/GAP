@@ -6,3 +6,4 @@
 3. create new generator, that implements `IImageGenerator` or `IImageTransformer`
 4. compile to .dll
 5. put the library to the mod directory
+6. enjoy 👍👍👍
