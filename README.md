@@ -1,6 +1,6 @@
 # Generative Art Program
 
-1## Moddability
+## Moddability
 1. create new project
 2. implement `IMod`
 3. create new generator, that implements `IImageGenerator` or `IImageTransformer`
