@@ -1,7 +1,8 @@
 //
-// GAP - Generative Art Producer
-//   by ZlomenyMesic & KryKom
-//
+// Generative Art Program
+// Copyright (c) 2025 KryKom & ZlomenyMesic
+// Licensed under the MIT License
+// 
 
 using System.Drawing;
 using NeoKolors.Settings;

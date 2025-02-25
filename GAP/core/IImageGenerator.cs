@@ -1,16 +1,18 @@
 //
-// GAP - Generative Art Producer
-//   by ZlomenyMesic & KryKom
-//
+// Generative Art Program
+// Copyright (c) 2025 KryKom & ZlomenyMesic
+// Licensed under the MIT License
+// 
 
 using System.Drawing;
 using GAP.util;
-using GAP.util.math;
+using GapCore.util;
+using GapCore.util.math;
 using NeoKolors.Common;
 using NeoKolors.Settings;
 using Color = System.Drawing.Color;
 
-namespace GAP.core.image.generation;
+namespace GapCore;
 
 /// <summary>
 /// Image Generator Interface <br/>

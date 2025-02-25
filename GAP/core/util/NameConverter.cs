@@ -1,9 +1,6 @@
 //
-// GAP - Generative Art Producer
-//   by ZlomenyMesic & KryKom
-//
 
-namespace GAP.util;
+namespace GapCore.util;
 
 public static class NameConverter {
     

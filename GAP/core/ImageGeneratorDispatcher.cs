@@ -1,12 +1,13 @@
 //
-// GAP - Generative Art Producer
-//   by ZlomenyMesic & KryKom
-//
+// Generative Art Program
+// Copyright (c) 2025 KryKom & ZlomenyMesic
+// Licensed under the MIT License
+// 
 
-using GAP.util.exceptions;
 using GAP.util.registries;
+using GapCore.util.exceptions;
 
-namespace GAP.core.image.generation;
+namespace GapCore;
 
 /// <summary>
 /// Image Generator Dispatcher <br/>

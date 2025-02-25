@@ -1,3 +1,9 @@
+//
+// GAP
+// Copyright (c) 2025 KryKom & ZlomenyMesic
+// Licensed under the MIT License
+// 
+
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using NeoKolors.Common;

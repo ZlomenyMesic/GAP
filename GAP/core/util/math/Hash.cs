@@ -6,7 +6,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace GAP.util.math;
+namespace GapCore.util.math;
 
 public static class Hash {
     

@@ -1,9 +1,10 @@
 //
-// GAP - Generative Art Producer
-//   by ZlomenyMesic & KryKom
-//
+// Generative Art Program
+// Copyright (c) 2025 KryKom & ZlomenyMesic
+// Licensed under the MIT License
+// 
 
-namespace GAP.util.registries.exceptions;
+namespace GapCore.util.registries.exceptions;
 
 public class RegistryInvalidTypeException : Exception {
     public RegistryInvalidTypeException(Type type, Type baseType) : 

@@ -1,4 +1,4 @@
-﻿namespace GAP.util.exceptions;
+﻿namespace GapCore.util.exceptions;
 
 internal class InvalidLayerException : Exception {
     internal InvalidLayerException(int errorID, string detail = "") : base(

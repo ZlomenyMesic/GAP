@@ -1,4 +1,10 @@
-namespace GAP.core.modLoader;
+//
+// Generative Art Program
+// Copyright (c) 2025 KryKom & ZlomenyMesic
+// Licensed under the MIT License
+// 
+
+namespace GapCore.modLoader;
 
 /// <summary>
 /// Automatically Loaded Attribute <br/>

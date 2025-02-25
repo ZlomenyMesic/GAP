@@ -1,8 +1,9 @@
 ﻿//
-// GAP - Generative Art Producer
-//   by ZlomenyMesic & KryKom
-//
-//      founded 11.9.2024
+// GAP
+// Copyright (c) 2025 KryKom & ZlomenyMesic
+// Licensed under the MIT License
+// 
+// founded 11.9.2024
 //
 
 using System.Drawing;

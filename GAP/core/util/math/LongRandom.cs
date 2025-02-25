@@ -1,11 +1,12 @@
 //
-// GAP - Generative Art Producer
-//   by ZlomenyMesic & KryKom
-//
+// Generative Art Program
+// Copyright (c) 2025 KryKom & ZlomenyMesic
+// Licensed under the MIT License
+// 
 
-namespace GAP.util.math;
+namespace GapCore.util.math;
 
-public class LongRandom {
+internal class LongRandom {
     public readonly long seed;
     private readonly Random rand1;
     private readonly Random rand2;
