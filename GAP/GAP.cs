@@ -6,9 +6,11 @@
 //
 
 using System.Drawing;
+using System.Drawing.Imaging;
 using GAP.core.image.generation;
 using GAP.core.image.generation.generators;
 using GAP.core.image.transformation;
+using GAP.core.image.transformation.transformers;
 using GAP.core.modLoader;
 using GAP.machineLearning.deepdream;
 using GAP.machineLearning.ladybug;
@@ -78,8 +80,9 @@ internal class GAP : IMod {
 
     public static event EventHandler Event;
     
-    static int Main() {
-        
+    static int Main(string[] args) {
+
+        MOD_DIRECTORY = args.Length > 0 ? args[0] : ".";
         
         // --- MAIN FUNCTIONALITY ---
         // DO NOT REMOVE !!!
@@ -121,16 +124,19 @@ internal class GAP : IMod {
         }
         
         // for (int i = 0; i < 100; i++) {
-        //     var s = new CurlyLines(1920, 1080, i, 7);
+        //     var s = new Stripes(30, 30, 10, 5, i);
         //     s.GenerateImage().Save($@".\gallery\curly_lines-1920x1080\{SeedFormat.WordFromSeed(i)}.png");
         // }
-        
-        // MidiEventCollection mec = new MidiEventCollection(1, 960);
-        // mec.AddTrack([new TempoEvent(600000, 0), new MetaEvent(MetaEventType.EndTrack, 0, 0)]);
-        // mec.AddTrack([new PatchChangeEvent(0, 2, 1), new NoteOnEvent(0, 2, 48, 32, 980), new NoteEvent(980, 2, MidiCommandCode.NoteOff, 48, 0), new MetaEvent(MetaEventType.EndTrack, 0, 1000)]);
-        //
-        // MidiFile.Export("./idk.midi", mec);
 
+        var v = Image.FromFile(@"C:\Users\krystof\Desktop\peng.png");
+        var c = new Bitmap(v);
+
+        // Grid g = new Grid(2);
+        // g.TransformImage(c).Save("./gridizes.png", ImageFormat.Png);
+
+        var p = new Pixelize(PixelType.SQUARES);
+        p.TransformImage(c).Save("./pixels.png", ImageFormat.Png);
+        
         // DeepDream.RunGenerator();
         // Ladybug.TrainModel();
         // Ladybug.RunGenerator();

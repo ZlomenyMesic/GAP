@@ -1,26 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Version>0.25.9.0</Version>
+    <Authors>KryKom;ZlomenyMesic</Authors>
+    <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ZlomenyMesic/GAP</RepositoryUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="NeoKolors.Common" Version="0.25.5" />
     <PackageReference Include="NeoKolors.Console" Version="0.25.4" />
     <PackageReference Include="NeoKolors.Settings" Version="0.25.4.3" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.1" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="machineLearning\deepdream\output\layers\" />
-    <Folder Include="machineLearning\ladybug\output\" />
-    <Folder Include="machineLearning\utils\" />
-  </ItemGroup>
-
+    
   <PropertyGroup>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <SuppressImplicitPlatformCompatibilityWarnings>true</SuppressImplicitPlatformCompatibilityWarnings>

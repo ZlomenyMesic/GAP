@@ -5,6 +5,8 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GAP", "GAP\GAP.csproj", "{79961535-D414-44BF-9AEF-0BEF56068646}"
 EndProject
+Project("{0A6D22A0-B161-4F45-AAA4-85AF4BF4B5C9}") = "GapCore", "GAP\core\GapCore.csproj", "{0A6D22A0-B161-4F45-AAA4-85AF4BF4B5C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
