@@ -9,10 +9,9 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Text;
-using GAP.core.image.generation;
-using GAP.core.modLoader;
-using GAP.util.exceptions;
-using NeoKolors.Console;
+using GapCore;
+using GapCore.modLoader;
+using GapCore.util.exceptions;
 using NeoKolors.Settings;
 using Debug = NeoKolors.Console.Debug;
 
@@ -153,7 +152,7 @@ public class DeepDream : IImageGenerator<DeepDream> {
     /// <summary>
     /// the current sequence of layers used in the generator
     /// </summary>
-    public string[] LayerSequence { get; set; } = ["mixed0"];
+    public object[] LayerSequence { get; set; } = ["mixed0"];
 
 
     public string FinishCheckPath { get; set; } = @"..\..\..\machineLearning\deepdream\output\DONE";
@@ -167,34 +166,34 @@ public class DeepDream : IImageGenerator<DeepDream> {
         /// <summary>
         /// all steps are equal to 10
         /// </summary>
-        public static readonly Func<int, int, int> Constant = (iteration, count) => 10;
+        public static readonly Func<int, int, int> CONSTANT = (_, _) => 10;
         /// <summary>
         /// all steps except the last one are equal to 5, last one is equal to 15
         /// </summary>
-        public static readonly Func<int, int, int> LastPriority = (iteration, count) => iteration == count - 1 ? 15 : 5;
+        public static readonly Func<int, int, int> LAST_PRIORITY = (iteration, count) => iteration == count - 1 ? 15 : 5;
         /// <summary>
         /// linear function starting at 5 and increasing by one each step
         /// </summary>
-        public static readonly Func<int, int, int> LinearIncreasing = (iteration, count) => 4 + iteration;
+        public static readonly Func<int, int, int> LINEAR_INCREASING = (iteration, _) => 4 + iteration;
         /// <summary>
         /// linear function decreasing by one each step and ending at 5
         /// </summary>
-        public static readonly Func<int, int, int> LinearDecreasing = (iteration, count) => 5 + count - iteration;
+        public static readonly Func<int, int, int> LINEAR_DECREASING = (iteration, count) => 5 + count - iteration;
         /// <summary>
         /// 2 raised to the power of the current step
         /// !!! TERRIBLE OPTION FOR MORE LAYERS !!!
         /// </summary>
-        public static readonly Func<int, int, int> Quadratic = (iteration, count) => (int)Math.Pow(2, iteration);
+        public static readonly Func<int, int, int> QUADRATIC = (iteration, _) => (int)Math.Pow(2, iteration);
     }
     
     /// <summary>
     /// currently used layer activation function
     /// </summary>
-    public Func<int, int, int> LayerActivationFunction { get; set; } = LayerActivationFunctions.LastPriority;
+    public Func<int, int, int> LayerActivationFunction { get; set; } = LayerActivationFunctions.LAST_PRIORITY;
 
 
-    private static readonly string ParamsPath = @"..\..\..\machineLearning\deepdream\params.txt";
-    private static readonly string DDPythonScriptPath = @"deepdream\DeepDream.py";
+    private const string PARAMS_PATH = @"..\..\..\machineLearning\deepdream\params.txt";
+    private const string DD_PYTHON_SCRIPT_PATH = @"deepdream\DeepDream.py";
 
 
     /// <summary>
@@ -207,7 +206,7 @@ public class DeepDream : IImageGenerator<DeepDream> {
         string activations = ArrayToString([..CreateLayerActivationsArray(LayerSequence.Length)]);
 
         // save the parameters to the file
-        using StreamWriter sw = new(ParamsPath);
+        using StreamWriter sw = new(PARAMS_PATH);
         sw.Write($"{Verbose}\n{ImageName}\n{ImageOrigin}\n{ImageOriginFormat}\n{OutputPath}\n{FinishCheckPath}\n{DistortionRate}\n{Octaves}\n{OctaveScale}\n{Iterations}\n{MaxLoss}\n{layers}\n{activations}");
     }
 
@@ -276,7 +275,7 @@ public class DeepDream : IImageGenerator<DeepDream> {
 
         SaveParameters();
 
-        PythonWrapper.RunPythonScript(DDPythonScriptPath);
+        PythonWrapper.RunPythonScript(DD_PYTHON_SCRIPT_PATH);
         WaitForOutput();
 
         // print the time spent
@@ -398,7 +397,7 @@ public class DeepDream : IImageGenerator<DeepDream> {
                     Iterations = (int)c["iterations"].Get(),
                     DistortionRate = (float)c["distortion_rate"].Get(),
                     MaxLoss = (int)c["max_loss"].Get(),
-                    LayerSequence = ((string[])c["layer_sequence"].Get()).ToArray(),
+                    LayerSequence = ((object[])c["layer_sequence"].Get()).ToArray(),
                     FinishCheckPath = (string)c["finish_check_path"].Get()
                 };
 

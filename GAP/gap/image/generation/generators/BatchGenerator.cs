@@ -6,16 +6,17 @@
 
 using System.Drawing;
 using System.Drawing.Imaging;
-using GAP.util;
+using GapCore;
+using GapCore.util;
 using NeoKolors.Settings;
 
-namespace GAP.core.image.generation.generators;
+namespace GAP.gap.image.generation.generators;
 
 public class BatchGenerator : IImageGenerator<BatchGenerator> {
     
     // TODO finish batch generator
 
-    public IBatchableGenerator? Generator { get; private set; } = null;
+    public IBatchableGenerator? Generator { get; private set; }
     public int Iterations { get; private set; }
     public int StartSeed { get; private set; }
     public NameType NameType { get; private set; }

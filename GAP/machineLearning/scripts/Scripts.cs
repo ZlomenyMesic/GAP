@@ -6,28 +6,28 @@
 //      founded 11.9.2024
 //
 
-namespace GAP.machineLearning.ladybug.scripts;
+namespace GAP.machineLearning.scripts;
 
 // while the scripts are accessible through C#, it is better to use them directly
 internal static class Scripts {
-    private static readonly string RenameDataPath = @"scripts\RenameData.py";
-    private static readonly string CreateSubsetsPath = @"scripts\CreateSubsets.py";
-    private static readonly string ResizeImagesPath = @"scripts\ResizeImages.py";
-    private static readonly string PrintModelSummaryPath = @"scripts\PrintModelSummary.py";
+    private const string RENAME_DATA_PATH = @"scripts\RenameData.py";
+    private const string CREATE_SUBSETS_PATH = @"scripts\CreateSubsets.py";
+    private const string RESIZE_IMAGES_PATH = @"scripts\ResizeImages.py";
+    private const string PRINT_MODEL_SUMMARY_PATH = @"scripts\PrintModelSummary.py";
 
     internal static void RenameData() {
-        PythonWrapper.RunPythonScript(RenameDataPath);
+        PythonWrapper.RunPythonScript(RENAME_DATA_PATH);
     }
 
     internal static void CreateDataSubsets() {
-        PythonWrapper.RunPythonScript(CreateSubsetsPath);
+        PythonWrapper.RunPythonScript(CREATE_SUBSETS_PATH);
     }
 
     internal static void ResizeImages() {
-        PythonWrapper.RunPythonScript(ResizeImagesPath);
+        PythonWrapper.RunPythonScript(RESIZE_IMAGES_PATH);
     }
 
     internal static void PrintModelSummary() {
-        PythonWrapper.RunPythonScript(PrintModelSummaryPath);
+        PythonWrapper.RunPythonScript(PRINT_MODEL_SUMMARY_PATH);
     }
 }

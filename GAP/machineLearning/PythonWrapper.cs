@@ -35,6 +35,7 @@ internal static class PythonWrapper {
     /// executes a command using cmd.exe.
     /// </summary>
     /// <param name="cmd">command to be executed</param>
+    // ReSharper disable once InconsistentNaming
     private static void ExecuteCMD(string cmd) {
         Process.Start(new ProcessStartInfo() {
             FileName = "cmd.exe",

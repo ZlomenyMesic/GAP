@@ -4,11 +4,6 @@
 // Licensed under the MIT License
 // 
 
-using GAP.core.image.generation;
-using GAP.core.image.generation.generators;
-using GAP.core.image.transformation;
-using GAP.core.image.transformation.transformers;
-
 namespace GAP;
 
 /// <summary>

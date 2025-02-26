@@ -8,16 +8,10 @@
 
 using System.Drawing;
 using System.Drawing.Imaging;
-using GAP.core.image.generation;
-using GAP.core.image.generation.generators;
-using GAP.core.image.transformation;
-using GAP.core.image.transformation.transformers;
-using GAP.core.modLoader;
-using GAP.machineLearning.deepdream;
-using GAP.machineLearning.ladybug;
-using GAP.util;
+using GAP.gap.image.transformation.transformers;
+using GapCore;
+using GapCore.modLoader;
 using NeoKolors.Console;
-using NAudio.Midi;
 
 namespace GAP;
 
@@ -79,7 +73,7 @@ internal class GAP : IMod {
     //
     //
 
-    public static event EventHandler Event;
+    // public static event EventHandler Event;
     
     static int Main(string[] args) {
 

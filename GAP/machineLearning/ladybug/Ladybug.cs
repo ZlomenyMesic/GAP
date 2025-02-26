@@ -7,8 +7,8 @@
 //
 
 using System.Drawing;
-using GAP.core.image.generation;
-using GAP.core.modLoader;
+using GapCore;
+using GapCore.modLoader;
 using NeoKolors.Console;
 using NeoKolors.Settings;
 

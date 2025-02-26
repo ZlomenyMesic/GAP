@@ -5,9 +5,10 @@
 // 
 
 using System.Drawing;
+using GapCore;
 using NeoKolors.Settings;
 
-namespace GAP.core.image.transformation.transformers;
+namespace GAP.gap.image.transformation.transformers;
 
 public class ColorReduce : IImageTransformer<ColorReduce> {
     

@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>0.25.9.0</Version>
+    <Version>0.25.9.2</Version>
     <Authors>KryKom;ZlomenyMesic</Authors>
     <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ZlomenyMesic/GAP</RepositoryUrl>

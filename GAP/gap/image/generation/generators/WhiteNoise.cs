@@ -6,11 +6,11 @@
 
 using System.Drawing;
 using System.Text.Json;
-using NeoKolors;
+using GapCore;
 using NeoKolors.Common;
 using NeoKolors.Settings;
 
-namespace GAP.core.image.generation.generators;
+namespace GAP.gap.image.generation.generators;
 
 /// <summary>
 /// White Noise Image Generation <br/>

@@ -5,7 +5,6 @@
 // 
 
 using System.Drawing;
-using GAP.util;
 using GapCore.util;
 using GapCore.util.math;
 using NeoKolors.Common;

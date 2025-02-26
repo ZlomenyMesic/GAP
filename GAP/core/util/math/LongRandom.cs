@@ -7,7 +7,7 @@
 namespace GapCore.util.math;
 
 internal class LongRandom {
-    public readonly long seed;
+    public readonly long Seed;
     private readonly Random rand1;
     private readonly Random rand2;
 
@@ -18,7 +18,7 @@ internal class LongRandom {
 
     public LongRandom(long seed) {
         
-        this.seed = seed;
+        this.Seed = seed;
         
         int seed1 = 0;
         int seed2 = 0;

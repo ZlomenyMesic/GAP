@@ -5,11 +5,12 @@
 // 
 
 using System.Drawing;
+using GapCore;
 using NeoKolors.Common;
 using NeoKolors.Settings;
 using Color = System.Drawing.Color;
 
-namespace GAP.core.image.generation.generators;
+namespace GAP.gap.image.generation.generators;
 
 public class Spectrogram : IBatchableGenerator<Spectrogram> {
     public int Width { get; private set; }
@@ -19,7 +20,7 @@ public class Spectrogram : IBatchableGenerator<Spectrogram> {
     public int LineLifetime { get; private set; }
     public int Step { get; private set; }
     public Color? Color { get; }
-    
+
 
     /// <summary>
     /// 2d spectrogram line image generator
@@ -29,6 +30,7 @@ public class Spectrogram : IBatchableGenerator<Spectrogram> {
     /// <param name="seed">seed</param>
     /// <param name="lineLifetime">how long will the line be</param>
     /// <param name="step">idk what that is</param>
+    /// <param name="color">color of the lines idk</param>
     public Spectrogram(int width, int height, int seed, int lineLifetime = 15000, int step = 200, Color? color = null) {
         Width = width;
         Height = height;

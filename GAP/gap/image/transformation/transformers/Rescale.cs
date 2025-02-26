@@ -6,9 +6,10 @@
 
 using System.Drawing;
 using System.Text.Json;
+using GapCore;
 using NeoKolors.Settings;
 
-namespace GAP.core.image.transformation.transformers;
+namespace GAP.gap.image.transformation.transformers;
 
 public class Rescale : IImageTransformer<Rescale>, ICloneable {
 

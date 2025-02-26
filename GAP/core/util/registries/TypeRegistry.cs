@@ -58,7 +58,7 @@ public abstract class TypeRegistry<T> {
         List<(string id, Type type)?> all = new();
         
         foreach (var r in REGISTRY) {
-            all.Add((r.Key, r.Value)!);
+            all.Add((r.Key, r.Value));
         }
         
         return all.ToArray();

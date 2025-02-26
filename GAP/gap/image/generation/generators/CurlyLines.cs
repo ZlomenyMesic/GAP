@@ -5,11 +5,12 @@
 // 
 
 using System.Drawing;
+using GapCore;
 using NeoKolors.Common;
 using NeoKolors.Settings;
 using Color = System.Drawing.Color;
 
-namespace GAP.core.image.generation.generators;
+namespace GAP.gap.image.generation.generators;
 
 public class CurlyLines : IBatchableGenerator<CurlyLines> {
     

@@ -5,10 +5,11 @@
 // 
 
 using System.Drawing;
+using GapCore;
 using NeoKolors.Settings;
 using ColorPalette = NeoKolors.Common.ColorPalette;
 
-namespace GAP.core.image.generation.generators;
+namespace GAP.gap.image.generation.generators;
 
 public class DottedLines : IImageGenerator<DottedLines> {
     
